@@ -1,0 +1,249 @@
+\documentclass[11pt]{article}
+
+% usepackage[margin = 1in]{geometry}
+\usepackage{fullpage}              
+\usepackage{graphicx}              
+\usepackage{amsmath}               
+\usepackage{amsfonts}              
+\usepackage{amsthm}                
+\usepackage{amssymb}
+\usepackage{mathrsfs}
+\usepackage{url}
+\usepackage{color}
+\usepackage{hyperref}
+\usepackage{algpseudocode}
+\usepackage[plain]{algorithm}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{authblk}
+\usepackage{tcolorbox}
+\usepackage{mathtools}
+\usepackage{bm}
+\usepackage{dsfont}
+%\usepackage[T1]{fontenc}
+%\usepackage{libertine}
+%\usepackage[libertine]{newtxmath}
+
+
+\hypersetup{
+	unicode = true,
+	colorlinks = true,
+	citecolor = blue,
+	filecolor = blue,
+	linkcolor = blue,
+	urlcolor = blue,
+	pdfstartview = {FitH},
+}
+
+% theorem environments
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{example}[theorem]{Example}
+\newtheorem*{remark}{Remark}
+\newtheorem{note}{Note}
+\newtheorem*{problem}{Problem}
+\newtheorem*{fact}{Fact}
+
+
+
+\algrenewcommand{\Require}{\item[\textbf{Input:}]}
+\algrenewcommand{\Ensure}{\item[\textbf{Output:}]}
+
+\newcommand{\wrt}{\vdash} 
+\newcommand{\tildO}{\tilde{O}}
+
+% roman numerals
+\newcommand{\romnum}[1]{\romannumeral #1}
+\newcommand{\Romnum}[1]{\uppercase\expandafter{\romannumeral #1}}
+
+\newcommand{\todo}[1]{\textcolor{red}{TODO: #1}}
+
+\DeclareMathOperator{\fieldchar}{char} % characteristic of a field
+\DeclareMathOperator{\groupofend}{End} % endomorphism ring
+\DeclareMathOperator{\trace}{Tr} % finite field trace
+\DeclareMathOperator{\gal}{Gal} % Galois group
+\DeclareMathOperator{\order}{ord} % order of an element
+\DeclareMathOperator{\lcm}{lcm} % least common multiple
+\DeclareMathOperator{\divisor}{div} % divisor on a curve
+\DeclareMathOperator{\supp}{supp} % support of a divisor
+\DeclareMathOperator{\norm}{N} % norm
+\DeclareMathOperator{\Res}{Res}
+\DeclareMathOperator{\Aut}{Aut}
+\DeclareMathOperator{\minpoly}{minpoly}
+\DeclareMathOperator{\loglog}{loglog}
+\DeclareMathOperator{\polylog}{polylog}
+\DeclareMathOperator{\rev}{rev}
+\DeclareMathOperator{\Hom}{Hom}
+\DeclareMathOperator{\qft}{QFT}
+\DeclareMathOperator{\E}{\mathbb{E}}
+
+
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+\DeclarePairedDelimiter{\ldbrac}{\lvert}{\rangle}
+\DeclarePairedDelimiter{\rdbrac}{\langle}{\rvert}
+\DeclarePairedDelimiter{\lrang}{\langle}{\rangle}
+\DeclarePairedDelimiter{\opnorm}{\lVert}{\rVert}
+
+
+\def\Q{\ensuremath{\mathbb{Q}}}
+\def\C{\ensuremath{\mathbb{C}}}
+\def\K{\ensuremath{\mathbb{K}}}
+\def\N{\ensuremath{\mathbb{N}}}
+\def\R{\ensuremath{\mathbb{R}}}
+\def\Z{\ensuremath{\mathbb{Z}}}
+\def\F{\ensuremath{\mathbb{F}}}
+\def\P{\ensuremath{\mathbb{P}}}
+\def\MM{\ensuremath{\mathsf{M}}}
+\def\CC{\ensuremath{\mathsf{C}}}
+\def\euler{\ensuremath{\varphi}}
+
+
+
+\title{Quantum Learning With Errors}
+
+\author{
+	%% Javad Oilskin\thanks{Department of Computer Science, Ryerson University,
+	%% (\tt{javad.doliskani@ryerson.ca}).}
+}
+
+\date{}
+
+\sloppy
+\setlength{\parindent}{0pt}
+
+
+
+
+\begin{document}
+\maketitle
+
+
+
+\begin{definition}[\cite{watrous2009zero}]
+    Two $m$-qubit mixed states $\Phi_1$ and $\Phi_2$ are said to be $(s, k, \epsilon)$-distinguishable if there exists a $k$-qubit mixed state $\Psi$ and an $(m + k)$-qubit quantum measurement circuit $Q$ of size $s$ such that
+    \[ \abs{ \Pr[Q(\Phi_1 \otimes \Psi) = 1] - \Pr[Q(\Phi_2 \otimes \Psi) = 1] } \ge \epsilon. \]
+\end{definition}
+\begin{definition}
+    For each $n \in \N$, let $\Phi_n$ and $\Psi_n$ be mixed states on $r(n)$ qubits where $r: \N \rightarrow \N$ is a polynomially bounded function. Then the two ensembles $\{ \Phi_n \}_{n \in \N}$ and $\{ \Psi_n \}_{n \in \N}$ are said to be polynomially quantum indistinguishable if for all polynomially bounded functions $s, k, p: \N \rightarrow \N$, the states $\Phi_n$ and $\Psi_n$ are $(s(n), k(n), 1 / p(n))$-indistinguishable for almost all $n \in \N$.
+\end{definition}
+From now on, we assume that $q$ and $r$ are powers of $2$. Let $\bm{s} \in \Z_q^n$ be fixed and let $b \in \{ 0, 1 \}$. Suppose that a quantum system is in the state 
+\[ \ldbrac{\phi_{\bm{s}, \bm{x}, b}} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} (-1)^{bj}\ldbrac{j}\ldbrac{\bm{x} + j\bm{s}} \]
+for some uniformly random $\bm{x} \in \Z_q$. Then the  system is described by the density operator  
+\[ \Phi_{\bm{s}, b} = \frac{1}{q^n} \sum_{\bm{x} \in \Z_q^n} \ldbrac{\phi_{\bm{s}, \bm{x}, b}} \rdbrac{\phi_{\bm{s}, \bm{x}, b}}. \]
+\begin{definition}[Search]
+    Let $\bm{s} \in \Z_q^n$, and let $\ell: \N \rightarrow \N$ be polynomially bounded. Given $\ell(n)$ copies of the state $\Phi_{\bm{s}, 0}$, i.e., given $\Phi_{\bm{s}, 0}^{\otimes \ell(n)}$, find $\bm{s}$.
+\end{definition}
+\begin{definition}[Decision]
+    Let $\bm{s} \in \Z_q^n$, and let $\ell: \N \rightarrow \N$ be polynomially bounded. Distinguish with non-negligible advantage between the two ensembles $\{ \Phi_{\bm{s}, 0}^{\otimes \ell(n)} \}_{n \in \N}$ and $\{ \Phi_{\bm{s}, 1}^{\otimes \ell(n)} \}_{n \in \N}$.
+\end{definition}
+\begin{theorem}[Search to Decision]
+    If there is a polynomial time quantum algorithm for the decision problem then there is a polynomial time quantum algorithm for the search problem.
+\end{theorem}
+\begin{proof}
+    Assume there is a quantum polynomial time algorithm $Q$ for the Decision problem. Let $\tilde{\Phi}_{\bm{s}, b} = \Phi_{\bm{s}, b}^{\otimes \ell(n)}$. Fix an arbitrary $n$ for which 
+    \[ \Pr[ Q(\tilde{\Phi}_{\bm{s}, 1}) = 1 ] - \Pr[ Q(\tilde{\Phi}_{\bm{s}, 0}) = 1 ] \ge \frac{1}{p(n)} \]
+    for some polynomial $p(n)$. We will construct an algorithm $W$ that computes $\bm{s}$ with high probability. Let $\bm{s} = (s_1, \dots, s_n)$. We show how to compute $s_1$, the other values $s_i$, $2 \le i \le n$, can be computed in a similar way. The strategy is to determine $s_1$ a bit at a time.
+
+    Let $m = 2np(n)^2$ and obtain $2m$ copies of the state $\tilde{\Phi}_{\bm{s}, 0}$ stored in two registers $T = \tilde{\Phi}_{\bm{s}, 0} \otimes \cdots \otimes \tilde{\Phi}_{\bm{s}, 0}$ and $S = \tilde{\Phi}_{\bm{s}, 0} \otimes \cdots \otimes \tilde{\Phi}_{\bm{s}, 0}$. For an arbitrary $\bm{x} = (x_1, \dots, x_n)$, define the following unitary
+    \[ U_1 \ldbrac{j}\ldbrac{\bm{x} + j\bm{s}} = (-1)^{x_1 + js_1} \ldbrac{j}\ldbrac{\bm{x} + j\bm{s}}. \]
+    We have
+    \[ U_1 \ldbrac{\phi_{\bm{s}, \bm{x}, 0}} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} (-1)^{js_1}\ldbrac{j}\ldbrac{\bm{x} + j\bm{s}}, \]
+    since $(-1)^{x_1}$ is a global phase. This means that we have
+    \begin{equation}
+        \label{equ:u1}
+        U_1^{\otimes \ell(n)} \tilde{\Phi}_{\bm{s}, 0} (U_1^*)^{\otimes \ell(n)} =
+        \begin{cases}
+            \tilde{\Phi}_{\bm{s}, 0} & \text{if } s_1 \text{ is even} \\
+            \tilde{\Phi}_{\bm{s}, 1} & \text{if } s_1 \text{ is odd}
+        \end{cases}
+    \end{equation}
+    If we apply $U_1^{\otimes \ell(n)}$ to all the states $\tilde{\Phi}_{\bm{s}, 0}$ in $S$ we obtain the state $T_c = \tilde{\Phi}_{\bm{s}, c} \otimes \cdots \otimes \tilde{\Phi}_{\bm{s}, c}$ where $c = s_1 \mod 2$. Now, we run the algorithm $Q$ on all the states in the two registers $T$ and $T_c$. Let $X_i$ and $Y_i$, $1 \le i \le m$, be random variables representing the output of $Q$ on the states $\tilde{\Phi}_{\bm{s}, c}$ in $T_c$ and the states $\tilde{\Phi}_{\bm{s}, 0}$ in $T$, respectively. Let $Z = \sum_{i = 1}^m (X_i - Y_i)$. If $Z \ge np(n)$ then $W$ outputs $1$, otherwise it outputs $0$. For simplicity, we replace $Y_i$ by $-Y_i$ and assume that $Y_i \in \{ -1, 0 \}$. If $c = 1$ we have
+    \begin{align*}
+        \Pr[ Z \le np(n) ]
+        & = \Pr[ Z \le \frac{m}{p(n)} - np(n) ] \\
+        & \le \Pr[ Z - m(\Pr[ Q(\tilde{\Phi}_{\bm{s}, 1}) = 1 ] - \Pr[ Q(\tilde{\Phi}_{\bm{s}, 0}) = 1]) < -np(n) ] \\
+        & = \Pr[ Z - \E[Z] \le -np(n) ] \\
+        & \le 2^{-n / 2}
+    \end{align*}
+    If $c = 0$ then $\E[Z] = 0$ and
+    \begin{align*}
+        \Pr[ Z \ge np(n) - 1 ]
+        & = \Pr[ Z -\E[Z] \ge np(n) - 1 ] \\
+        & \le e^{-(np(n) - 1)^2 / m} \\
+        & \le 2^{-\frac{n}{2}(1 - o(1))}.
+    \end{align*}
+    Therefore, $W$ computes the least significant bit of $s_1$ with probability exponentially close to $1$. Assume that we have already computed the first $k$ bits $b_0, \dots, b_k$ of $s_1$, and let $\tilde{s}_1 = b_k2^{k - 1} + \cdots + b_12^1 + b_0$. Define the unitary
+    \[ U_{k + 1} \ldbrac{j}\ldbrac{\bm{x} + j\bm{s}} = \omega_{2^{k + 1}}^{x_1 + js_1} \omega_{2^{k + 1}}^{-j\tilde{s}_1} \ldbrac{j}\ldbrac{\bm{x} + j\bm{s}}. \]
+    Then the actions of $U_{k + 1}$ on the state $\tilde{\Phi}_{\bm{s}, 0}$ is similar to \eqref{equ:u1}. More precisely,
+    \[
+    U_{k + 1}^{\otimes \ell(n)} \tilde{\Phi}_{\bm{s}, 0} (U_{k + 1}^*)^{\otimes \ell(n)} =
+    \begin{cases}
+        \tilde{\Phi}_{\bm{s}, 0} & \text{if the } k\text{-th bit of } s_1 \text{ is } 0 \\
+        \tilde{\Phi}_{\bm{s}, 1} & \text{if the } k\text{-th bit of } s_1 \text{ is } 1
+    \end{cases}
+    \]
+    Repeating the above process with $U_{k + 1}$, W determines the $(k + 1)$-th bit of $s_1$ with high probability.
+\end{proof}
+
+
+
+%% ///////////////////////////////////////////////////////
+
+
+
+\section{Quantum public key system}
+
+
+\textbf{Key generation:}
+\begin{enumerate}[topsep = 1pt, itemsep = 1pt, parsep = 1pt]
+\item Select $\bm{x} \in \Z_q^n$ uniformly at random.
+\item Apply $\qft_r \otimes \mathds{1}$ to the register $\ldbrac{0} \ldbrac{\bm{x}}$ to get the state $\frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} \ldbrac{j} \ldbrac{\bm{x}}$.
+\item Apply the the operation $\ldbrac{j}\ldbrac{\bm{x}} \mapsto \ldbrac{j}\ldbrac{\bm{x} + j\bm{s}}$ to get the state $\frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} \ldbrac{j} \ldbrac{\bm{x} + j\bm{s}}$
+\end{enumerate}
+
+\vspace*{5mm}
+
+\textbf{Encryption:}
+\begin{enumerate}[topsep = 1pt, itemsep = 1pt, parsep = 1pt]
+\item Alice obtains one of Bob's public keys, say $\ldbrac{\psi}$.
+\item To encrypt a bit $b \in \{ 0, 1 \}$, Alice performs the unitary $\ldbrac{j}\ldbrac{\bm{y}} \mapsto (-1)^{bj}\ldbrac{j}\ldbrac{\bm{y}}$ on $\ldbrac{\psi}$ to obtain a state $\ldbrac{\psi_b}$. The state $\ldbrac{\psi_b}$ is sent to Bob.
+\end{enumerate}
+
+\vspace*{5mm}
+
+\textbf{Decryption:} \\
+On receiving the encrypted state $\ldbrac{\psi'}$ Bob perform the following steps:
+\begin{enumerate}[topsep = 1pt, itemsep = 1pt, parsep = 1pt]
+\item Apply the the operation $\ldbrac{j}\ldbrac{\bm{y}} \mapsto \ldbrac{j}\ldbrac{\bm{y} - j\bm{s}}$ to $\ldbrac{\psi'}$.
+\item Discard the second register.
+\item Apply $\qft_r$ and measure.
+\item If the measurement result is 0 then output 0, otherwise output 1.
+\end{enumerate}
+
+\paragraph{Correctness.} 
+Given a public key $\ldbrac{\psi} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} \ldbrac{j} \ldbrac{\bm{x} + j\bm{s}}$ of Bob, a bit $b \in \{ 0, 1 \}$ is encrypted, by Alice, into the state
+\[ \ldbrac{\psi_b} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} (-1)^{bj}\ldbrac{j} \ldbrac{\bm{x} + j\bm{s}}. \]
+The decryption steps are as follows
+\begin{align*}
+    \ldbrac{\psi_b}
+    & \mapsto \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} (-1)^{bj}\ldbrac{j} \ldbrac{\bm{x}} \\  
+    & \mapsto \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} (-1)^{bj}\ldbrac{j} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} \omega_r^{rbj / 2}\ldbrac{j} \\
+    & \mapsto \ldbrac*{\frac{r}{2}b}.
+\end{align*}
+
+
+\paragraph{Security.}
+
+
+\bibliographystyle{plain}
+\bibliography{references}
+\end{document}
+
+
+
