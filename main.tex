@@ -80,7 +80,7 @@
 \DeclareMathOperator{\polylog}{polylog}
 \DeclareMathOperator{\rev}{rev}
 \DeclareMathOperator{\Hom}{Hom}
-\DeclareMathOperator{\qft}{QFT}
+\DeclareMathOperator{\qft}{F}
 \DeclareMathOperator{\E}{\mathbb{E}}
 
 
@@ -148,22 +148,22 @@ for some uniformly random $\bm{x} \in \Z_q$. Then the  system is described by th
 \begin{proof}
     Assume there is a quantum polynomial time algorithm $Q$ for the Decision problem. Let $\tilde{\Phi}_{\bm{s}, b} = \Phi_{\bm{s}, b}^{\otimes \ell(n)}$. Fix an arbitrary $n$ for which 
     \[ \Pr[ Q(\tilde{\Phi}_{\bm{s}, 1}) = 1 ] - \Pr[ Q(\tilde{\Phi}_{\bm{s}, 0}) = 1 ] \ge \frac{1}{p(n)} \]
-    for some polynomial $p(n)$. We will construct an algorithm $W$ that computes $\bm{s}$ with high probability. Let $\bm{s} = (s_1, \dots, s_n)$. We show how to compute $s_1$, the other values $s_i$, $2 \le i \le n$, can be computed in a similar way. The strategy is to determine $s_1$ a bit at a time.
+    for some polynomial $p(n)$. We will construct an algorithm $W$ that computes $\bm{s}$ with high probability. Let $\bm{s} = (s_1, \dots, s_n)$. We show how to compute $s_1$, the other values $s_i$, $2 \le i \le n$, can be computed in a similar way. The strategy is to determine $s_1$ one bit at a time.
 
-    Let $m = 2np(n)^2$ and obtain $2m$ copies of the state $\tilde{\Phi}_{\bm{s}, 0}$ stored in two registers $T = \tilde{\Phi}_{\bm{s}, 0} \otimes \cdots \otimes \tilde{\Phi}_{\bm{s}, 0}$ and $S = \tilde{\Phi}_{\bm{s}, 0} \otimes \cdots \otimes \tilde{\Phi}_{\bm{s}, 0}$. For an arbitrary $\bm{x} = (x_1, \dots, x_n)$, define the following unitary
+    Let $m = 2np(n)^2$ and obtain $2m$ copies of the state $\tilde{\Phi}_{\bm{s}, 0}$ stored in two registers $R = \tilde{\Phi}_{\bm{s}, 0} \otimes \cdots \otimes \tilde{\Phi}_{\bm{s}, 0}$ and $S = \tilde{\Phi}_{\bm{s}, 0} \otimes \cdots \otimes \tilde{\Phi}_{\bm{s}, 0}$. For an arbitrary $\bm{x} = (x_1, \dots, x_n)$, define the following unitary
     \[ U_1 \ldbrac{j}\ldbrac{\bm{x} + j\bm{s}} = (-1)^{x_1 + js_1} \ldbrac{j}\ldbrac{\bm{x} + j\bm{s}}. \]
-    We have
-    \[ U_1 \ldbrac{\phi_{\bm{s}, \bm{x}, 0}} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} (-1)^{js_1}\ldbrac{j}\ldbrac{\bm{x} + j\bm{s}}, \]
-    since $(-1)^{x_1}$ is a global phase. This means that we have
+    Ignoring the global phase $(-1)^{x_1}$, $U_1$ acts on the state $\ldbrac{\phi_{\bm{s}, \bm{x}, 0}}$ as follows
+    \[ U_1 \ldbrac{\phi_{\bm{s}, \bm{x}, 0}} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} (-1)^{js_1}\ldbrac{j}\ldbrac{\bm{x} + j\bm{s}}. \]
+    This means we have
     \begin{equation}
         \label{equ:u1}
         U_1^{\otimes \ell(n)} \tilde{\Phi}_{\bm{s}, 0} (U_1^*)^{\otimes \ell(n)} =
         \begin{cases}
             \tilde{\Phi}_{\bm{s}, 0} & \text{if } s_1 \text{ is even} \\
-            \tilde{\Phi}_{\bm{s}, 1} & \text{if } s_1 \text{ is odd}
+            \tilde{\Phi}_{\bm{s}, 1} & \text{if } s_1 \text{ is odd}.
         \end{cases}
     \end{equation}
-    If we apply $U_1^{\otimes \ell(n)}$ to all the states $\tilde{\Phi}_{\bm{s}, 0}$ in $S$ we obtain the state $T_c = \tilde{\Phi}_{\bm{s}, c} \otimes \cdots \otimes \tilde{\Phi}_{\bm{s}, c}$ where $c = s_1 \mod 2$. Now, we run the algorithm $Q$ on all the states in the two registers $T$ and $T_c$. Let $X_i$ and $Y_i$, $1 \le i \le m$, be random variables representing the output of $Q$ on the states $\tilde{\Phi}_{\bm{s}, c}$ in $T_c$ and the states $\tilde{\Phi}_{\bm{s}, 0}$ in $T$, respectively. Let $Z = \sum_{i = 1}^m (X_i - Y_i)$. If $Z \ge np(n)$ then $W$ outputs $1$, otherwise it outputs $0$. For simplicity, we replace $Y_i$ by $-Y_i$ and assume that $Y_i \in \{ -1, 0 \}$. If $c = 1$ we have
+    If we apply $U_1^{\otimes \ell(n)}$ to all the states $\tilde{\Phi}_{\bm{s}, 0}$ in $S$ we obtain the state $S_c = \tilde{\Phi}_{\bm{s}, c} \otimes \cdots \otimes \tilde{\Phi}_{\bm{s}, c}$ where $c = s_1 \mod 2$. Now, $W$ runs the algorithm $Q$ on all the states in the two registers $R$ and $S_c$. Let $X_i$ and $Y_i$, $1 \le i \le m$, be random variables representing the output of $Q$ on the states $\tilde{\Phi}_{\bm{s}, c}$ in $S_c$ and the states $\tilde{\Phi}_{\bm{s}, 0}$ in $R$, respectively. Let $Z = \sum_{i = 1}^m (X_i - Y_i)$. If $Z \ge np(n)$ then $W$ outputs $1$, otherwise it outputs $0$. For simplicity, we replace $Y_i$ by $-Y_i$ and assume that $Y_i \in \{ -1, 0 \}$. If $c = 1$ we have
     \begin{align*}
         \Pr[ Z \le np(n) ]
         & = \Pr[ Z \le \frac{m}{p(n)} - np(n) ] \\
@@ -178,7 +178,7 @@ for some uniformly random $\bm{x} \in \Z_q$. Then the  system is described by th
         & \le e^{-(np(n) - 1)^2 / m} \\
         & \le 2^{-\frac{n}{2}(1 - o(1))}.
     \end{align*}
-    Therefore, $W$ computes the least significant bit of $s_1$ with probability exponentially close to $1$. Assume that we have already computed the first $k$ bits $b_0, \dots, b_k$ of $s_1$, and let $\tilde{s}_1 = b_k2^{k - 1} + \cdots + b_12^1 + b_0$. Define the unitary
+    Therefore, $W$ outputs the least significant bit of $s_1$ with probability exponentially close to $1$. Assume that we have already computed the first $k$ bits $b_0, \dots, b_{k - 1}$ of $s_1$, and let $\tilde{s}_1 = b_{k - 1}2^{k - 1} + \cdots + b_12^1 + b_0$. Define the unitary
     \[ U_{k + 1} \ldbrac{j}\ldbrac{\bm{x} + j\bm{s}} = \omega_{2^{k + 1}}^{x_1 + js_1} \omega_{2^{k + 1}}^{-j\tilde{s}_1} \ldbrac{j}\ldbrac{\bm{x} + j\bm{s}}. \]
     Then the actions of $U_{k + 1}$ on the state $\tilde{\Phi}_{\bm{s}, 0}$ is similar to \eqref{equ:u1}. More precisely,
     \[
@@ -188,7 +188,7 @@ for some uniformly random $\bm{x} \in \Z_q$. Then the  system is described by th
         \tilde{\Phi}_{\bm{s}, 1} & \text{if the } k\text{-th bit of } s_1 \text{ is } 1
     \end{cases}
     \]
-    Repeating the above process with $U_{k + 1}$, W determines the $(k + 1)$-th bit of $s_1$ with high probability.
+    Repeating the above process with $U_{k + 1}$, $W$ determines the $(k + 1)$-th bit of $s_1$ with high probability. All the bits of $s_1$ are computed this way.
 \end{proof}
 
 
@@ -200,43 +200,48 @@ for some uniformly random $\bm{x} \in \Z_q$. Then the  system is described by th
 \section{Quantum public key system}
 
 
-\textbf{Key generation:}
+\textit{Key generation:}
+
 \begin{enumerate}[topsep = 1pt, itemsep = 1pt, parsep = 1pt]
 \item Select $\bm{x} \in \Z_q^n$ uniformly at random.
-\item Apply $\qft_r \otimes \mathds{1}$ to the register $\ldbrac{0} \ldbrac{\bm{x}}$ to get the state $\frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} \ldbrac{j} \ldbrac{\bm{x}}$.
-\item Apply the the operation $\ldbrac{j}\ldbrac{\bm{x}} \mapsto \ldbrac{j}\ldbrac{\bm{x} + j\bm{s}}$ to get the state $\frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} \ldbrac{j} \ldbrac{\bm{x} + j\bm{s}}$
+\item Apply $\qft_r \otimes \mathds{1}$ to the register $\ldbrac{0} \ldbrac{\bm{x}}$ to obtain the state $\frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} \ldbrac{j} \ldbrac{\bm{x}}$.
+\item Apply the the operation $\ldbrac{j}\ldbrac{\bm{x}} \mapsto \ldbrac{j}\ldbrac{\bm{x} + j\bm{s}}$ to obtain the state $\ldbrac{\phi_{\bm{s}, \bm{x}, 0}} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} \ldbrac{j} \ldbrac{\bm{x} + j\bm{s}}$
+\item Publish the state $\ldbrac{\phi_{\bm{s}, \bm{x}, 0}}$.     
 \end{enumerate}
 
 \vspace*{5mm}
 
-\textbf{Encryption:}
+\textit{Encryption:}
+
 \begin{enumerate}[topsep = 1pt, itemsep = 1pt, parsep = 1pt]
-\item Alice obtains one of Bob's public keys, say $\ldbrac{\psi}$.
-\item To encrypt a bit $b \in \{ 0, 1 \}$, Alice performs the unitary $\ldbrac{j}\ldbrac{\bm{y}} \mapsto (-1)^{bj}\ldbrac{j}\ldbrac{\bm{y}}$ on $\ldbrac{\psi}$ to obtain a state $\ldbrac{\psi_b}$. The state $\ldbrac{\psi_b}$ is sent to Bob.
+\item Alice obtains a copy of Bob's public keys $\Phi_{\bm{s}, 0}$.
+\item To encrypt a bit $b \in \{ 0, 1 \}$, Alice performs the unitary $U: \ldbrac{j}\ldbrac{\bm{y}} \mapsto (-1)^{bj}\ldbrac{j}\ldbrac{\bm{y}}$ on $\Phi_{\bm{s}, 0}$ to obtain the state $\Phi_{\bm{s}, b}$.
+\item The state $\Phi_{\bm{s}, b}$ is sent to Bob.
 \end{enumerate}
 
 \vspace*{5mm}
 
-\textbf{Decryption:} \\
-On receiving the encrypted state $\ldbrac{\psi'}$ Bob perform the following steps:
+\textit{Decryption:}
+On receiving the encrypted state $\Phi_{\bm{s}, b}$, Bob perform the following:
 \begin{enumerate}[topsep = 1pt, itemsep = 1pt, parsep = 1pt]
-\item Apply the the operation $\ldbrac{j}\ldbrac{\bm{y}} \mapsto \ldbrac{j}\ldbrac{\bm{y} - j\bm{s}}$ to $\ldbrac{\psi'}$.
+\item Apply the the unitary $U: \ldbrac{j}\ldbrac{\bm{y}} \mapsto \ldbrac{j}\ldbrac{\bm{y} - j\bm{s}}$ to $\Phi_{\bm{s}, b}$.
 \item Discard the second register.
 \item Apply $\qft_r$ and measure.
 \item If the measurement result is 0 then output 0, otherwise output 1.
 \end{enumerate}
 
 \paragraph{Correctness.} 
-Given a public key $\ldbrac{\psi} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} \ldbrac{j} \ldbrac{\bm{x} + j\bm{s}}$ of Bob, a bit $b \in \{ 0, 1 \}$ is encrypted, by Alice, into the state
-\[ \ldbrac{\psi_b} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} (-1)^{bj}\ldbrac{j} \ldbrac{\bm{x} + j\bm{s}}. \]
-The decryption steps are as follows
+Given the encrypted state $\Phi_{\bm{s}, b}$, the decryption steps are as follows
 \begin{align*}
-    \ldbrac{\psi_b}
-    & \mapsto \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} (-1)^{bj}\ldbrac{j} \ldbrac{\bm{x}} \\  
-    & \mapsto \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} (-1)^{bj}\ldbrac{j} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} \omega_r^{rbj / 2}\ldbrac{j} \\
-    & \mapsto \ldbrac*{\frac{r}{2}b}.
+    \Phi_{\bm{s}, b}
+    & \mapsto U \frac{1}{q^n} \sum_{\bm{x} \in \Z_q^n} \ldbrac{\phi_{\bm{s}, \bm{x}, b}} \rdbrac{\phi_{\bm{s}, \bm{x}, b}} U^* & (\text{apply } U)\\
+    & = \frac{1}{q^n} \sum_{\bm{x} \in \Z_q^n} \frac{1}{r} \sum_{j = 0}^{r - 1} \sum_{k = 0}^{r - 1} (-1)^{b(j - k)}\ldbrac{k}\ldbrac{\bm{x}} \rdbrac{j}\rdbrac{\bm{x}} \\
+    & = \frac{1}{r} \sum_{j = 0}^{r - 1} \sum_{k = 0}^{r - 1} (-1)^{b(j - k)}\ldbrac{k}\rdbrac{j} \otimes \frac{1}{q^n} \sum_{\bm{x} \in \Z_q^n} \ldbrac{\bm{x}}\rdbrac{\bm{x}} \\
+    & \mapsto \frac{1}{r} \sum_{j = 0}^{r - 1} \sum_{k = 0}^{r - 1} (-1)^{b(j - k)}\ldbrac{k}\rdbrac{j} & (\text{discard the second register}) \\
+    & \mapsto \qft_r \frac{1}{r} \sum_{j = 0}^{r - 1} \sum_{k = 0}^{r - 1} (-1)^{b(j - k)}\ldbrac{k}\rdbrac{j} \qft_r^* & (\text{apply quantum Fourier transfom})\\
+    & = \ldbrac{br/2} \rdbrac{br/2}
 \end{align*}
-
+If $b = 0$ then the state of the system is $\ldbrac{0} \rdbrac{0}$, otherwise it is $\ldbrac{r / 2} \rdbrac{r / 2}$. 
 
 \paragraph{Security.}
 
