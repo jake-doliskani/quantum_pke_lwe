@@ -73,6 +73,7 @@
 \DeclareMathOperator{\divisor}{div} % divisor on a curve
 \DeclareMathOperator{\supp}{supp} % support of a divisor
 \DeclareMathOperator{\norm}{N} % norm
+\DeclareMathOperator{\negl}{negl} % norm
 \DeclareMathOperator{\Res}{Res}
 \DeclareMathOperator{\Aut}{Aut}
 \DeclareMathOperator{\minpoly}{minpoly}
@@ -139,34 +140,38 @@
 In this section, we review some basic concepts and notations of quantum computing and the learning with error (LWE) problem. 
 
 Let $n \ge 1$, and $q \ge 2$ be integers, and let $\chi$ be a probability distribution over $\Z$. For a random fixed $\bm{s} \in \Z_q^n$, denote by $A_{\bm{s}, \chi}$ the probability distribution over $\Z_q^n \times \Z_q$ defined as follows: choose $\bm{a} \in \Z_q^n$ uniformly at random, choose $e$ from according to $\chi$ and output  $(\bm{a}, \lrang{\bm{a}, \bm{s}} + e)$.
-\begin{definition}[Search LWE]
+\begin{definition}[LWE, Search]
 The search-$\lwe_{n, q, \chi}$ is the problem of recovering $\bm{s}$ given samples from the distribution $A_{\bm{s}, \chi}$. An algorithm $Q$ is said to solve $\lwe_{n, q, \chi}$ if $Q$  outputs $\bm{s}$ with probability at least $1 / \poly(n\log q)$ and has running time at most $\poly(n \log q)$.
 \end{definition}
-\begin{definition}[Decision LWE]
+\begin{definition}[LWE, Decision]
     The decision-$\lwe_{n, q, \chi}$ problem is to distinguish between the distribution $A_{\bm{s}, \chi}$ and the uniform distribution over $\Z_q^n \times \Z_q$. An algorithm $Q$ is said to solve the desicion-$\lwe_{n, q, \chi}$ if it succeeds with advantage at least $1 / \poly(n\log q)$ and has running time at most $\poly(n\log q)$. 
 \end{definition}
-Let $n \ge 1$ and $q \ge 2$ be as above and let $r < q$ be a positive integer. For $\bm{s}, \bm{x} \in \Z_q^n$ define the state
+Let $n \ge 1$ and $q \ge 2$ be as above and let $r < q$ be a positive integer. Let $\Sigma = \Z_r \times \Z_q^n$ and define the complex Euclidean space $\mathcal{X} = \C^\Sigma$. For a fixed $\bm{s} \in \Z_q^n$ define the probability distribution $B_{\bm{s}, r}$ over a finite subset of $\mathcal{X}$ as follows: choose $\bm{x} \in \Z_q^n$ uniformly at random and output the state
 \[ \ldbrac{\phi_{\bm{s}, r}(\bm{x})} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1}\ldbrac{j}\ldbrac{\bm{x} + j\bm{s}}. \]
-If $\bm{s}$ is fixed and $\bm{x}$ is uniformly random and unknown, the quantum system corresponding to $\ldbrac{\phi_{\bm{s}, r}(\bm{x})}$ is described by the density operator
+Since $\bm{s}$ is fixed and $\bm{x}$ is uniformly random and unknown, the quantum system corresponding to the state $\ldbrac{\phi_{\bm{s}, r}(\bm{x})}$ is described by the density operator
 \[ \rho_{\bm{s}, r} = \frac{1}{q^n} \sum_{\bm{x} \in \Z_q^n} \ldbrac{\phi_{\bm{s}, r}(\bm{x})} \rdbrac{\phi_{\bm{s}, r}(\bm{x})}. \]
-\begin{definition}[Search EDCP]
-    Let parameters $n$, $q$, $r$ and $\bm{s}$ be defined as above, and let $\ell: \N \rightarrow \N$ be a polynomially bounded function. The search EDCP$_{n, q}^\ell$ is defined as follows: given $\ell(n)$ copies of the state $\rho_{\bm{s}}$, that is, given $\rho_{\bm{s}}^{\otimes \ell(n)}$, find $\bm{s}$. A quantum algorithm $Q$ is said to solve EDCP$_{n, q}^\ell$ if it outputs $\bm{s}$ with probability at least $1 / \poly(n\log q)$ and running time at most $\poly(n\log q)$.
+Therefore, the output of the distribution $B_{\bm{s}, r}$ is always described the density operator $\rho_{\bm{s}, r}$. In other words, the distribution $B_{\bm{s}, r}$ provides \textit{copies} of the state $\rho_{\bm{s}, r}$.
+\begin{definition}[EDCP, Search]
+    Let $n$, $q$ and $r$ be defined as above. The search-$\edcp_{n, q, r}$ is the problem of recovering $\bm{s}$ given samples from the distribution $B_{\bm{s}, r}$. A quantum algorithm $Q$ is said to solve $\edcp_{n, q, r}$ if it outputs $\bm{s}$ with probability at least $1 / \poly(n\log q)$ and has running time at most $\poly(n\log q)$.
 \end{definition}
 \begin{definition}[\cite{watrous2009zero}]
-    Two $m$-qubit mixed states $\rho_1$ and $\rho_2$ are said to be $(s, k, \epsilon)$-distinguishable if there exists a $k$-qubit mixed state $\sigma$ and an $(m + k)$-qubit quantum measurement circuit $Q$ of size $s$ such that
-    \[ \abs{ \Pr[Q(\rho_1 \otimes \sigma) = 1] - \Pr[Q(\rho_2 \otimes \sigma) = 1] } \ge \epsilon. \]
-\end{definition}
+    Let $A, B$ be probability distributions on a finite subset of a complex Euclidean space $\mathcal{X}$. Then $A$ is said to be $(s, \epsilon)$-distinguishable from $B$ if there is a quantum measurement circuit $Q$ of size $s$ such that
+    \[ \abs*{ \Pr_{\rho \in A}[Q(\rho) = 1] - \Pr_{\rho \in B}[Q(\rho) = 1] } \ge \epsilon. \]
+\end{definition} 
+Two distributions $A, B$ are $(s, \epsilon)$-indistinguishable if they are not $(s, \epsilon)$-distinguishable.
 \begin{definition}
-    For each $n \in \N$, let $\rho_n$ and $\sigma_n$ be mixed states on $r(n)$ qubits where $r: \N \rightarrow \N$ is a polynomially bounded function. Then the two ensembles $\{ \rho_n \}_{n \in \N}$ and $\{ \sigma_n \}_{n \in \N}$ are said to be polynomially quantum indistinguishable if for all polynomially bounded functions $s, k, p: \N \rightarrow \N$, the states $\rho_n$ and $\sigma_n$ are $(s(n), k(n), 1 / p(n))$-indistinguishable for almost all $n \in \N$.
+    For each $n \in \N$, let $A_n$ and $B_n$ be probability distributions on a finite subset of a complex Euclidean space $\mathcal{X}_n$. Then the two ensembles $\{ A_n \}_{n \in \N}$ and $\{ B_n \}_{n \in \N}$ are said to be polynomially quantum indistinguishable if for all polynomially bounded functions $s, p: \N \rightarrow \N$, the distributions $A_n$ and $B_n$ are $(s(n), 1 / p(n))$-indistinguishable for almost all $n \in \N$.
 \end{definition}
-For uniformly random $j \in \Z_r$ and $\bm{x} \in \Z_q^n$ define the state $\ldbrac{\psi_{\bm{x}, j}} = \ldbrac{j}\ldbrac{\bm{x}}$. The density operator corresponding to this state is
-\[ \rho = \frac{1}{rq^n} \sum_{j = 0}^{r - 1} \sum_{\bm{x} \in \Z_q^n} \ldbrac{\psi_{\bm{x}, j}} \rdbrac{\psi_{\bm{x}, j}}. \]
-\begin{definition}[Decisional EDCP]
-    Let parameters $n$, $q$, $r$ and $\bm{s}$ be defined as above, and let $\ell: \N \rightarrow \N$ be a polynomially bounded function. The decisional EDCP$_{n, q}^\ell$ problem is to distinguish between the two ensembles $\{ \rho^{\otimes \ell(n)} \}_{n \in \N}$ and $\{ \rho_{\bm{s}}^{\otimes \ell(n)} \}_{n \in \N}$.
+Two ensembles are called quantum computationally indistinguishable if they are polynomially quantum indistinguishable. The advantage of a polynomial-time quantum algorithm $Q$ in distinguishing between the distributions $A_n$ and $B_n$ is defined as
+\[ \delta_Q(A_n, B_n) = \abs*{ \Pr_{\rho \in A_n}[Q(\rho) = 1] - \Pr_{\rho \in B_n}[Q(\rho) = 1] }. \]
+Two ensembles $\{ A_n \}_{n \in \N}$ and $\{ B_n \}_{n \in \N}$ are then quantum computationally indistinguishable if $\delta_Q(A_n, B_n) = \negl(n)$ for all such $Q$ and almost all $n$. 
+\begin{definition}[EDCP, Decision]
+    \label{def:d-edcp}
+    Let $n$, $q$ and $r$ be defined as above. Define the probability distribution $U_{r}$ over a finite subset of $\mathcal{X}$ by choosing $(j, \bm{x}) \in \Z_r \times \Z_q^n$ uniformly at random and outputting the state $\ldbrac{j}\ldbrac{\bm{x}}$. The decision-$\edcp_{n, q, r}$ is the problem of distinguishing between the distributions $B_{\bm{s}, r}$ and $U_r$.
 \end{definition}
-A quantum algorithm $Q$ is said to solve the decisional EDCP$_{n, q}^\ell$ if it succeeds with advantage at least $1 / \poly(n\log q)$ and running time at most $\poly(n\log q)$.
-
-
+A quantum algorithm $Q$ is said to solve the decision-$\edcp_{n, q}^\ell$ if it succeeds with advantage at least $1 / \poly(n\log q)$ and has running time at most $\poly(n\log q)$. The density operator corresponding to the output of the distribution $U_r$ in Definition \ref{def:d-edcp} is
+\[ \rho = \frac{1}{rq^n} \sum_{j = 0}^{r - 1} \sum_{\bm{x} \in \Z_q^n}  \ldbrac{j}\ldbrac{\bm{x}} \rdbrac{j}\rdbrac{\bm{x}} = \mathds{1}_{\mathcal{X}}. \]
+Therefore, decision-$\edcp_{n, q, r}$ is the problem of distinguishing between the same number of copies of the states $\rho_{\bm{s}, r}$ and $\mathds{1}_{\mathcal{X}}$. 
 
 
 %% ///////////////////////////////////////////////////////
@@ -176,33 +181,6 @@ A quantum algorithm $Q$ is said to solve the decisional EDCP$_{n, q}^\ell$ if it
 \section{Search to Decision Reduction}
 
 
-\begin{theorem}[Search to Decision]
-    If there is a quantum polynomial time algorithm for decisional EDCP then there is a quantum polynomial time algorithm for search EDCP.
-\end{theorem}
-\begin{proof}
-    Let $Q$ be a quantum polynomial time algorithm for the decisional EDCP$_{n, q}^\ell$, and suppose that $Q$ has advantage at least $p(n)$ in distinguishing the two ensembles $\{ \rho^{\otimes \ell(n)} \}_{n \in \N}$ and $\{ \rho_{\bm{s}}^{\otimes \ell(n)} \}_{n \in \N}$. Let $\tilde{\rho}_{\bm{s}} = \rho_{\bm{s}}^{\otimes \ell(n)}$ and $\tilde{\rho} = \rho^{\otimes \ell(n)}$ and fix an arbitrary $n$ for which
-    \[ \abs{\Pr[ Q(\tilde{\rho}_{\bm{s}}) = 1 ] - \Pr[ Q(\tilde{\rho}) = 1 ]} \ge \frac{1}{p(n)}. \]
-    Let $\bm{s} = (s_1, \dots, s_n)$. We construct a quantum algorithm $W$ that computes $s_1$ with probability exponentially close to $1$. The other $s_i$, $2 \le i \le n$, can be computed similarly. For a state $\ldbrac{\phi_{\bm{s}, \bm{x}}}$, where $\bm{x} = (x_1, \dots, x_n) \in \Z_q^n$ is arbitrary, and for $y \in \Z_q$ define the following unitary
-    \[
-    U \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1}\ldbrac{j}\ldbrac{\bm{x} + j\bm{s}} \ldbrac{y} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1}\ldbrac{j}\ldbrac{\bm{x} + j\bm{s}} \ldbrac{x_1 + js_1 - jy}.
-    \]
-    If we discard the last register, two cases can happen: i) $y = s_1$, so we end up with the same state $\ldbrac{\psi_{\bm{s}, \bm{x}}}$. ii) $y \ne s_1$, so we end up with a state $\ldbrac{j} \ldbrac{\bm{x} + j\bm{s}}$ for a uniformly random $0 \le j \le r - 1$. So, given a state $\tilde{\rho}_{\bm{s}}$, and a number $y \in \Z_q$, $W$ determines if $y = s_1$ by performing the following the following steps enough number of times, and outputting the majority:   
-    \begin{enumerate}[topsep = 1pt, itemsep = 1pt, parsep = 1pt]
-    \item Append a copy of the register $\ldbrac{y}$ to each of the states $\rho_{\bm{s}}$ in $\tilde{\rho}_{\bm{s}}$, and let $\sigma$ be the resulting state.
-    \item Perform the operation $U^{\otimes \ell(n)} \sigma (U^*)^{\otimes \ell(n)}$ and discard the last register to obtain a state $\tilde{\sigma}$.
-    \item Output the value $Q(\tilde{\sigma})$.        
-    \end{enumerate}
-    More precisely, suppose $W$ runs the above steps $m = 2np(n)^2$ many times. Let the random variable $X_i$ denote the output $Q(\tilde{\sigma})$ after the $i$-th run, and let $X = \sum_{i = 1}^m X_i$. If $\tilde{\sigma} = \tilde{\rho}_{\bm{s}}$ then, by the Hoeffdings's inequality
-    \begin{align*}
-        \Pr\Big[ X \le \frac{1}{2} (m + np(n)) \Big]
-        & = \Pr\Big[ X - \frac{m}{2} - np(n) \le -\frac{1}{2}np(n) \Big] \\
-        & \le \Pr\Big[ X - \E[X] \le -\frac{1}{2}np(n) \Big] \\
-        & \le e^{-n / 4}.
-    \end{align*}
-    Similarly, if $\tilde{\sigma} = \tilde{\rho}$ then
-    \[ \Pr\Big[ X \ge \frac{1}{2} (m - np(n)) \Big] \le \Pr\Big[ X - \E[X] \ge \frac{1}{2}np(n) \Big] \le e^{-n / 4}. \]
-    By trying the above procedure for all $y \in \Z_q$, $W$ computes $s_1$ with high probability.
-\end{proof}
 
 
 
