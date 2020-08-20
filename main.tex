@@ -180,7 +180,7 @@ Therefore, decision-$\edcp_{n, q, r}$ is the problem of distinguishing between t
 
 \section{Search to Decision Reduction}
 
-In this section, we give a search-to-decision reduction for $\edcp$. The reduction works for a large class of moduli $q$.
+In this section, we give a search-to-decision reduction for $\edcp$. The reduction works for a large class of moduli $q$. The technique we use is inspired by the one used in \cite{micciancio2012trapdoors} for a search-to-decision reduction for LWE.
 \begin{lemma}
     \label{lem:small-r}
     For any $r' \le r$, given access to the distribution $B_{\bm{s}, r}$, we can efficiently sample from the distribution $B_{\bm{s}, r'}$. 
@@ -204,8 +204,13 @@ In this section, we give a search-to-decision reduction for $\edcp$. The reducti
         & = \frac{1}{q^nr} \sum_{\bm{x} \in \Z_q^n} \sum_{b, c = 0}^{\ell - 1} \tr(\ldbrac{b}\rdbrac{c} \otimes \ldbrac{\bm{x} + (ar' + b)\bm{s}} \rdbrac{\bm{x} + (ar' + c)\bm{s}}) \\
         & = \frac{\ell}{r},
     \end{align*}
-    and the post-measurement state is
-    \[ \frac{M_a \rho_{\bm{s}, r} M_a^*}{(\ell / r)} = \rho_{\bm{s}, \ell}.  \]
+    and the post-measurement state corresponding to this outcome is
+    \begin{align*}
+        \frac{M_a \rho_{\bm{s}, r} M_a^*}{(\ell / r)}
+        & = \frac{1}{q^nr} \sum_{\bm{x} \in \Z_q^n} \sum_{b, c = 0}^{\ell - 1} \ldbrac{b}\ldbrac{\bm{x} + (ar' + b)\bm{s}} \rdbrac{c}\rdbrac{\bm{x} + (ar' + c)\bm{s}} \\
+        & = \frac{1}{q^nr} \sum_{\bm{x} \in \Z_q^n} \sum_{b, c = 0}^{\ell - 1} \ldbrac{b}\ldbrac{\bm{x} + b\bm{s}} \rdbrac{c}\rdbrac{\bm{x} + c\bm{s}} \\
+        & = \rho_{\bm{s}, \ell},
+    \end{align*}
     So if the outcome is $a \in [0, \lfloor r / r'  \rfloor)$ we obtain the state $\rho_{\bm{s}, r'}$, which is what we are looking for. Therefore, the probability of obtaining the desired state after one measurement is
     \[ \lfloor r / r' \rfloor \frac{\ell}{r} = \lfloor r / r' \rfloor \frac{r'}{r} \ge \left( \frac{r}{r'} - 1 \right)\frac{r}{r'} = 1 - \frac{r'}{r} \ge \frac{1}{2}. \]
     If the measurement outcome is $a = \lfloor r / r' \rfloor$ then we repeat the above process.
@@ -216,7 +221,7 @@ In this section, we give a search-to-decision reduction for $\edcp$. The reducti
 \begin{proof}
     Let $D$ be an oracle for solving decision-$\edcp_{n, q, r'}$. Given samples from the distribution $B_{\bm{s}, r}$, we will recover $\bm{s} \bmod p^{e_i}$ for each $i$, and then assemble the results using the Chinese remainder theorem to recover $\bm{s} \bmod q$. We shall compute $\bm{s} \bmod p_1^{e_1}$, the algorithm is the same for the other $p_i$. Let $p = p_1$ and $e = e_1$.
 
-    The first step is to construct the distribution $B_{\bm{s}, r'}$ from the distribution $B_{\bm{s}, r}$. This can be efficiently done using Lemma \ref{lem:small-r}. Now, from $B_{\bm{s}, r'}$ we construct the distribution $B_{\bm{s}, r'}^k$ for all $k = 1, \dots, e$ as follows. Given a sample $\rho_{\bm{s}, r'}$ from $B_{\bm{s}, r'}$, a sample from $B_{\bm{s}, r'}^k$ is constructed by computing $j \bmod p^k$ into an auxiliary register and then discarding the register. More precisely, if we denote by  $\ldbrac{\phi_{\bm{s}, r'}^k(\bm{x})}$ the result of 
+    The first step is to construct the distribution $B_{\bm{s}, r'}$ from the distribution $B_{\bm{s}, r}$. This can be efficiently done using Lemma \ref{lem:small-r}. Now, from $B_{\bm{s}, r'}$ we construct the distribution $B_{\bm{s}, r'}^k$ for all $k = 1, \dots, e$. Given a sample $\rho_{\bm{s}, r'}$ from $B_{\bm{s}, r'}$, a sample from $B_{\bm{s}, r'}^k$ is constructed by computing $j \bmod p^k$ into an auxiliary register and then discarding the register. More precisely, if we denote by  $\ldbrac{\phi_{\bm{s}, r'}^k(\bm{x})}$ the result of 
     \begin{align}
         \ldbrac{\phi_{\bm{s}, r'}(\bm{x})}\ldbrac{0}
         & \mapsto \frac{1}{\sqrt{r'}} \sum_{j = 0}^{r' - 1} \ldbrac{j}\ldbrac{\bm{x} + j\bm{s}}\ldbrac{j \bmod p^k} \label{equ:r-1}  \\
@@ -224,7 +229,7 @@ In this section, we give a search-to-decision reduction for $\edcp$. The reducti
     \end{align}
     where $0 \le r_k \le \lfloor r' / p^k \rfloor$ and the random constant $0 \le c \le p^k - 1$ depend on the outcome of measuring the last register, then
     \[ \rho_{\bm{s}, r'}^k = \frac{1}{q^n} \sum_{\bm{x} \in \Z_q^n} \ldbrac{\phi_{\bm{s}, r'}^k(\bm{x})} \rdbrac{\phi_{\bm{s}, r'}^k(\bm{x})} \]
-    is a sample from $B_{\bm{s}, r'}^k$. For $k = 0$ we have $j = 0 \bmod p^0$ for all $j$, so $\rho_{\bm{s}, r'}^0 = \rho_{\bm{s}, r'}$ and the distribution $B_{\bm{s}, r'}^0$ is the same as $B_{\bm{s}, r'}$. For $k = e$, since $r' \le p^e$, discarding the last register in \eqref{equ:r-1} collapses the state $\rho_{\bm{s}, r'}$ to $\mathds{1}$. Therefore, by a hybrid argument there is a $1 \le k \le e$ such that $\edcp_{n, q, r'}$ can distinguish between $B_{\bm{s}, r'}^{k - 1}$ and $B_{\bm{s}, r'}^k$ with non-negligible advantage. Using the amplification technique of Section ?? we can assume that the distinguishing advantage is exponentially close to $1$. Let $\bm{s} = (s_1, \dots, s_n)$. Given samples from $B_{\bm{s}, r'}^{k - 1}$ we can compute $s_1 \bmod p$ as follows. Consider the state $\ldbrac{\phi_{\bm{s}, r'}^{k - 1}(\bm{x})}$ where $\bm{x} = (x_1, \dots, x_n)$, and let $y \in \Z_p$. If we perform the transformation $\ldbrac{j}\ldbrac{\bm{a}}\ldbrac{0} \mapsto \ldbrac{j}\ldbrac{\bm{a}}\ldbrac{a_1 - jy \bmod p}$ on $\ldbrac{\phi_{\bm{s}, r'}^{k - 1}(\bm{x})}$ we have
+    is a sample from $B_{\bm{s}, r'}^k$. For $k = 0$ we have $j = 0 \bmod p^0$ for all $j$, so $\rho_{\bm{s}, r'}^0 = \rho_{\bm{s}, r'}$ and the distribution $B_{\bm{s}, r'}^0$ is the same as $B_{\bm{s}, r'}$. For $k = e$, since $r' \le p^e$, discarding the last register in \eqref{equ:r-1} collapses the state $\rho_{\bm{s}, r'}$ to $\mathds{1}$. Therefore, by a hybrid argument there is a $1 \le k \le e$ such that $\edcp_{n, q, r'}$ can distinguish between $B_{\bm{s}, r'}^{k - 1}$ and $B_{\bm{s}, r'}^k$ with non-negligible advantage. Using the amplification technique of Section ?? we can assume that the distinguishing advantage is exponentially close to $1$. Let $\bm{s} = (s_1, \dots, s_n)$. Given samples from $B_{\bm{s}, r'}^{k - 1}$ we can compute $s_1 \bmod p$ as follows. Consider the state $\ldbrac{\phi_{\bm{s}, r'}^{k - 1}(\bm{x})}$ where $\bm{x} = (x_1, \dots, x_n)$, and let $y \in \Z_p$. If we perform the transformation $\ldbrac{j}\ldbrac{\bm{a}}\ldbrac{0} \mapsto \ldbrac{j}\ldbrac{\bm{a}}\ldbrac{a_1 - jy \bmod p^k}$ on $\ldbrac{\phi_{\bm{s}, r'}^{k - 1}(\bm{x})}$ we have
     \[ \ldbrac{\phi_{\bm{s}, r'}^{k - 1}(\bm{x})}\ldbrac{0} \mapsto \frac{1}{\sqrt{r_{k - 1}}} \sum_{j = 0}^{r_{k - 1} - 1} \ldbrac{jp^{k - 1} + c}\ldbrac{\bm{x} + (jp^{k - 1} + c)\bm{s}}\ldbrac{x_1 + (jp^{k - 1} + c)(s_1 - y) \bmod p^k}. \]
     If we measure the last register, the resulting state will be a sample from $B_{\bm{s}, r'}^{k - 1}$ or $B_{\bm{s}, r'}^k$ depending on whether $s_1 = y$ or $s_1 \ne y \bmod p$:
     \begin{itemize}
@@ -237,11 +242,14 @@ In this section, we give a search-to-decision reduction for $\edcp$. The reducti
     \end{align*}
     where $0 \le c_2 \le p - 1$ is a random constant and $0 \le r_k \le \lfloor r_{k - 1} / p \rfloor$. The mixed state corresponding to $\ldbrac{\psi}$ is clearly a sample from $B_{\bm{s}, r'}^k$.
     \end{itemize}
-    Therefore, using $D$ we can find out whether $y = s_1 \bmod p$. By trying every $y \in \Z_p$ we can recover $s_1 \bmod p$. Assume we have recovered the first $h$ digits of $s_1$ in base $p$, that is we have computed $0 \le \tilde{s}_1 < p^h$ such that $\tilde{s}_1 = s_1 \bmod p$. To compute the $(h + 1)$-th digit, we perform the transformation
+    Therefore, using $D$ we can find out whether $y = s_1 \bmod p$. By trying every $y \in \Z_p$ we can recover $s_1 \bmod p$. Assume we have recovered the first $h$ digits of $s_1$ in base $p$, that is we have computed $0 \le \tilde{s}_1 < p^h$ such that $\tilde{s}_1 = s_1 \bmod p^h$. To compute the $(h + 1)$-th digit, we perform the transformation
     \[ \ldbrac{j}\ldbrac{\bm{a}}\ldbrac{0} \mapsto \ldbrac{j}\ldbrac{\bm{a}}\ldbrac{(a_1 - j\tilde{s}_1) / p^h - jy \bmod p}  \]
     on the samples from $B_{\bm{s}, r'}^{k - 1}$ and repeat the above procedure.
 \end{proof}
-
+\begin{corollary}
+    Let $q = p_1^{e_1} \cdots p_\ell^{e_\ell}$ be the prime factorization of $q$ and assume that the primes $p_i$ are of size $\poly(n)$. If $r \le p_i^{e_i}$ for all $1 \le i \le \ell$ then there is a polynomial-time quantum reduction from solving search-$\edcp_{n, q, r}$ to solving decision-$\edcp_{n, q, r}$. In particular, if $q$ is a prime power then search-$\edcp_{n, q, r}$ and decision-$\edcp_{n, q, r}$ are quantum polynomial-time equivalent.
+\end{corollary}
+I follows from the above corollary that for the two special cases $q = 2^e$ and $q = p$, where $p$ is $\poly(n)$-bounded prime, the search-$\edcp$ and decision-$\edcp$ are polynomial-time equivalent without loss of parameters. 
 
 %% ///////////////////////////////////////////////////////
 
