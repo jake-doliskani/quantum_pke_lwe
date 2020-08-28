@@ -135,7 +135,7 @@
 
 
 \section{Preliminaries}
-
+\label{sec:preli}
 
 In this section, we review some basic concepts and notations of quantum computing and the learning with error (LWE) problem. 
 
@@ -251,71 +251,98 @@ In this section, we give a search-to-decision reduction for $\edcp$. The reducti
 \end{corollary}
 I follows from the above corollary that for the two special cases $q = 2^e$ and $q = p$, where $p$ is $\poly(n)$-bounded prime, the search-$\edcp$ and decision-$\edcp$ are polynomial-time equivalent without loss of parameters. 
 
+
+
 %% ///////////////////////////////////////////////////////
 
 
 
-\section{EDCP for \boldmath${q = 2^k}$\unboldmath}
+\section{A Better Decision Problem}
 
+In this section, we propose an $\edcp$ decision problem that will be more suitable for applications than the one defined in Section \ref{sec:preli}. The new problem is best understood for prime modulus $q$, so let us assume, for now, that $q$ is $\poly(n)$-bounded prime.
 
-In this section we assume $q$ and $r$ are powers of $2$. Let $\bm{s} \in \Z_q^n$ be fixed and let $b \in \{ 0, 1 \}$. Suppose that a quantum system is in the state 
-\[ \ldbrac{\phi_{\bm{s}, \bm{x}, b}} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} (-1)^{bj}\ldbrac{j}\ldbrac{\bm{x} + j\bm{s}} \]
-for some uniformly random $\bm{x} \in \Z_q$. Then the  system is described by the density operator  
-\[ \Phi_{\bm{s}, b} = \frac{1}{q^n} \sum_{\bm{x} \in \Z_q^n} \ldbrac{\phi_{\bm{s}, \bm{x}, b}} \rdbrac{\phi_{\bm{s}, \bm{x}, b}}. \]
-\begin{definition}[Search]
-    Let $\bm{s} \in \Z_q^n$, and let $\ell: \N \rightarrow \N$ be polynomially bounded. Given $\ell(n)$ copies of the state $\Phi_{\bm{s}, 0}$, i.e., given $\Phi_{\bm{s}, 0}^{\otimes \ell(n)}$, find $\bm{s}$.
+Define the distribution $\tilde{B}_{\bm{s}, r}$ on $\mathcal{X}$ by choosing $\bm{x} \in \Z_q^n$ and $t \in \Z_q$ uniformly at random and outputting the state
+\[ \ldbrac{\phi_{\bm{s}, r, t}(\bm{x})} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} \omega_q^{jt} \ldbrac{j}\ldbrac{\bm{x} + j\bm{s}}. \]
+\begin{definition}[EDCP, Decision]
+    \label{def:d-edcp-n}
+     The decision-$\edcp_{n, q, r}$ is the problem of distinguishing between the distributions $B_{\bm{s}, r}$ and $\tilde{B}_{\bm{s}, r}$.
 \end{definition}
-\begin{definition}[Decision]
-    Let $\bm{s} \in \Z_q^n$, and let $\ell: \N \rightarrow \N$ be polynomially bounded. Distinguish with non-negligible advantage between the two ensembles $\{ \Phi_{\bm{s}, 0}^{\otimes \ell(n)} \}_{n \in \N}$ and $\{ \Phi_{\bm{s}, 1}^{\otimes \ell(n)} \}_{n \in \N}$.
-\end{definition}
-\begin{theorem}[Search to Decision]
-    If there is a polynomial time quantum algorithm for the decision problem then there is a polynomial time quantum algorithm for the search problem.
-\end{theorem}
-\begin{proof}
-    Assume there is a quantum polynomial time algorithm $Q$ for the Decision problem. Let $\tilde{\Phi}_{\bm{s}, b} = \Phi_{\bm{s}, b}^{\otimes \ell(n)}$. Fix an arbitrary $n$ for which 
-    \[ \Pr[ Q(\tilde{\Phi}_{\bm{s}, 1}) = 1 ] - \Pr[ Q(\tilde{\Phi}_{\bm{s}, 0}) = 1 ] \ge \frac{1}{p(n)} \]
-    for some polynomial $p(n)$. We will construct an algorithm $W$ that computes $\bm{s}$ with high probability. Let $\bm{s} = (s_1, \dots, s_n)$. We show how to compute $s_1$, the other values $s_i$, $2 \le i \le n$, can be computed in a similar way. The strategy is to determine $s_1$ one bit at a time.
+The motivation behind this new definition is that an instance of this decision problem can be efficiently transformed into an instance of the decision-LWE problem using the technique in \cite{brakerski2018learning}. More precisely, given a state $\ldbrac{\phi_{\bm{s}, r, t}(\bm{x})}$, we first apply the transformation $\ldbrac{j} \mapsto \ldbrac{j - \lfloor (r - 1) / 2 \rfloor}$ to the first register to obtain the state
+\begin{equation}
+    \label{equ:symm-edcp}
+    \frac{1}{\sqrt{r}} \sum_{j = -\lfloor (r - 1) / 2 \rfloor}^{\lceil (r - 1) / 2 \rceil} \omega_q^{jt} \ldbrac{j}\ldbrac{\bm{x} + j\bm{s}},
+\end{equation}
+where we have again denoted the random element $\bm{x} + \lfloor (r - 1) / 2 \rfloor \bm{s} \in \Z_q^n$ by $\bm{x}$. Next, using the quantum rejection sampling we can, with probability $\Omega(\sigma / r) = \Omega(1 / \sqrt{\kappa})$, transform \eqref{equ:symm-edcp} into 
+\begin{equation}
+    \label{equ:symm-eg}
+    \sum_{j = -\lfloor (r - 1) / 2 \rfloor}^{\lceil (r - 1) / 2 \rceil} \omega_q^{jt} g_\sigma(j) \ldbrac{j}\ldbrac{\bm{x} + j\bm{s}},
+\end{equation}
+where $g_\sigma(x) = \exp(-\pi x^2 / \sigma^2)$ is the Gaussian distribution. Now if we apply the transform $F_q \otimes F_{q^n}$ to \eqref{equ-symm-eg} and measure the last register we obtain the state
+\[ \frac{1}{\sqrt{q}} \sum_{y \in \Z_q} \sum_{j = -\lfloor (r - 1) / 2 \rfloor}^{\lceil (r - 1) / 2 \rceil} \omega_q^{j(\lrang{\bm{a}, \bm{s}} + y + t)} g_\sigma(j) \ldbrac{y},\]
+where $\bm{a} \in \Z_q^n$ is uniformly random and known. By lemma ??, the above state is $2^{-\Omega(\kappa)}$-close to the state
+\[ \frac{1}{\sqrt{q}} \sum_{y \in \Z_q} \sum_{j \in \Z} \omega_q^{j(\lrang{\bm{a}, \bm{s}} + y + t)} g_\sigma(j) \ldbrac{y},\]
 
-    Let $m = 2np(n)^2$ and obtain $2m$ copies of the state $\tilde{\Phi}_{\bm{s}, 0}$ stored in two registers $R = \tilde{\Phi}_{\bm{s}, 0} \otimes \cdots \otimes \tilde{\Phi}_{\bm{s}, 0}$ and $S = \tilde{\Phi}_{\bm{s}, 0} \otimes \cdots \otimes \tilde{\Phi}_{\bm{s}, 0}$. For an arbitrary $\bm{x} = (x_1, \dots, x_n)$, define the following unitary
-    \[ U_1 \ldbrac{j}\ldbrac{\bm{x} + j\bm{s}} = (-1)^{x_1 + js_1} \ldbrac{j}\ldbrac{\bm{x} + j\bm{s}}. \]
-    Ignoring the global phase $(-1)^{x_1}$, $U_1$ acts on the state $\ldbrac{\phi_{\bm{s}, \bm{x}, 0}}$ as follows
-    \[ U_1 \ldbrac{\phi_{\bm{s}, \bm{x}, 0}} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} (-1)^{js_1}\ldbrac{j}\ldbrac{\bm{x} + j\bm{s}}. \]
-    This means we have
-    \begin{equation}
-        \label{equ:u1}
-        U_1^{\otimes \ell(n)} \tilde{\Phi}_{\bm{s}, 0} (U_1^*)^{\otimes \ell(n)} =
-        \begin{cases}
-            \tilde{\Phi}_{\bm{s}, 0} & \text{if } s_1 \text{ is even} \\
-            \tilde{\Phi}_{\bm{s}, 1} & \text{if } s_1 \text{ is odd}.
-        \end{cases}
-    \end{equation}
-    If we apply $U_1^{\otimes \ell(n)}$ to all the states $\tilde{\Phi}_{\bm{s}, 0}$ in $S$ we obtain the state $S_c = \tilde{\Phi}_{\bm{s}, c} \otimes \cdots \otimes \tilde{\Phi}_{\bm{s}, c}$ where $c = s_1 \mod 2$. Now, $W$ runs the algorithm $Q$ on all the states in the two registers $R$ and $S_c$. Let $X_i$ and $Y_i$, $1 \le i \le m$, be random variables representing the output of $Q$ on the states $\tilde{\Phi}_{\bm{s}, c}$ in $S_c$ and the states $\tilde{\Phi}_{\bm{s}, 0}$ in $R$, respectively. Let $Z = \sum_{i = 1}^m (X_i - Y_i)$. If $Z \ge np(n)$ then $W$ outputs $1$, otherwise it outputs $0$. For simplicity, we replace $Y_i$ by $-Y_i$ and assume that $Y_i \in \{ -1, 0 \}$. If $c = 1$ we have
-    \begin{align*}
-        \Pr[ Z \le np(n) ]
-        & = \Pr[ Z \le \frac{m}{p(n)} - np(n) ] \\
-        & \le \Pr[ Z - m(\Pr[ Q(\tilde{\Phi}_{\bm{s}, 1}) = 1 ] - \Pr[ Q(\tilde{\Phi}_{\bm{s}, 0}) = 1]) < -np(n) ] \\
-        & = \Pr[ Z - \E[Z] \le -np(n) ] \\
-        & \le 2^{-n / 2}
-    \end{align*}
-    If $c = 0$ then $\E[Z] = 0$ and
-    \begin{align*}
-        \Pr[ Z \ge np(n) - 1 ]
-        & = \Pr[ Z -\E[Z] \ge np(n) - 1 ] \\
-        & \le e^{-(np(n) - 1)^2 / m} \\
-        & \le 2^{-\frac{n}{2}(1 - o(1))}.
-    \end{align*}
-    Therefore, $W$ outputs the least significant bit of $s_1$ with probability exponentially close to $1$. Assume that we have already computed the first $k$ bits $b_0, \dots, b_{k - 1}$ of $s_1$, and let $\tilde{s}_1 = b_{k - 1}2^{k - 1} + \cdots + b_12^1 + b_0$. Define the unitary
-    \[ U_{k + 1} \ldbrac{j}\ldbrac{\bm{x} + j\bm{s}} = \omega_{2^{k + 1}}^{x_1 + js_1} \omega_{2^{k + 1}}^{-j\tilde{s}_1} \ldbrac{j}\ldbrac{\bm{x} + j\bm{s}}. \]
-    Then the actions of $U_{k + 1}$ on the state $\tilde{\Phi}_{\bm{s}, 0}$ is similar to \eqref{equ:u1}. More precisely,
-    \[
-    U_{k + 1}^{\otimes \ell(n)} \tilde{\Phi}_{\bm{s}, 0} (U_{k + 1}^*)^{\otimes \ell(n)} =
-    \begin{cases}
-        \tilde{\Phi}_{\bm{s}, 0} & \text{if the } k\text{-th bit of } s_1 \text{ is } 0 \\
-        \tilde{\Phi}_{\bm{s}, 1} & \text{if the } k\text{-th bit of } s_1 \text{ is } 1
-    \end{cases}
-    \]
-    Repeating the above process with $U_{k + 1}$, $W$ determines the $(k + 1)$-th bit of $s_1$ with high probability. All the bits of $s_1$ are computed this way.
-\end{proof}
+%% \section{EDCP for \boldmath${q = 2^k}$\unboldmath}
+
+
+%% In this section we assume $q$ and $r$ are powers of $2$. Let $\bm{s} \in \Z_q^n$ be fixed and let $b \in \{ 0, 1 \}$. Suppose that a quantum system is in the state 
+%% \[ \ldbrac{\phi_{\bm{s}, \bm{x}, b}} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} (-1)^{bj}\ldbrac{j}\ldbrac{\bm{x} + j\bm{s}} \]
+%% for some uniformly random $\bm{x} \in \Z_q$. Then the  system is described by the density operator  
+%% \[ \Phi_{\bm{s}, b} = \frac{1}{q^n} \sum_{\bm{x} \in \Z_q^n} \ldbrac{\phi_{\bm{s}, \bm{x}, b}} \rdbrac{\phi_{\bm{s}, \bm{x}, b}}. \]
+%% \begin{definition}[Search]
+%%     Let $\bm{s} \in \Z_q^n$, and let $\ell: \N \rightarrow \N$ be polynomially bounded. Given $\ell(n)$ copies of the state $\Phi_{\bm{s}, 0}$, i.e., given $\Phi_{\bm{s}, 0}^{\otimes \ell(n)}$, find $\bm{s}$.
+%% \end{definition}
+%% \begin{definition}[Decision]
+%%     Let $\bm{s} \in \Z_q^n$, and let $\ell: \N \rightarrow \N$ be polynomially bounded. Distinguish with non-negligible advantage between the two ensembles $\{ \Phi_{\bm{s}, 0}^{\otimes \ell(n)} \}_{n \in \N}$ and $\{ \Phi_{\bm{s}, 1}^{\otimes \ell(n)} \}_{n \in \N}$.
+%% \end{definition}
+%% \begin{theorem}[Search to Decision]
+%%     If there is a polynomial time quantum algorithm for the decision problem then there is a polynomial time quantum algorithm for the search problem.
+%% \end{theorem}
+%% \begin{proof}
+%%     Assume there is a quantum polynomial time algorithm $Q$ for the Decision problem. Let $\tilde{\Phi}_{\bm{s}, b} = \Phi_{\bm{s}, b}^{\otimes \ell(n)}$. Fix an arbitrary $n$ for which 
+%%     \[ \Pr[ Q(\tilde{\Phi}_{\bm{s}, 1}) = 1 ] - \Pr[ Q(\tilde{\Phi}_{\bm{s}, 0}) = 1 ] \ge \frac{1}{p(n)} \]
+%%     for some polynomial $p(n)$. We will construct an algorithm $W$ that computes $\bm{s}$ with high probability. Let $\bm{s} = (s_1, \dots, s_n)$. We show how to compute $s_1$, the other values $s_i$, $2 \le i \le n$, can be computed in a similar way. The strategy is to determine $s_1$ one bit at a time.
+
+%%     Let $m = 2np(n)^2$ and obtain $2m$ copies of the state $\tilde{\Phi}_{\bm{s}, 0}$ stored in two registers $R = \tilde{\Phi}_{\bm{s}, 0} \otimes \cdots \otimes \tilde{\Phi}_{\bm{s}, 0}$ and $S = \tilde{\Phi}_{\bm{s}, 0} \otimes \cdots \otimes \tilde{\Phi}_{\bm{s}, 0}$. For an arbitrary $\bm{x} = (x_1, \dots, x_n)$, define the following unitary
+%%     \[ U_1 \ldbrac{j}\ldbrac{\bm{x} + j\bm{s}} = (-1)^{x_1 + js_1} \ldbrac{j}\ldbrac{\bm{x} + j\bm{s}}. \]
+%%     Ignoring the global phase $(-1)^{x_1}$, $U_1$ acts on the state $\ldbrac{\phi_{\bm{s}, \bm{x}, 0}}$ as follows
+%%     \[ U_1 \ldbrac{\phi_{\bm{s}, \bm{x}, 0}} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} (-1)^{js_1}\ldbrac{j}\ldbrac{\bm{x} + j\bm{s}}. \]
+%%     This means we have
+%%     \begin{equation}
+%%         \label{equ:u1}
+%%         U_1^{\otimes \ell(n)} \tilde{\Phi}_{\bm{s}, 0} (U_1^*)^{\otimes \ell(n)} =
+%%         \begin{cases}
+%%             \tilde{\Phi}_{\bm{s}, 0} & \text{if } s_1 \text{ is even} \\
+%%             \tilde{\Phi}_{\bm{s}, 1} & \text{if } s_1 \text{ is odd}.
+%%         \end{cases}
+%%     \end{equation}
+%%     If we apply $U_1^{\otimes \ell(n)}$ to all the states $\tilde{\Phi}_{\bm{s}, 0}$ in $S$ we obtain the state $S_c = \tilde{\Phi}_{\bm{s}, c} \otimes \cdots \otimes \tilde{\Phi}_{\bm{s}, c}$ where $c = s_1 \mod 2$. Now, $W$ runs the algorithm $Q$ on all the states in the two registers $R$ and $S_c$. Let $X_i$ and $Y_i$, $1 \le i \le m$, be random variables representing the output of $Q$ on the states $\tilde{\Phi}_{\bm{s}, c}$ in $S_c$ and the states $\tilde{\Phi}_{\bm{s}, 0}$ in $R$, respectively. Let $Z = \sum_{i = 1}^m (X_i - Y_i)$. If $Z \ge np(n)$ then $W$ outputs $1$, otherwise it outputs $0$. For simplicity, we replace $Y_i$ by $-Y_i$ and assume that $Y_i \in \{ -1, 0 \}$. If $c = 1$ we have
+%%     \begin{align*}
+%%         \Pr[ Z \le np(n) ]
+%%         & = \Pr[ Z \le \frac{m}{p(n)} - np(n) ] \\
+%%         & \le \Pr[ Z - m(\Pr[ Q(\tilde{\Phi}_{\bm{s}, 1}) = 1 ] - \Pr[ Q(\tilde{\Phi}_{\bm{s}, 0}) = 1]) < -np(n) ] \\
+%%         & = \Pr[ Z - \E[Z] \le -np(n) ] \\
+%%         & \le 2^{-n / 2}
+%%     \end{align*}
+%%     If $c = 0$ then $\E[Z] = 0$ and
+%%     \begin{align*}
+%%         \Pr[ Z \ge np(n) - 1 ]
+%%         & = \Pr[ Z -\E[Z] \ge np(n) - 1 ] \\
+%%         & \le e^{-(np(n) - 1)^2 / m} \\
+%%         & \le 2^{-\frac{n}{2}(1 - o(1))}.
+%%     \end{align*}
+%%     Therefore, $W$ outputs the least significant bit of $s_1$ with probability exponentially close to $1$. Assume that we have already computed the first $k$ bits $b_0, \dots, b_{k - 1}$ of $s_1$, and let $\tilde{s}_1 = b_{k - 1}2^{k - 1} + \cdots + b_12^1 + b_0$. Define the unitary
+%%     \[ U_{k + 1} \ldbrac{j}\ldbrac{\bm{x} + j\bm{s}} = \omega_{2^{k + 1}}^{x_1 + js_1} \omega_{2^{k + 1}}^{-j\tilde{s}_1} \ldbrac{j}\ldbrac{\bm{x} + j\bm{s}}. \]
+%%     Then the actions of $U_{k + 1}$ on the state $\tilde{\Phi}_{\bm{s}, 0}$ is similar to \eqref{equ:u1}. More precisely,
+%%     \[
+%%     U_{k + 1}^{\otimes \ell(n)} \tilde{\Phi}_{\bm{s}, 0} (U_{k + 1}^*)^{\otimes \ell(n)} =
+%%     \begin{cases}
+%%         \tilde{\Phi}_{\bm{s}, 0} & \text{if the } k\text{-th bit of } s_1 \text{ is } 0 \\
+%%         \tilde{\Phi}_{\bm{s}, 1} & \text{if the } k\text{-th bit of } s_1 \text{ is } 1
+%%     \end{cases}
+%%     \]
+%%     Repeating the above process with $U_{k + 1}$, $W$ determines the $(k + 1)$-th bit of $s_1$ with high probability. All the bits of $s_1$ are computed this way.
+%% \end{proof}
 
 
 
