@@ -105,8 +105,9 @@
 \def\CC{\ensuremath{\mathsf{C}}}
 \def\lwe{\ensuremath{\mathsf{LWE}}}
 \def\edcp{\ensuremath{\mathsf{EDCP}}}
-\def\euler{\ensuremath{\varphi}}
-
+\def\gen{\ensuremath{\mathsf{Gen}}}
+\def\enc{\ensuremath{\mathsf{Enc}}}
+\def\dec{\ensuremath{\mathsf{Dec}}}
 
 
 \title{Quantum Learning With Errors}
@@ -390,53 +391,54 @@ Measuring the above state, we obtain a pair $(-\bm{a}, \lrang{-\bm{a}, \bm{s}} +
 
 
 
-\section{Quantum public key system}
+\section{Quantum Public-Key Cryptosystem}
 
+A quantum public-key cryptosystem is, similar to a classical system, a set of three algorithms:
+\begin{itemize}[itemsep = 1pt]
+\item $\gen(1^n)$ generates a public-key $pk$ and a secret-key $sk$, based on the security parameter $n$.
+\item $\enc(pk, m)$, outputs a ciphertext $c$ for a given public-key $pk$ and message $m$.
+\item $\dec(sk, c)$, outputs a message $m$ for a given secret-key $sk$ and ciphertext $c$.
+\end{itemize}
+The output pair $(pk, sk)$ of the $\gen$ algorithm for a quantum system is a consists usually of a quantum state and a classical state, respectively. In particular, the public-key $pk$ is a quantum state that is generated using a classical key $sk$. The algorithm $\enc$ encrypts the message $m$, which is classical information, using the quantum state $pk$. The output $c$ of $\enc$ is a quantum state. The algorithm $\dec$ uses the key $sk$ to decrypt the quantum state into a classical message $m$.
 
-\textit{Key generation:}
+For the security parameter $n$, we set the parameters for public key system as follows. We choose $q = \poly(n)$ such that $q = 2^s$ for some integer $s > 0$. We also set $r = 2^{s'}$ where $s' < s$. The main reason for these choices of parameters is efficiency, as we shall explain at the end of this section. In what follows we describe our cryptosystem for encrypting a one-bit message $b \in \{ 0, 1 \}$.
 
-\begin{enumerate}[topsep = 1pt, itemsep = 1pt, parsep = 1pt]
-\item Select $\bm{x} \in \Z_q^n$ uniformly at random.
-\item Apply $\qft_r \otimes \mathds{1}$ to the register $\ket{0} \ket{\bm{x}}$ to obtain the state $\frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} \ket{j} \ket{\bm{x}}$.
-\item Apply the the operation $\ket{j}\ket{\bm{x}} \mapsto \ket{j}\ket{\bm{x} + j\bm{s}}$ to obtain the state $\ket{\phi_{\bm{s}, \bm{x}, 0}} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} \ket{j} \ket{\bm{x} + j\bm{s}}$
-\item Publish the state $\ket{\phi_{\bm{s}, \bm{x}, 0}}$.     
-\end{enumerate}
+\vspace*{\topskip}
 
-\vspace*{5mm}
+$\gen(1^n)$: Select $\bm{x}, \bm{s} \in \Z_q^n$ uniformly at random. Apply the transformation $\qft_r \otimes \mathds{1}$ to the register $\ket{0} \ket{\bm{x}}$ to obtain the state $\ket{\psi_1} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} \ket{j} \ket{\bm{x}}$. Apply the transformation $\ket{j}\ket{\bm{x}} \mapsto \ket{j}\ket{\bm{x} + j\bm{s}}$ to $\ket{\psi_1}$ to obtain the state
+\[ \ket{\phi_{\bm{s}, r, 0}(\bm{x})} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} \ket{j} \ket{\bm{x} + j\bm{s}}. \]
+Return the public-key, private-key pair $(pk, sk) = (\ket{\phi_{\bm{s}, r, 0}(\bm{x})}, \bm{s})$.     
 
-\textit{Encryption:}
+\vspace*{\topskip}
 
-\begin{enumerate}[topsep = 1pt, itemsep = 1pt, parsep = 1pt]
-\item Alice obtains a copy of Bob's public keys $\Phi_{\bm{s}, 0}$.
-\item To encrypt a bit $b \in \{ 0, 1 \}$, Alice performs the unitary $U: \ket{j}\ket{\bm{y}} \mapsto (-1)^{bj}\ket{j}\ket{\bm{y}}$ on $\Phi_{\bm{s}, 0}$ to obtain the state $\Phi_{\bm{s}, b}$.
-\item The state $\Phi_{\bm{s}, b}$ is sent to Bob.
-\end{enumerate}
-
-\vspace*{5mm}
-
-\textit{Decryption:}
-On receiving the encrypted state $\Phi_{\bm{s}, b}$, Bob perform the following:
-\begin{enumerate}[topsep = 1pt, itemsep = 1pt, parsep = 1pt]
-\item Apply the the unitary $U: \ket{j}\ket{\bm{y}} \mapsto \ket{j}\ket{\bm{y} - j\bm{s}}$ to $\Phi_{\bm{s}, b}$.
-\item Discard the second register.
-\item Apply $\qft_r$ and measure.
-\item If the measurement result is 0 then output 0, otherwise output 1.
-\end{enumerate}
-
-\paragraph{Correctness.} 
-Given the encrypted state $\Phi_{\bm{s}, b}$, the decryption steps are as follows
+$\enc(pk = \rho_{\bm{s}, r, 0}, b \in \{ 0, 1 \})$:  Apply the transformation $U: \ket{j}\ket{\bm{y}} \mapsto (-1)^{bj}\ket{j}\ket{\bm{y}}$ to $\rho_{\bm{s}, r, 0}$ to obtain the state
 \begin{align*}
-    \Phi_{\bm{s}, b}
-    & \mapsto U \frac{1}{q^n} \sum_{\bm{x} \in \Z_q^n} \ket{\phi_{\bm{s}, \bm{x}, b}} \bra{\phi_{\bm{s}, \bm{x}, b}} U^*  \tag{apply $U$} \\
-    & = \frac{1}{q^n} \sum_{\bm{x} \in \Z_q^n} \frac{1}{r} \sum_{j = 0}^{r - 1} \sum_{k = 0}^{r - 1} (-1)^{b(j - k)}\ket{k}\ket{\bm{x}} \bra{j}\bra{\bm{x}} \\
-    & = \frac{1}{r} \sum_{j = 0}^{r - 1} \sum_{k = 0}^{r - 1} (-1)^{b(j - k)}\ket{k}\bra{j} \otimes \frac{1}{q^n} \sum_{\bm{x} \in \Z_q^n} \ket{\bm{x}}\bra{\bm{x}} \\
-    & \mapsto \frac{1}{r} \sum_{j = 0}^{r - 1} \sum_{k = 0}^{r - 1} (-1)^{b(j - k)}\ket{k}\bra{j} \tag{discard the second register} \\
-    & \mapsto \qft_r \frac{1}{r} \sum_{j = 0}^{r - 1} \sum_{k = 0}^{r - 1} (-1)^{b(j - k)}\ket{k}\bra{j} \qft_r^* \tag{apply quantum Fourier transfom}\\
-    & = \ket{br/2} \bra{br/2}
+    U \rho_{\bm{s}, r, 0} U^*
+    & = U \E_{\bm{x} \leftarrow \Z_q^n} \Big[ \ket{\phi_{\bm{s}, r, 0}(\bm{x})} \bra{\phi_{\bm{s}, r, 0}(\bm{x})} \Big] U^* \\
+    & = \E_{\bm{x} \leftarrow \Z_q^n} \Big[ U \ket{\phi_{\bm{s}, r, 0}(\bm{x})} \bra{\phi_{\bm{s}, r, 0}(\bm{x})} U^* \Big] \\
+    & = \E_{\bm{x} \leftarrow \Z_q^n} \Big[ \ket{\phi_{\bm{s}, r, b}(\bm{x})} \bra{\phi_{\bm{s}, r, b}(\bm{x})} \Big] \\
+    & = \rho_{\bm{s}, r, b}.
 \end{align*}
-If $b = 0$ then the state of the system is $\ket{0} \bra{0}$, otherwise it is $\ket{r / 2} \bra{r / 2}$. 
+Return $\rho_{\bm{s}, r, b}$.
 
-\paragraph{Security.}
+\vspace*{\topskip}
+
+$\dec(sk = \bm{s}, c = \rho_{\bm{s}, r, b})$:  Apply the transformation $U: \ket{j}\ket{\bm{y}} \mapsto \ket{j}\ket{\bm{y} - j\bm{s}}$ to $\rho_{\bm{s}, r, b}$. Discard the second register. Apply $\qft_r$ to the resulting state and measure. If the measurement result is 0 then output 0, otherwise output 1.
+
+%% \paragraph{Correctness.} 
+%% Given the encrypted state $\Phi_{\bm{s}, b}$, the decryption steps are as follows
+%% \begin{align*}
+%%     \Phi_{\bm{s}, b}
+%%     & \mapsto U \frac{1}{q^n} \sum_{\bm{x} \in \Z_q^n} \ket{\phi_{\bm{s}, \bm{x}, b}} \bra{\phi_{\bm{s}, \bm{x}, b}} U^*  \tag{apply $U$} \\
+%%     & = \frac{1}{q^n} \sum_{\bm{x} \in \Z_q^n} \frac{1}{r} \sum_{j = 0}^{r - 1} \sum_{k = 0}^{r - 1} (-1)^{b(j - k)}\ket{k}\ket{\bm{x}} \bra{j}\bra{\bm{x}} \\
+%%     & = \frac{1}{r} \sum_{j = 0}^{r - 1} \sum_{k = 0}^{r - 1} (-1)^{b(j - k)}\ket{k}\bra{j} \otimes \frac{1}{q^n} \sum_{\bm{x} \in \Z_q^n} \ket{\bm{x}}\bra{\bm{x}} \\
+%%     & \mapsto \frac{1}{r} \sum_{j = 0}^{r - 1} \sum_{k = 0}^{r - 1} (-1)^{b(j - k)}\ket{k}\bra{j} \tag{discard the second register} \\
+%%     & \mapsto \qft_r \frac{1}{r} \sum_{j = 0}^{r - 1} \sum_{k = 0}^{r - 1} (-1)^{b(j - k)}\ket{k}\bra{j} \qft_r^* \tag{apply quantum Fourier transfom}\\
+%%     & = \ket{br/2} \bra{br/2}
+%% \end{align*}
+%% If $b = 0$ then the state of the system is $\ket{0} \bra{0}$, otherwise it is $\ket{r / 2} \bra{r / 2}$. 
+
+%% \paragraph{Security.}
 
 
 \bibliographystyle{plain}
