@@ -1,7 +1,6 @@
 \documentclass[11pt]{article}
 
-% usepackage[margin = 1in]{geometry}
-\usepackage{fullpage}              
+\usepackage[margin = 1in]{geometry}
 \usepackage{graphicx}              
 \usepackage{amsmath}               
 \usepackage{amsfonts}              
@@ -9,7 +8,7 @@
 \usepackage{amssymb}
 \usepackage{mathrsfs}
 \usepackage{url}
-\usepackage{color}
+\usepackage{xcolor}
 \usepackage{hyperref}
 \usepackage{algpseudocode}
 \usepackage[plain]{algorithm}
@@ -20,6 +19,8 @@
 \usepackage{mathtools}
 \usepackage{bm}
 \usepackage{dsfont}
+\usepackage{tikz}
+\usepackage{quantikz}
 %\usepackage[T1]{fontenc}
 %\usepackage{libertine}
 %\usepackage[libertine]{newtxmath}
@@ -87,27 +88,29 @@
 
 
 \DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+\let\ket\relax
 \DeclarePairedDelimiter{\ket}{\lvert}{\rangle}
+\let\bra\relax
 \DeclarePairedDelimiter{\bra}{\langle}{\rvert}
 \DeclarePairedDelimiter{\lrang}{\langle}{\rangle}
 \DeclarePairedDelimiter{\opnorm}{\lVert}{\rVert}
 
 
-\def\Q{\ensuremath{\mathbb{Q}}}
-\def\C{\ensuremath{\mathbb{C}}}
-\def\K{\ensuremath{\mathbb{K}}}
-\def\N{\ensuremath{\mathbb{N}}}
-\def\R{\ensuremath{\mathbb{R}}}
-\def\Z{\ensuremath{\mathbb{Z}}}
-\def\F{\ensuremath{\mathbb{F}}}
-\def\P{\ensuremath{\mathbb{P}}}
-\def\MM{\ensuremath{\mathsf{M}}}
-\def\CC{\ensuremath{\mathsf{C}}}
-\def\lwe{\ensuremath{\mathsf{LWE}}}
-\def\edcp{\ensuremath{\mathsf{EDCP}}}
-\def\gen{\ensuremath{\mathsf{Gen}}}
-\def\enc{\ensuremath{\mathsf{Enc}}}
-\def\dec{\ensuremath{\mathsf{Dec}}}
+\def\Q{\mathbb{Q}}
+\def\C{\mathbb{C}}
+\def\K{\mathbb{K}}
+\def\N{\mathbb{N}}
+\def\R{\mathbb{R}}
+\def\Z{\mathbb{Z}}
+\def\F{\mathbb{F}}
+\def\P{\mathbb{P}}
+\def\MM{\mathsf{M}}
+\def\CC{\mathsf{C}}
+\def\lwe{\mathsf{LWE}}
+\def\edcp{\mathsf{EDCP}}
+\def\gen{\mathsf{Gen}}
+\def\enc{\mathsf{Enc}}
+\def\dec{\mathsf{Dec}}
 
 
 \title{Quantum Learning With Errors}
@@ -250,7 +253,7 @@ In this section, we give a search-to-decision reduction for $\edcp$. The reducti
 \begin{corollary}
     Let $q = p_1^{e_1} \cdots p_\ell^{e_\ell}$ be the prime factorization of $q$ and assume that the primes $p_i$ are of size $\poly(n)$. If $r \le p_i^{e_i}$ for all $1 \le i \le \ell$ then there is a polynomial-time quantum reduction from solving search-$\edcp_{n, q, r}$ to solving decision-$\edcp_{n, q, r}$. In particular, if $q$ is a prime power then search-$\edcp_{n, q, r}$ and decision-$\edcp_{n, q, r}$ are quantum polynomial-time equivalent.
 \end{corollary}
-I follows from the above corollary that for the two special cases $q = 2^e$ and $q = p$, where $p$ is $\poly(n)$-bounded prime, the search-$\edcp$ and decision-$\edcp$ are polynomial-time equivalent without loss of parameters. 
+It follows from the above corollary that for the two special cases $q = 2^e$ and $q = p$, where $p$ is $\poly(n)$-bounded prime, the search-$\edcp$ and decision-$\edcp$ are polynomial-time equivalent without loss of parameters. 
 
 
 
@@ -318,75 +321,6 @@ Measuring the above state, we obtain a pair $(-\bm{a}, \lrang{-\bm{a}, \bm{s}} +
 
 
 
-
-
-
-
-
-%% \section{EDCP for \boldmath${q = 2^k}$\unboldmath}
-
-
-%% In this section we assume $q$ and $r$ are powers of $2$. Let $\bm{s} \in \Z_q^n$ be fixed and let $b \in \{ 0, 1 \}$. Suppose that a quantum system is in the state 
-%% \[ \ket{\phi_{\bm{s}, \bm{x}, b}} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} (-1)^{bj}\ket{j}\ket{\bm{x} + j\bm{s}} \]
-%% for some uniformly random $\bm{x} \in \Z_q$. Then the  system is described by the density operator  
-%% \[ \Phi_{\bm{s}, b} = \frac{1}{q^n} \sum_{\bm{x} \in \Z_q^n} \ket{\phi_{\bm{s}, \bm{x}, b}} \bra{\phi_{\bm{s}, \bm{x}, b}}. \]
-%% \begin{definition}[Search]
-%%     Let $\bm{s} \in \Z_q^n$, and let $\ell: \N \rightarrow \N$ be polynomially bounded. Given $\ell(n)$ copies of the state $\Phi_{\bm{s}, 0}$, i.e., given $\Phi_{\bm{s}, 0}^{\otimes \ell(n)}$, find $\bm{s}$.
-%% \end{definition}
-%% \begin{definition}[Decision]
-%%     Let $\bm{s} \in \Z_q^n$, and let $\ell: \N \rightarrow \N$ be polynomially bounded. Distinguish with non-negligible advantage between the two ensembles $\{ \Phi_{\bm{s}, 0}^{\otimes \ell(n)} \}_{n \in \N}$ and $\{ \Phi_{\bm{s}, 1}^{\otimes \ell(n)} \}_{n \in \N}$.
-%% \end{definition}
-%% \begin{theorem}[Search to Decision]
-%%     If there is a polynomial time quantum algorithm for the decision problem then there is a polynomial time quantum algorithm for the search problem.
-%% \end{theorem}
-%% \begin{proof}
-%%     Assume there is a quantum polynomial time algorithm $Q$ for the Decision problem. Let $\tilde{\Phi}_{\bm{s}, b} = \Phi_{\bm{s}, b}^{\otimes \ell(n)}$. Fix an arbitrary $n$ for which 
-%%     \[ \Pr[ Q(\tilde{\Phi}_{\bm{s}, 1}) = 1 ] - \Pr[ Q(\tilde{\Phi}_{\bm{s}, 0}) = 1 ] \ge \frac{1}{p(n)} \]
-%%     for some polynomial $p(n)$. We will construct an algorithm $W$ that computes $\bm{s}$ with high probability. Let $\bm{s} = (s_1, \dots, s_n)$. We show how to compute $s_1$, the other values $s_i$, $2 \le i \le n$, can be computed in a similar way. The strategy is to determine $s_1$ one bit at a time.
-
-%%     Let $m = 2np(n)^2$ and obtain $2m$ copies of the state $\tilde{\Phi}_{\bm{s}, 0}$ stored in two registers $R = \tilde{\Phi}_{\bm{s}, 0} \otimes \cdots \otimes \tilde{\Phi}_{\bm{s}, 0}$ and $S = \tilde{\Phi}_{\bm{s}, 0} \otimes \cdots \otimes \tilde{\Phi}_{\bm{s}, 0}$. For an arbitrary $\bm{x} = (x_1, \dots, x_n)$, define the following unitary
-%%     \[ U_1 \ket{j}\ket{\bm{x} + j\bm{s}} = (-1)^{x_1 + js_1} \ket{j}\ket{\bm{x} + j\bm{s}}. \]
-%%     Ignoring the global phase $(-1)^{x_1}$, $U_1$ acts on the state $\ket{\phi_{\bm{s}, \bm{x}, 0}}$ as follows
-%%     \[ U_1 \ket{\phi_{\bm{s}, \bm{x}, 0}} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} (-1)^{js_1}\ket{j}\ket{\bm{x} + j\bm{s}}. \]
-%%     This means we have
-%%     \begin{equation}
-%%         \label{equ:u1}
-%%         U_1^{\otimes \ell(n)} \tilde{\Phi}_{\bm{s}, 0} (U_1^*)^{\otimes \ell(n)} =
-%%         \begin{cases}
-%%             \tilde{\Phi}_{\bm{s}, 0} & \text{if } s_1 \text{ is even} \\
-%%             \tilde{\Phi}_{\bm{s}, 1} & \text{if } s_1 \text{ is odd}.
-%%         \end{cases}
-%%     \end{equation}
-%%     If we apply $U_1^{\otimes \ell(n)}$ to all the states $\tilde{\Phi}_{\bm{s}, 0}$ in $S$ we obtain the state $S_c = \tilde{\Phi}_{\bm{s}, c} \otimes \cdots \otimes \tilde{\Phi}_{\bm{s}, c}$ where $c = s_1 \mod 2$. Now, $W$ runs the algorithm $Q$ on all the states in the two registers $R$ and $S_c$. Let $X_i$ and $Y_i$, $1 \le i \le m$, be random variables representing the output of $Q$ on the states $\tilde{\Phi}_{\bm{s}, c}$ in $S_c$ and the states $\tilde{\Phi}_{\bm{s}, 0}$ in $R$, respectively. Let $Z = \sum_{i = 1}^m (X_i - Y_i)$. If $Z \ge np(n)$ then $W$ outputs $1$, otherwise it outputs $0$. For simplicity, we replace $Y_i$ by $-Y_i$ and assume that $Y_i \in \{ -1, 0 \}$. If $c = 1$ we have
-%%     \begin{align*}
-%%         \Pr[ Z \le np(n) ]
-%%         & = \Pr[ Z \le \frac{m}{p(n)} - np(n) ] \\
-%%         & \le \Pr[ Z - m(\Pr[ Q(\tilde{\Phi}_{\bm{s}, 1}) = 1 ] - \Pr[ Q(\tilde{\Phi}_{\bm{s}, 0}) = 1]) < -np(n) ] \\
-%%         & = \Pr[ Z - \E[Z] \le -np(n) ] \\
-%%         & \le 2^{-n / 2}
-%%     \end{align*}
-%%     If $c = 0$ then $\E[Z] = 0$ and
-%%     \begin{align*}
-%%         \Pr[ Z \ge np(n) - 1 ]
-%%         & = \Pr[ Z -\E[Z] \ge np(n) - 1 ] \\
-%%         & \le e^{-(np(n) - 1)^2 / m} \\
-%%         & \le 2^{-\frac{n}{2}(1 - o(1))}.
-%%     \end{align*}
-%%     Therefore, $W$ outputs the least significant bit of $s_1$ with probability exponentially close to $1$. Assume that we have already computed the first $k$ bits $b_0, \dots, b_{k - 1}$ of $s_1$, and let $\tilde{s}_1 = b_{k - 1}2^{k - 1} + \cdots + b_12^1 + b_0$. Define the unitary
-%%     \[ U_{k + 1} \ket{j}\ket{\bm{x} + j\bm{s}} = \omega_{2^{k + 1}}^{x_1 + js_1} \omega_{2^{k + 1}}^{-j\tilde{s}_1} \ket{j}\ket{\bm{x} + j\bm{s}}. \]
-%%     Then the actions of $U_{k + 1}$ on the state $\tilde{\Phi}_{\bm{s}, 0}$ is similar to \eqref{equ:u1}. More precisely,
-%%     \[
-%%     U_{k + 1}^{\otimes \ell(n)} \tilde{\Phi}_{\bm{s}, 0} (U_{k + 1}^*)^{\otimes \ell(n)} =
-%%     \begin{cases}
-%%         \tilde{\Phi}_{\bm{s}, 0} & \text{if the } k\text{-th bit of } s_1 \text{ is } 0 \\
-%%         \tilde{\Phi}_{\bm{s}, 1} & \text{if the } k\text{-th bit of } s_1 \text{ is } 1
-%%     \end{cases}
-%%     \]
-%%     Repeating the above process with $U_{k + 1}$, $W$ determines the $(k + 1)$-th bit of $s_1$ with high probability. All the bits of $s_1$ are computed this way.
-%% \end{proof}
-
-
-
 %% ///////////////////////////////////////////////////////
 
 
@@ -407,7 +341,16 @@ For the security parameter $n$, we set the parameters for public key system as f
 
 $\gen(1^n)$: Select $\bm{x}, \bm{s} \in \Z_q^n$ uniformly at random. Apply the transformation $\qft_r \otimes \mathds{1}$ to the register $\ket{0} \ket{\bm{x}}$ to obtain the state $\ket{\psi_1} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} \ket{j} \ket{\bm{x}}$. Apply the transformation $\ket{j}\ket{\bm{x}} \mapsto \ket{j}\ket{\bm{x} + j\bm{s}}$ to $\ket{\psi_1}$ to obtain the state
 \[ \ket{\phi_{\bm{s}, r, 0}(\bm{x})} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} \ket{j} \ket{\bm{x} + j\bm{s}}. \]
-Return the public-key, private-key pair $(pk, sk) = (\ket{\phi_{\bm{s}, r, 0}(\bm{x})}, \bm{s})$.     
+Return the public-key, secret-key pair $(pk, sk) = (\ket{\phi_{\bm{s}, r, 0}(\bm{x})}, \bm{s})$.     
+
+\begin{figure}[h]
+    \centering
+    \begin{quantikz}[thin lines]
+        \lstick{$\ket{0}$} & \gate{\qft_r} & \ctrl{1} & \qw \\
+        \lstick{$\ket{\bm{x}}$} & \qw  & \gate{A} & \qw 
+    \end{quantikz}
+    \caption{The key generation circuit. The gate $\qft_r$ is the quantum fourier transform over $\Z_r$, and the gate $A$ is the multiply-add operation $\ket{j}\ket{\bm{x}} \mapsto \ket{j}\ket{\bm{x} + j\bm{s}}$.}
+\end{figure}
 
 \vspace*{\topskip}
 
@@ -421,24 +364,46 @@ $\enc(pk = \rho_{\bm{s}, r, 0}, b \in \{ 0, 1 \})$:  Apply the transformation $U
 \end{align*}
 Return $\rho_{\bm{s}, r, b}$.
 
+\begin{figure}[h]
+    \centering
+    \begin{quantikz}[thin lines]
+         & & \lstick{$\ket{j}$} & \ctrl{2} & \qw & \qw \\
+         & & \lstick{$\ket{\bm{y}}$} & \qw & \qw & \qw \\
+        \lstick{$\ket{0}$} & \gate{X} & \gate{H} & \gate{U_b} & \meter{} & \qw
+    \end{quantikz}
+    \caption{The encryption circuit. The gate $U_b$ performs the operation $\ket{j}\ket{c} \mapsto \ket{j}\ket{c \oplus (jb \bmod 2)}$.}
+\end{figure}
+
 \vspace*{\topskip}
 
-$\dec(sk = \bm{s}, c = \rho_{\bm{s}, r, b})$:  Apply the transformation $U: \ket{j}\ket{\bm{y}} \mapsto \ket{j}\ket{\bm{y} - j\bm{s}}$ to $\rho_{\bm{s}, r, b}$. Discard the second register. Apply $\qft_r$ to the resulting state and measure. If the measurement result is 0 then output 0, otherwise output 1.
+$\dec(sk = \bm{s}, c = \rho_{\bm{s}, r, b})$:  Apply the transformation $S: \ket{j}\ket{\bm{y}} \mapsto \ket{j}\ket{\bm{y} - j\bm{s}}$ to $\rho_{\bm{s}, r, b}$. Discard the second register. Apply $\qft_r$ to the resulting state and measure. If the measurement result is 0 then output 0, otherwise output 1.
 
-%% \paragraph{Correctness.} 
-%% Given the encrypted state $\Phi_{\bm{s}, b}$, the decryption steps are as follows
-%% \begin{align*}
-%%     \Phi_{\bm{s}, b}
-%%     & \mapsto U \frac{1}{q^n} \sum_{\bm{x} \in \Z_q^n} \ket{\phi_{\bm{s}, \bm{x}, b}} \bra{\phi_{\bm{s}, \bm{x}, b}} U^*  \tag{apply $U$} \\
-%%     & = \frac{1}{q^n} \sum_{\bm{x} \in \Z_q^n} \frac{1}{r} \sum_{j = 0}^{r - 1} \sum_{k = 0}^{r - 1} (-1)^{b(j - k)}\ket{k}\ket{\bm{x}} \bra{j}\bra{\bm{x}} \\
-%%     & = \frac{1}{r} \sum_{j = 0}^{r - 1} \sum_{k = 0}^{r - 1} (-1)^{b(j - k)}\ket{k}\bra{j} \otimes \frac{1}{q^n} \sum_{\bm{x} \in \Z_q^n} \ket{\bm{x}}\bra{\bm{x}} \\
-%%     & \mapsto \frac{1}{r} \sum_{j = 0}^{r - 1} \sum_{k = 0}^{r - 1} (-1)^{b(j - k)}\ket{k}\bra{j} \tag{discard the second register} \\
-%%     & \mapsto \qft_r \frac{1}{r} \sum_{j = 0}^{r - 1} \sum_{k = 0}^{r - 1} (-1)^{b(j - k)}\ket{k}\bra{j} \qft_r^* \tag{apply quantum Fourier transfom}\\
-%%     & = \ket{br/2} \bra{br/2}
-%% \end{align*}
-%% If $b = 0$ then the state of the system is $\ket{0} \bra{0}$, otherwise it is $\ket{r / 2} \bra{r / 2}$. 
+\begin{figure}[h]
+    \centering
+    \begin{quantikz}[thin lines]
+        \lstick{$\ket{j}$} & \ctrl{1} & \gate{\qft_r} & \meter{} & \qw \\
+        \lstick{$\ket{\bm{y}}$} & \gate{S} & \meter{} & \qw & \qw
+    \end{quantikz}
+    \caption{The decryption circuit. The gate $\qft_r$ is the quantum fourier transform over $\Z_r$, and the gate $S$ is the multiply-subtract operation $\ket{j}\ket{\bm{x}} \mapsto \ket{j}\ket{\bm{x} - j\bm{s}}$.}
+\end{figure}
 
-%% \paragraph{Security.}
+\begin{lemma}[Correctness]
+    For any bit $b \in \{ 0, 1 \}$ and all outputs $(\bm{s}, \rho_{\bm{s}, r, 0})$ of $\gen$, we have
+    \[ \Pr [ \dec(\bm{s}, \enc(\rho_{\bm{s}, r, 0}, b)) = b ] = 1. \]
+\end{lemma}
+\begin{proof}
+    Given a ciphertext $\rho_{\bm{s}, r, b}$, the decryption steps are as follows
+    \begin{align*}
+        \rho_{\bm{s}, r, b}
+        & \mapsto \E_{\bm{x} \leftarrow \Z_q^n} \Big[ A \ket{\phi_{\bm{s}, r, b}(\bm{x})} \bra{\phi_{\bm{s}, r, b}(\bm{x})} A^* \Big]  \tag{apply $A$} \\
+        & = \E_{\bm{x} \leftarrow \Z_q^n} \bigg[ \frac{1}{r} \sum_{j = 0}^{r - 1} \sum_{k = 0}^{r - 1} (-1)^{b(j - k)}\ket{k}\ket{\bm{x}} \bra{j}\bra{\bm{x}} \bigg] \\
+        & = \frac{1}{r} \sum_{j = 0}^{r - 1} \sum_{k = 0}^{r - 1} (-1)^{b(j - k)}\ket{k}\bra{j} \otimes \E_{\bm{x} \leftarrow \Z_q^n} \Big[ \ket{\bm{x}}\bra{\bm{x}} \Big] \\
+        & \mapsto \frac{1}{r} \sum_{j = 0}^{r - 1} \sum_{k = 0}^{r - 1} (-1)^{b(j - k)}\ket{k}\bra{j} \tag{discard the second register} \\
+        & \mapsto \qft_r \frac{1}{r} \sum_{j = 0}^{r - 1} \sum_{k = 0}^{r - 1} (-1)^{b(j - k)}\ket{k}\bra{j} \qft_r^* \tag{apply quantum Fourier transform}\\
+        & = \ket{br/2} \bra{br/2}
+    \end{align*}
+    If $b = 0$ then the state of the system is $\ket{0} \bra{0}$, otherwise it is $\ket{r / 2} \bra{r / 2}$. 
+\end{proof}
 
 
 \bibliographystyle{plain}
