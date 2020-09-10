@@ -113,6 +113,7 @@
 \def\dec{\mathsf{Dec}}
 \def\X{\mathcal{X}}
 \def\SX{\mathcal{S(X)}}
+\def\U{\mathcal{U}}
 
 
 \title{Quantum Learning With Errors}
@@ -215,8 +216,8 @@ The search-$\lwe_{n, q, \chi}$ is the problem of recovering $\bm{s}$ given sampl
 The distribution $\chi$ is called the error distribution and is usually chosen to be $\mathcal{D}_{\Z, \alpha q}$, the discrete Gaussian distribution centered around zero with standard deviation $\alpha q$. The parameter $\alpha \in (0, 1)$ is called the error rate. Let $n \ge 1$ and $q \ge 2$ be as above and let $r = r(n) < q$ be a positive integer. Let $\Sigma = \Z_r \times \Z_q^n$ and define the complex Euclidean space $\X = \C^\Sigma$. For a fixed $\bm{s} \in \Z_q^n$ define the probability distribution $\mu_{\bm{s}, r}: \SX \rightarrow [0, 1]$ as follows: choose $\bm{x} \in \Z_q^n$ uniformly at random and output the state
 \[ \ket{\phi_{\bm{s}, r}(\bm{x})} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1}\ket{j}\ket{\bm{x} + j\bm{s}}. \]
 If we only have access to the output of $\mu_{\bm{s}, r}$, i.e., $\bm{x}$ is unknown, then the quantum system corresponding to the state $\ket{\phi_{\bm{s}, r}(\bm{x})}$ is described by the density operator
-\[ \rho_{\bm{s}, r} = \frac{1}{q^n} \sum_{\bm{x} \in \Z_q^n} \ket{\phi_{\bm{s}, r}(\bm{x})} \bra{\phi_{\bm{s}, r}(\bm{x})} = \E_{\bm{x} \in U(\Z_q^n)} \Big[ \ket{\phi_{\bm{s}, r}(\bm{x})} \bra{\phi_{\bm{s}, r}(\bm{x})} \Big], \]
-where $U(\Z_q^n)$ is the uniform distribution over $\Z_q^n$. Therefore, the output of the distribution $\mu_{\bm{s}, r}$ is always described by the density operator $\rho_{\bm{s}, r}$. In other words, the distribution $\mu_{\bm{s}, r}$ provides \textit{copies} of the state $\rho_{\bm{s}, r}$.
+\[ \rho_{\bm{s}, r} = \frac{1}{q^n} \sum_{\bm{x} \in \Z_q^n} \ket{\phi_{\bm{s}, r}(\bm{x})} \bra{\phi_{\bm{s}, r}(\bm{x})} = \E_{\bm{x} \in \U(\Z_q^n)} \Big[ \ket{\phi_{\bm{s}, r}(\bm{x})} \bra{\phi_{\bm{s}, r}(\bm{x})} \Big], \]
+Therefore, the output of the distribution $\mu_{\bm{s}, r}$ is always described by the density operator $\rho_{\bm{s}, r}$. In other words, the distribution $\mu_{\bm{s}, r}$ provides \textit{copies} of the state $\rho_{\bm{s}, r}$.
 \begin{definition}[EDCP, Search]
     Let $n$, $q$ and $r$ be defined as above. The search-$\edcp_{n, q, r}$ is the problem of recovering $\bm{s}$ given samples from the distribution $\mu_{\bm{s}, r}$. A quantum algorithm $Q$ is said to solve $\edcp_{n, q, r}$ if it outputs $\bm{s}$ with probability at least $1 / \poly(n\log q)$ and has running time at most $\poly(n\log q)$.
 \end{definition}
@@ -225,8 +226,13 @@ where $U(\Z_q^n)$ is the uniform distribution over $\Z_q^n$. Therefore, the outp
     Let $n$, $q$ and $r$ be defined as above. Define the probability distribution $\gamma_r: \SX \rightarrow [0, 1]$ by choosing $(j, \bm{x}) \in \Z_r \times \Z_q^n$ uniformly at random and outputting the state $\ket{j}\ket{\bm{x}}$. The decision-$\edcp_{n, q, r}$ is the problem of distinguishing between the distributions $\mu_{\bm{s}, r}$ and $\gamma_r$.
 \end{definition}
 A quantum algorithm $Q$ is said to solve the decision-$\edcp_{n, q, r}$ if it succeeds with advantage at least $1 / \poly(n\log q)$ and has running time at most $\poly(n\log q)$. The density operator corresponding to the output of the distribution $\gamma_r$ in Definition \ref{def:d-edcp} is
-\[ \rho = \frac{1}{rq^n} \sum_{j = 0}^{r - 1} \sum_{\bm{x} \in \Z_q^n}  \ket{j}\ket{\bm{x}} \bra{j}\bra{\bm{x}} = \E_{(j, \bm{x}) \in U(\Z_r \times \Z_q^n)} \Big[ \ket{j}\ket{\bm{x}} \bra{j}\bra{\bm{x}} \Big] = \mathds{1}_{\X}, \]
-where $U(\Z_r \times \Z_q^n)$ is the uniform distribution over $\Z_r \times \Z_q^n$. Therefore, decision-$\edcp_{n, q, r}$ is the problem of distinguishing between the same number of copies of the states $\rho_{\bm{s}, r}$ and $\mathds{1}_{\X}$. 
+\[ \rho = \frac{1}{rq^n} \sum_{j = 0}^{r - 1} \sum_{\bm{x} \in \Z_q^n}  \ket{j}\ket{\bm{x}} \bra{j}\bra{\bm{x}} = \E_{(j, \bm{x}) \in \U(\Z_r \times \Z_q^n)} \Big[ \ket{j}\ket{\bm{x}} \bra{j}\bra{\bm{x}} \Big] = \mathds{1}_{\X}, \]
+Therefore, decision-$\edcp_{n, q, r}$ is the problem of distinguishing between the same number of copies of the states $\rho_{\bm{s}, r}$ and $\mathds{1}_{\X}$. For an integer $m > 0$, we denote by $\edcp_{n, q, r}^m$ the $\edcp$ problem in which the number of samples from $\mu_{\bm{s}, r}$ is bounded by $m$. The following theorem establishes a poly-time equivalence between $\lwe$ and $\edcp$.
+\begin{theorem}
+    \label{thm:lwe-edcp}
+    Let $\chi$ be a discrete Gaussian distribution centered around zero with standard deviation $\alpha q$. There is a poly-time quantum reduction from $\lwe_{n, q, \chi}$ to $\edcp_{n, q, r}^m$ with $m = \poly(n\log q)$ and $r = \poly(n\log q) / \alpha$. Conversely, for the same parameter relationship up to $\poly(n\log q)$ factors, there is a poly-time quantum reduction from $\edcp$ to $\lwe$. 
+\end{theorem}
+Note that the equivalence in Theorem \ref{thm:lwe-edcp} holds only when the number of samples $m = \poly(n\log q)$. Giving such an equivalence for arbitrary $m$ is an open problem. See Section ?? for a detailed discussion.
 
 
 %% ///////////////////////////////////////////////////////
@@ -235,35 +241,35 @@ where $U(\Z_r \times \Z_q^n)$ is the uniform distribution over $\Z_r \times \Z_q
 
 \section{A Search to Decision Reduction}
 
-In this section, we give a search-to-decision reduction for $\edcp$. The reduction works for a large class of moduli $q$. The technique we use is inspired by the one used in \cite{micciancio2012trapdoors} for a search-to-decision reduction for LWE.
+In this section, we give a search-to-decision reduction for $\edcp$. The reduction works for a large class of moduli $q$. The technique we use is inspired by the one in \cite{micciancio2012trapdoors} for a search-to-decision reduction for LWE. We need the following lemma, which shows the self-reducibility of $\edcp$.
 \begin{lemma}
     \label{lem:small-r}
-    For any $r' \le r$, given access to the distribution $B_{\bm{s}, r}$, we can efficiently sample from the distribution $B_{\bm{s}, r'}$. 
+    For any $r' \le r$, given access to the distribution $\mu_{\bm{s}, r}$, we can efficiently sample from the distribution $\mu_{\bm{s}, r'}$. In particular, there is an efficient reduction from $\edcp_{n, q, r}$ to $\edcp_{n, q, r'}$.
 \end{lemma}
 \begin{proof}
-    If $r' > r / 2$ then a simple indicator function can be used to to produce sample from $B_{\bm{s}, r'}$. More precisely, define the function $f: [0, r) \rightarrow \{ 0, 1 \}$ by
+    To keep the reduction efficient, we treat the two cases $r' > r / 2$ and $r' \le r / 2$ separately. If $r' > r / 2$ then a simple indicator function can be used to to produce samples from $\mu_{\bm{s}, r'}$. More precisely, define the function $f: [0, r) \rightarrow \{ 0, 1 \}$ by
     \[ f(x) = 
     \begin{cases}
-        1 & \text{if } x < r' \\
+        1 & \text{if } x < r', \\
         0 & \text{otherwise}.
     \end{cases} \]
-    Then applying the transformation $\ket{j}\ket{\bm{a}}\ket{0} \mapsto \ket{j}\ket{\bm{a}}\ket{f(j)}$, where $\bm{a} \in \Z_q^n$, to $\rho_{\bm{s}, r}$ and measuring the last register results in the state $\rho_{\bm{s}, r'}$ with probability at least $1 / 2$. If the measurement outcome is not $1$ then we repeat the above process.
+    Then applying the transformation $\ket{j}\ket{\bm{y}}\ket{0} \mapsto \ket{j}\ket{\bm{y}}\ket{f(j)}$, where $\bm{y} \in \Z_q^n$, to $\rho_{\bm{s}, r} \in \mu_{\bm{s}, r}$ and measuring the last register results in the state $\rho_{\bm{s}, r'}$ with probability at least $1 / 2$. If the measurement outcome is not $1$ then we repeat the above process.
 
-    If $r' \le r / 2$ then we proceed as follows. Consider the measurement $\mu$ on the space $\X$ defined by the operators
+    If $r' \le r / 2$ then we proceed as follows. Consider the measurement $M$ on the space $\X$ defined by the operators
     \[ M_a = \sum_{b = 0}^{\ell - 1} \ket{b}\bra{ar' + b} \otimes \mathds{1}, \]
-    where $\ell = r'$ for $0 \le a < \lfloor r / r'  \rfloor$ and $\ell = r - r'$ for $a = \lfloor r / r'  \rfloor$. This measurement can be implemented efficiently \cite{kaye2007introduction}. If we perform $\mu$ on a sample $\rho_{\bm{s}, r}$ from $B_{\bm{s}, r}$ the probability of observing the outcome $a$ is
+    where $\ell = r'$ for $0 \le a < \lfloor r / r'  \rfloor$ and $\ell = r - r'$ for $a = \lfloor r / r'  \rfloor$. This measurement can be implemented efficiently \cite[\S A.8]{kaye2007introduction}. If we perform $M$ on a sample $\rho_{\bm{s}, r}$ from $\mu_{\bm{s}, r}$ the probability of observing the outcome $a$ is
     \begin{align*}
         \tr(M_a^*M_a \rho_{\bm{s}, r})
-        & = \frac{1}{q^n} \sum_{\bm{x} \in \Z_q^n} \tr(M_a \ket{\phi_{\bm{s}, r}(\bm{x})} \bra{\phi_{\bm{s}, r}(\bm{x})} M_a^*) \\
-        & = \frac{1}{q^nr} \sum_{\bm{x} \in \Z_q^n} \sum_{b, c = 0}^{\ell - 1} \tr(\ket{b}\ket{\bm{x} + (ar' + b)\bm{s}} \bra{c}\bra{\bm{x} + (ar' + c)\bm{s}}) \\
-        & = \frac{1}{q^nr} \sum_{\bm{x} \in \Z_q^n} \sum_{b, c = 0}^{\ell - 1} \tr(\ket{b}\bra{c} \otimes \ket{\bm{x} + (ar' + b)\bm{s}} \bra{\bm{x} + (ar' + c)\bm{s}}) \\
+        & = \E_{\bm{x} \in \U(\Z_q^n)} \Big[ \tr(M_a \ket{\phi_{\bm{s}, r}(\bm{x})} \bra{\phi_{\bm{s}, r}(\bm{x})} M_a^*) \Big] \\
+        & = \frac{1}{r} \sum_{b, c = 0}^{\ell - 1} \E_{\bm{x} \in \U(\Z_q^n)}\Big[ \tr(\ket{b}\ket{\bm{x} + (ar' + b)\bm{s}} \bra{c}\bra{\bm{x} + (ar' + c)\bm{s}}) \Big] \\
+        & = \frac{1}{r} \sum_{b, c = 0}^{\ell - 1} \E_{\bm{x} \in \U(\Z_q^n)}\Big[ \tr(\ket{b}\bra{c} \otimes \ket{\bm{x} + (ar' + b)\bm{s}} \bra{\bm{x} + (ar' + c)\bm{s}}) \Big] \\
         & = \frac{\ell}{r},
     \end{align*}
     and the post-measurement state corresponding to this outcome is
     \begin{align*}
         \frac{M_a \rho_{\bm{s}, r} M_a^*}{(\ell / r)}
-        & = \frac{1}{q^nr} \sum_{\bm{x} \in \Z_q^n} \sum_{b, c = 0}^{\ell - 1} \ket{b}\ket{\bm{x} + (ar' + b)\bm{s}} \bra{c}\bra{\bm{x} + (ar' + c)\bm{s}} \\
-        & = \frac{1}{q^nr} \sum_{\bm{x} \in \Z_q^n} \sum_{b, c = 0}^{\ell - 1} \ket{b}\ket{\bm{x} + b\bm{s}} \bra{c}\bra{\bm{x} + c\bm{s}} \\
+        & = \frac{1}{r} \sum_{b, c = 0}^{\ell - 1} \E_{\bm{x} \in \U(\Z_q^n)}\Big[ \ket{b}\ket{\bm{x} + (ar' + b)\bm{s}} \bra{c}\bra{\bm{x} + (ar' + c)\bm{s}} \Big] \\
+        & = \frac{1}{r} \sum_{b, c = 0}^{\ell - 1} \E_{\bm{x} \in \U(\Z_q^n)}\Big[ \ket{b}\ket{\bm{x} + b\bm{s}} \bra{c}\bra{\bm{x} + c\bm{s}} \Big] \\
         & = \rho_{\bm{s}, \ell},
     \end{align*}
     So if the outcome is $a \in [0, \lfloor r / r'  \rfloor)$ we obtain the state $\rho_{\bm{s}, r'}$, which is what we are looking for. Therefore, the probability of obtaining the desired state after one measurement is
