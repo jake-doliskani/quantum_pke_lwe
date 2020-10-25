@@ -82,6 +82,7 @@
 \DeclareMathOperator{\polylog}{polylog}
 \DeclareMathOperator{\poly}{poly}
 \DeclareMathOperator{\rev}{rev}
+\DeclareMathOperator{\entpy}{H}
 \let\hom\relax
 \DeclareMathOperator{\hom}{Hom}
 \DeclareMathOperator{\qft}{F}
@@ -446,8 +447,8 @@ Return $\rho_{\bm{s}, r, b}$.
 \begin{figure}
     \centering
     \begin{quantikz}[thin lines]
-         & & \lstick{$\ket{j}$} & \ctrl{2} & \qw & \qw \\
-         & & \lstick{$\ket{\bm{y}}$} & \qw & \qw & \qw \\
+         \lstick{$\ket{j}$} & \qw & \qw & \ctrl{2} & \qw & \qw \\
+          \lstick{$\ket{\bm{y}}$} & \qw & \qw & \qw & \qw & \qw \\
         \lstick{$\ket{0}$} & \gate{X} & \gate{H} & \gate{U_b} & \meter{} & \qw
     \end{quantikz}
     \caption{The encryption circuit. The gate $U_b$ performs the operation $\ket{j}\ket{c} \mapsto \ket{j}\ket{c \oplus (jb \bmod 2)}$.}
@@ -483,6 +484,66 @@ $\dec(sk = \bm{s}, c = \rho_{\bm{s}, r, b})$:  Apply the transformation $S: \ket
     \end{align*}
     If $b = 0$ then the state of the system is $\ket{0} \bra{0}$, otherwise it is $\ket{r / 2} \bra{r / 2}$. 
 \end{proof}
+
+
+
+%% ///////////////////////////////////////////////////////
+
+
+
+
+\section{Information-Theoretic and Hardness Bounds}
+
+In this section, we derive hardness bounds for $\edcp$ based on the number of samples. The $\edcp_{n, q, r}^m$ problem is to recover the secret $\bm{s} \in \Z_q^n$ given $m$ copies of the state $\rho_{\bm{s}, r}$. We can derive a lower bound on $m$ using the tools from quantum information theory.
+
+To better understand the problem we can model it in the following standard way, for $m = 1$. Alice selects a uniformly random $\bm{s} \in \Z_q^n$ and stores it in the classical register $\mathsf{Y}$. She then prepares a register $\mathsf{X}$ in the state $\rho_{\bm{s}, r}$ and sends $\mathsf{X}$ to Bob. Therefore, Bob has access to the register $\mathsf{X}$ that is prepared according to the ensemble
+\[
+\begin{array}{rrll}
+    \eta: & \Z_q^n & \longrightarrow & \mathrm{Pos}(\X) \\
+    & \bm{s} & \longmapsto & \frac{1}{q^n}\rho_{\bm{s}, r},
+\end{array}
+\]
+where $\mathrm{Pos(\X)}$ is the space of positive semidefinite operators on $\X$. Bob picks a measurement $\mu: \Z_q^n \rightarrow \mathrm{Pos}(\X)$ and measures $\mathsf{X}$ according to $\mu$. He stores the outcome of the measurement in a classical register $\mathsf{Z}$. The pair $(\mathsf{Y}, \mathsf{Z})$ of classical registers will be distributed according to the distribution
+\[
+\begin{array}{rrll}
+    q: & \Z_q^n \times \Z_q^n & \longrightarrow & [0, 1] \\
+    & (\bm{s}, \bm{u}) & \longmapsto & \lrang{\mu(\bm{u}), \eta(\bm{s})}.
+\end{array}
+\]
+The amount of information that Bob can learn about $\mathsf{Y}$ using the measurement $\mu$ is determined by the mutual information between $\mathsf{Y}$ and $\mathsf{Z}$, which we denote by $\operatorname{I}_\mu(\eta)$. The accessible information of the ensemble $\eta$ is defined as
+\[ \operatorname{I}(\eta) = \sup_{\mu} \operatorname{I}_\mu(\eta), \]
+where the supremum ranges over all choices of the measurement $\mu$. Note that the pair $(\mathsf{Y}, \mathsf{X})$ is in the classical-quantum state
+\[ \sigma = \sum_{\bm{s} \in \Z_q^n} \ket{\bm{s}}\bra{\bm{s}} \otimes \eta(\bm{s}). \]
+The quantum mutual information between $\mathsf{Y}$ and $\mathsf{X}$, with respect to the state $\sigma$, is called the Holevo information of the ensemble $\eta$ and is denoted by $\chi(\eta)$. We have
+\[ \chi(\eta) = \operatorname{I}(\mathsf{Y} : \mathsf{X}) = \entpy\Bigg( \frac{1}{q^n} \sum_{\bm{s} \in \Z_q^n} \rho_{\bm{s}, r} \Bigg) - \frac{1}{q^n} \sum_{\bm{s} \in \Z_q^n} \entpy(\rho_{\bm{s}, r}), \]
+where $\entpy(\cdot)$ is the von Neumann entropy.
+\begin{theorem}[Holevo's theorem]
+    \label{thm:holevo}
+    Let $\Sigma$ be an alphabet and let $\X$ be complex Euclidean space. For any ensemble $\eta: \Sigma \rightarrow \mathrm{Pos}(\X)$ it holds that $\operatorname{I}(\eta) \le \chi(\eta)$.
+\end{theorem}
+Therefore, according to Theorem \ref{thm:holevo}, we can obtain an upper bound on the accessible information of the ensemble $\eta$ by computing $\chi(\eta)$. For an arbitrary number of samples $m$, we need to compute $\chi(\eta^{\otimes m})$ for the ensemble
+\[
+\begin{array}{rrll}
+    \eta^{\otimes m}: & \Z_q^n & \longrightarrow & \mathrm{Pos}(\X^{\otimes m}) \\
+    & \bm{s} & \longmapsto & \frac{1}{q^n}\rho_{\bm{s}, r}^{\otimes m}.
+\end{array}
+\]
+First, note that the entropy is additive with respect to tensor products, i.e., for any two states $\sigma_1$ and $\sigma_2$ it holds that $\entpy(\sigma_1 \otimes \sigma_2) = \entpy(\sigma_1) + \entpy(\sigma_2)$, so $\entpy(\rho_{\bm{s}, r}^{\otimes m}) = m\entpy(\rho_{\bm{s}, r})$. For a state $\sigma$ of the registers $(\mathsf{X}_1, \cdots, \mathsf{X}_m)$, we have, by the subadditivity of von Neumann entropy,
+\[ \entpy(\sigma) \le \entpy(\tr_1(\sigma)) + \cdots + \entpy(\tr_m(\sigma))\]
+where $\tr_k(\sigma)$ is the reduction of $\sigma$ to the state of register $\mathsf{X}_k$. Therefore,
+\begin{align*}
+    \entpy\Bigg( \frac{1}{q^n} \sum_{\bm{s} \in \Z_q^n} \rho_{\bm{s}, r}^{\otimes m} \Bigg)
+    & \le \sum_{i = 1}^m \entpy\Bigg(\tr_i\Bigg( \frac{1}{q^n} \sum_{\bm{s} \in \Z_q^n} \rho_{\bm{s}, r}^{\otimes m} \Bigg)\Bigg) \tag{by subadditivity of $\entpy$} \\
+    & = \sum_{i = 1}^m \entpy\Bigg(\frac{1}{q^n} \sum_{\bm{s} \in \Z_q^n} \tr_i(\rho_{\bm{s}, r}^{\otimes m}) \Bigg) \tag{by linearity of $\tr$} \\
+    & = m\entpy\Bigg( \frac{1}{q^n} \sum_{\bm{s} \in \Z_q^n} \rho_{\bm{s}, r} \Bigg).
+\end{align*}
+It follows from the above that $\chi(\eta^{\otimes m}) \le m\chi(\eta)$. Now, we can compute $\chi(\eta)$ by computing the eigenvalues of the operators $\rho_{\bm{s}, r}$ and $q^{-n}\sum_{\bm{s} \in \Z_q^n} \rho_{\bm{s}, r}$. The eigenvectors of $\rho_{\bm{s}, r}$ are
+\[ \ket{\phi_{\bm{x}, k}} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} \omega_r^{jk} \ket{j}\ket{\bm{x} + j\bm{s}}, \hspace*{2mm} (k, \bm{x}) \in \Z_r \times \Z_q^n. \]
+So the eigenvalues of $\rho_{\bm{s}, r}$ are $0$ and $q^{-n}$ with multiplicities $(r - 1)q^n$ and $q^n$, respectively. 
+
+
+%% ///////////////////////////////////////////////////////
+
 
 
 \bibliographystyle{plain}
