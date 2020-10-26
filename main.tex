@@ -515,31 +515,79 @@ The amount of information that Bob can learn about $\mathsf{Y}$ using the measur
 where the supremum ranges over all choices of the measurement $\mu$. Note that the pair $(\mathsf{Y}, \mathsf{X})$ is in the classical-quantum state
 \[ \sigma = \sum_{\bm{s} \in \Z_q^n} \ket{\bm{s}}\bra{\bm{s}} \otimes \eta(\bm{s}). \]
 The quantum mutual information between $\mathsf{Y}$ and $\mathsf{X}$, with respect to the state $\sigma$, is called the Holevo information of the ensemble $\eta$ and is denoted by $\chi(\eta)$. We have
-\[ \chi(\eta) = \operatorname{I}(\mathsf{Y} : \mathsf{X}) = \entpy\Bigg( \frac{1}{q^n} \sum_{\bm{s} \in \Z_q^n} \rho_{\bm{s}, r} \Bigg) - \frac{1}{q^n} \sum_{\bm{s} \in \Z_q^n} \entpy(\rho_{\bm{s}, r}), \]
+\begin{equation}
+    \label{equ:holevo-chi}
+    \chi(\eta) = \operatorname{I}(\mathsf{Y} : \mathsf{X}) = \entpy\Bigg( \frac{1}{q^n} \sum_{\bm{s} \in \Z_q^n} \rho_{\bm{s}, r} \Bigg) - \frac{1}{q^n} \sum_{\bm{s} \in \Z_q^n} \entpy(\rho_{\bm{s}, r}),
+\end{equation}
 where $\entpy(\cdot)$ is the von Neumann entropy.
 \begin{theorem}[Holevo's theorem]
     \label{thm:holevo}
     Let $\Sigma$ be an alphabet and let $\X$ be complex Euclidean space. For any ensemble $\eta: \Sigma \rightarrow \mathrm{Pos}(\X)$ it holds that $\operatorname{I}(\eta) \le \chi(\eta)$.
 \end{theorem}
 Therefore, according to Theorem \ref{thm:holevo}, we can obtain an upper bound on the accessible information of the ensemble $\eta$ by computing $\chi(\eta)$. For an arbitrary number of samples $m$, we need to compute $\chi(\eta^{\otimes m})$ for the ensemble
-\[
-\begin{array}{rrll}
-    \eta^{\otimes m}: & \Z_q^n & \longrightarrow & \mathrm{Pos}(\X^{\otimes m}) \\
-    & \bm{s} & \longmapsto & \frac{1}{q^n}\rho_{\bm{s}, r}^{\otimes m}.
-\end{array}
-\]
-First, note that the entropy is additive with respect to tensor products, i.e., for any two states $\sigma_1$ and $\sigma_2$ it holds that $\entpy(\sigma_1 \otimes \sigma_2) = \entpy(\sigma_1) + \entpy(\sigma_2)$, so $\entpy(\rho_{\bm{s}, r}^{\otimes m}) = m\entpy(\rho_{\bm{s}, r})$. For a state $\sigma$ of the registers $(\mathsf{X}_1, \cdots, \mathsf{X}_m)$, we have, by the subadditivity of von Neumann entropy,
-\[ \entpy(\sigma) \le \entpy(\tr_1(\sigma)) + \cdots + \entpy(\tr_m(\sigma))\]
-where $\tr_k(\sigma)$ is the reduction of $\sigma$ to the state of register $\mathsf{X}_k$. Therefore,
-\begin{align*}
-    \entpy\Bigg( \frac{1}{q^n} \sum_{\bm{s} \in \Z_q^n} \rho_{\bm{s}, r}^{\otimes m} \Bigg)
-    & \le \sum_{i = 1}^m \entpy\Bigg(\tr_i\Bigg( \frac{1}{q^n} \sum_{\bm{s} \in \Z_q^n} \rho_{\bm{s}, r}^{\otimes m} \Bigg)\Bigg) \tag{by subadditivity of $\entpy$} \\
-    & = \sum_{i = 1}^m \entpy\Bigg(\frac{1}{q^n} \sum_{\bm{s} \in \Z_q^n} \tr_i(\rho_{\bm{s}, r}^{\otimes m}) \Bigg) \tag{by linearity of $\tr$} \\
-    & = m\entpy\Bigg( \frac{1}{q^n} \sum_{\bm{s} \in \Z_q^n} \rho_{\bm{s}, r} \Bigg).
-\end{align*}
-It follows from the above that $\chi(\eta^{\otimes m}) \le m\chi(\eta)$. Now, we can compute $\chi(\eta)$ by computing the eigenvalues of the operators $\rho_{\bm{s}, r}$ and $q^{-n}\sum_{\bm{s} \in \Z_q^n} \rho_{\bm{s}, r}$. The eigenvectors of $\rho_{\bm{s}, r}$ are
-\[ \ket{\phi_{\bm{x}, k}} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} \omega_r^{jk} \ket{j}\ket{\bm{x} + j\bm{s}}, \hspace*{2mm} (k, \bm{x}) \in \Z_r \times \Z_q^n. \]
-So the eigenvalues of $\rho_{\bm{s}, r}$ are $0$ and $q^{-n}$ with multiplicities $(r - 1)q^n$ and $q^n$, respectively. 
+\begin{equation}
+    \label{equ:ensem-m}
+    \begin{array}{rrll}
+        \eta^{\otimes m}: & \Z_q^n & \longrightarrow & \mathrm{Pos}(\X^{\otimes m}) \\
+        & \bm{s} & \longmapsto & \frac{1}{q^n}\rho_{\bm{s}, r}^{\otimes m}.
+    \end{array}
+\end{equation}
+\begin{theorem}
+    \label{thm:acc-bound}
+    For the ensemble $\eta^{\otimes m}$ in \eqref{equ:ensem-m} we have $\operatorname{I}(\eta^{\otimes m}) \le m(1 - q^{-n})\log r$.
+\end{theorem}
+\begin{proof}
+    First, note that the entropy is additive with respect to tensor products, i.e., for any two states $\sigma_1$ and $\sigma_2$ it holds that $\entpy(\sigma_1 \otimes \sigma_2) = \entpy(\sigma_1) + \entpy(\sigma_2)$, so $\entpy(\rho_{\bm{s}, r}^{\otimes m}) = m\entpy(\rho_{\bm{s}, r})$. Next, for a state $\sigma$ of a compound register $(\mathsf{X}_1, \cdots, \mathsf{X}_m)$, we have, by the subadditivity of von Neumann entropy,
+    \[ \entpy(\sigma) \le \entpy(\tr_1(\sigma)) + \cdots + \entpy(\tr_m(\sigma))\]
+    where $\tr_k(\sigma)$ is the reduction of $\sigma$ to the state of the register $\mathsf{X}_k$. Therefore,
+    \begin{align*}
+        \entpy\Bigg( \frac{1}{q^n} \sum_{\bm{s} \in \Z_q^n} \rho_{\bm{s}, r}^{\otimes m} \Bigg)
+        & \le \sum_{i = 1}^m \entpy\Bigg(\tr_i\Bigg( \frac{1}{q^n} \sum_{\bm{s} \in \Z_q^n} \rho_{\bm{s}, r}^{\otimes m} \Bigg)\Bigg) \tag{by subadditivity of $\entpy$} \\
+        & = \sum_{i = 1}^m \entpy\Bigg(\frac{1}{q^n} \sum_{\bm{s} \in \Z_q^n} \tr_i(\rho_{\bm{s}, r}^{\otimes m}) \Bigg) \tag{by linearity of $\tr$} \\
+        & = m\entpy\Bigg( \frac{1}{q^n} \sum_{\bm{s} \in \Z_q^n} \rho_{\bm{s}, r} \Bigg).
+    \end{align*}
+    It follows from \eqref{equ:holevo-chi}  that $\chi(\eta^{\otimes m}) \le m\chi(\eta)$. Now, we can compute $\chi(\eta)$ by computing the eigenvalues of the operators $\rho_{\bm{s}, r}$ and $\rho = q^{-n}\sum_{\bm{s} \in \Z_q^n} \rho_{\bm{s}, r}$. The eigenvectors of $\rho_{\bm{s}, r}$ are
+    \[ \ket{\psi_{\bm{x}, t}} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} \omega_r^{jt} \ket{j}\ket{\bm{x} + j\bm{s}}, \hspace*{2mm} (t, \bm{x}) \in \Z_r \times \Z_q^n, \]
+    and the eigenvalues are $0$ and $q^{-n}$ with multiplicities $(r - 1)q^n$ and $q^n$, respectively. To compute the eigenvalues of $\rho$ it is best to write the second register in the Fourier basis. We have
+    \begin{align*}
+        (\mathds{1} \otimes \qft_{q^n}) \rho_{\bm{s}, r} (\mathds{1} \otimes \qft_{q^n})^*
+        & = \E_{\bm{x} \in \U(\Z_q^n)} \Big[ (\mathds{1} \otimes \qft_{q^n}) \ket{\phi_{\bm{s}, r}(\bm{x})} \bra{\phi_{\bm{s}, r}(\bm{x})} (\mathds{1} \otimes \qft_{q^n})^* \Big] \\
+        & = \frac{1}{rq^n} \sum_{\bm{y}, \bm{z} \in \Z_q^n} \E_{\bm{x} \in \U(\Z_q^n)} \Big[ \omega_q^{\lrang{\bm{x}, \bm{y} - \bm{z}}} \Big] \sum_{j, k \in \Z_r} \omega_q^{\lrang{j\bm{y} - k\bm{z}, \bm{s}}} \ket{j}\bra{k} \otimes \ket{\bm{y}}\bra{\bm{z}} \\
+        & = \frac{1}{r} \E_{\bm{y} \in \U(\Z_q^n)} \Big[ \sum_{j, k \in \Z_r} \omega_q^{\lrang{(j - k)\bm{y}, \bm{s}}} \ket{j}\bra{k} \otimes \ket{\bm{y}}\bra{\bm{y}} \Big],
+    \end{align*}
+    where the last equality follows from the fact that
+    \[
+    \E_{\bm{x} \in \U(\Z_q^n)} \Big[ \omega_q^{\lrang{\bm{x}, \bm{y} - \bm{z}}} \Big] =
+    \begin{cases}
+        1 & \text{if } \bm{y} = \bm{z} \\
+        0 & \text{if } \bm{y} \ne \bm{z}.
+    \end{cases}
+    \]
+    Therefore, we have 
+    \begin{align}
+        (\mathds{1} \otimes \qft_{q^n}) \rho (\mathds{1} \otimes \qft_{q^n})^*
+        & = \frac{1}{r} \E_{\bm{y} \in \U(\Z_q^n)} \Big[ \sum_{j, k \in \Z_r} \E_{\bm{s} \in \U(\Z_q^n)} \Big[ \omega_q^{\lrang{(j - k)\bm{y}, \bm{s}}} \Big] \ket{j}\bra{k} \otimes \ket{\bm{y}}\bra{\bm{y}} \Big] \nonumber \\
+        & = \frac{1}{rq^n} \sum_{j, k \in \Z_r} \ket{j}\bra{k} \otimes \ket{0}\bra{0} + \frac{1}{rq^n} \mathds{1} \otimes (\mathds{1} - \ket{0}\bra{0}) \label{equ:f-basis}
+    \end{align}
+    where, again, the second equality follows from
+    \[
+    \E_{\bm{s} \in \U(\Z_q^n)} \Big[ \omega_q^{\lrang{(j - k)\bm{y}, \bm{s}}} \Big] = 
+    \begin{cases}
+        1 & \text{if } (j - k)\bm{y} = 0 \\
+        0 & \text{if } (j - k)\bm{y} \ne 0.
+    \end{cases}
+    \]
+    The eigenvectors of \eqref{equ:f-basis} are
+    \begin{align*}
+        & \ket{\psi_{\bm{x}, t}} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} \omega_r^{jt} \ket{j}\ket{\bm{x}}, \hspace*{2mm} (t, \bm{x}) \in \Z_r \times \Z_q^n, \hspace*{1mm} \bm{x} \ne 0, \\
+        & \ket{\psi_t} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} \omega_r^{jt} \ket{j}\ket{0}, \hspace*{2mm} t \in \Z_r,
+    \end{align*}
+    and the eigenvalues are $0$, $q^{-n}$ and $r^{-1}q^{-n}$ with multiplicities $r - 1$, $1$ and $(q^n - 1)r$, respectively. Finally, using \eqref{equ:holevo-chi} and the eigenvalues for $\rho$ and $\rho_{\bm{s}, r}$ we have
+    \[ m\chi(\eta) \le m\Big( \frac{1}{q^n}\log(q^n) + \frac{r(q^n - 1)}{rq^n}\log(rq^n) - \log(q^n) \Big) = m\Big( 1 - \frac{1}{q^n} \Big)\log r. \qedhere \]
+\end{proof}
+
+
+
 
 
 %% ///////////////////////////////////////////////////////
