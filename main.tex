@@ -13,14 +13,13 @@
 \usepackage{algpseudocode}
 \usepackage[plain]{algorithm}
 \usepackage{enumitem}
-\usepackage{booktabs}
 \usepackage{authblk}
 \usepackage{tcolorbox}
 \usepackage{mathtools}
 \usepackage{bm}
 \usepackage{dsfont}
 \usepackage{tikz}
-\usepackage{quantikz}
+\usetikzlibrary{quantikz}
 %\usepackage[T1]{fontenc}
 %\usepackage{libertine}
 %\usepackage[libertine]{newtxmath}
@@ -154,7 +153,7 @@ Our notations for quantum information mostly follow those of \cite{watrous2018th
 
 We will use the Dirac notation for the elements of $\SX$. In particular, we denote the column vector $x \in \SX$ by $\ket{x}$ and the row vector $x^*$ by $\bra{x}$. A state $\rho$ is called pure if it can be written as $\rho = \ket{x}\bra{x}$, in which case we will simply write the state as $\ket{x}$. By the spectral theorem, every state $\rho$ is a linear combination of pure states. Therefore, a quantum state can also be represented as a linear combination
 \[ \sum_{x} \alpha_x \ket{x}, \hspace*{1mm} \sum_{x} \abs{\alpha_x}^2 = 1. \]
-We shall alternate between these equivalent representations of quantum state throughout this paper. The density operator representation is particularly useful when the underlying quantum state is not completely known. For example if, we only know that the system is in the state $\ket{\psi_x}$ with probability $p_x$ then the state of the system is described by the density operator
+We shall alternate between these equivalent representations of quantum states throughout this paper. The density operator representation is particularly useful when the underlying quantum state is not completely known. For example if, we only know that the system is in the state $\ket{\psi_x}$ with probability $p_x$ then the state of the system is described by the density operator
 \[ \rho = \sum_{x} p_x \ket{\psi_x}\bra{\psi_x} = \E_x \Big[ \ket{\psi_x} \bra{\psi_x} \Big]. \]
 More, generally, the density operator corresponding to a probability distribution $\gamma: \SX \rightarrow [0, 1]$ is defined as
 \[ \rho_\gamma = \int_{\ket{\phi} \in \SX} \ket{\phi}\bra{\phi} d\gamma(\ket{\phi}) = \E_{\ket{\phi} \in \gamma} \Big[ \ket{\phi}\bra{\phi} \Big]. \]
@@ -236,7 +235,7 @@ Therefore, decision-$\edcp_{n, q, r}$ is the problem of distinguishing between t
     \label{thm:lwe-edcp}
     Let $\chi$ be a discrete Gaussian distribution centered around zero with standard deviation $\alpha q$. There is a polynomial-time quantum reduction from $\lwe_{n, q, \chi}$ to $\edcp_{n, q, r}^m$ with $m = \poly(n\log q)$ and $r = \poly(n\log q) / \alpha$. Conversely, for the same parameter relationship up to $\poly(n\log q)$ factors, there is a polynomial-time quantum reduction from $\edcp$ to $\lwe$. 
 \end{theorem}
-Note that the equivalence in Theorem \ref{thm:lwe-edcp} holds only when the number of samples $m = \poly(n\log q)$. Giving such an equivalence for arbitrary $m$ is an open problem. See Section ?? for a detailed discussion.
+Note that the equivalence in Theorem \ref{thm:lwe-edcp} holds only when the number of samples $m = \poly(n\log q)$. Giving such an equivalence for arbitrary $m$ is an open problem. See Section \ref{sec:hardness-poly} for a detailed discussion.
 
 
 %% ///////////////////////////////////////////////////////
@@ -342,6 +341,7 @@ It follows from the above corollary that for a prime power $q = p^e$, where $p <
 
 
 \section{A Better Decision Problem}
+\label{sec:new-decsn}
 
 In this section, we propose an $\edcp$ decision problem that will be more suitable for applications than the one defined in Section \ref{sec:preli}. We assume, as before, that the modulus $q$ has $\poly(n)$-bounded prime factors. Perhaps the new decision problem is best understood for a prime modulus $q$. So let us assume, for now, that $q$ is a $\poly(n)$-bounded prime. 
 
@@ -493,10 +493,15 @@ $\dec(sk = \bm{s}, c = \rho_{\bm{s}, r, b})$:  Apply the transformation $S: \ket
 
 
 \section{Information-Theoretic and Hardness Bounds}
+\label{sec:hardness}
 
-In this section, we derive hardness bounds for $\edcp$ based on the number of samples. The $\edcp_{n, q, r}^m$ problem is to recover the secret $\bm{s} \in \Z_q^n$ given $m$ copies of the state $\rho_{\bm{s}, r}$. We can derive a lower bound on $m$ using the tools from quantum information theory.
+In this section, we derive hardness bounds for $\edcp$ based on the number of samples. The $\edcp_{n, q, r}^m$ problem is to recover the secret $\bm{s} \in \Z_q^n$ given $m$ copies of the state $\rho_{\bm{s}, r}$.
 
-To better understand the problem we can model it in the following standard way, for $m = 1$. Alice selects a uniformly random $\bm{s} \in \Z_q^n$ and stores it in the classical register $\mathsf{Y}$. She then prepares a register $\mathsf{X}$ in the state $\rho_{\bm{s}, r}$ and sends $\mathsf{X}$ to Bob. Therefore, Bob has access to the register $\mathsf{X}$ that is prepared according to the ensemble
+
+
+\subsection{Limited number of samples}
+
+We can derive a lower bound on $m$ using the tools from quantum information theory. To better understand the problem we can model it in the following standard way, for $m = 1$. Alice selects a uniformly random $\bm{s} \in \Z_q^n$ and stores it in the classical register $\mathsf{Y}$. She then prepares a register $\mathsf{X}$ in the state $\rho_{\bm{s}, r}$ and sends $\mathsf{X}$ to Bob. Therefore, Bob has access to the register $\mathsf{X}$ that is prepared according to the ensemble
 \[
 \begin{array}{rrll}
     \eta: & \Z_q^n & \longrightarrow & \mathrm{Pos}(\X) \\
@@ -534,7 +539,7 @@ Therefore, according to Theorem \ref{thm:holevo}, we can obtain an upper bound o
 \end{equation}
 \begin{theorem}
     \label{thm:acc-bound}
-    For the ensemble $\eta^{\otimes m}$ in \eqref{equ:ensem-m} we have $\operatorname{I}(\eta^{\otimes m}) \le m(1 - q^{-n})\log r$.
+    For the ensemble $\eta^{\otimes m}$ in \eqref{equ:ensem-m} we have $\chi(\eta^{\otimes m}) \le m(1 - q^{-n})\log r$.
 \end{theorem}
 \begin{proof}
     First, note that the entropy is additive with respect to tensor products, i.e., for any two states $\sigma_1$ and $\sigma_2$ it holds that $\entpy(\sigma_1 \otimes \sigma_2) = \entpy(\sigma_1) + \entpy(\sigma_2)$, so $\entpy(\rho_{\bm{s}, r}^{\otimes m}) = m\entpy(\rho_{\bm{s}, r})$. Next, for a state $\sigma$ of a compound register $(\mathsf{X}_1, \cdots, \mathsf{X}_m)$, we have, by the subadditivity of von Neumann entropy,
@@ -585,7 +590,63 @@ Therefore, according to Theorem \ref{thm:holevo}, we can obtain an upper bound o
     and the eigenvalues are $0$, $q^{-n}$ and $r^{-1}q^{-n}$ with multiplicities $r - 1$, $1$ and $(q^n - 1)r$, respectively. Finally, using \eqref{equ:holevo-chi} and the eigenvalues for $\rho$ and $\rho_{\bm{s}, r}$ we have
     \[ m\chi(\eta) \le m\Big( \frac{1}{q^n}\log(q^n) + \frac{r(q^n - 1)}{rq^n}\log(rq^n) - \log(q^n) \Big) = m\Big( 1 - \frac{1}{q^n} \Big)\log r. \qedhere \]
 \end{proof}
+Assume that Bob has found a measurement $\mu$ on $\eta^{\otimes m}$, i.e., a measurement that can operate on the joint state of $m$ copies of Alice's state, such that, after possibly some post-measurement processing, he can guess the value of $\mathsf{Y}$ with a constant probability $p$. Then a lower bound on $m$, that depends on $p$, can be computed using Theorem \ref{thm:acc-bound}. We need the following result known as Fano's inequality.
+\begin{lemma}[Fano’s inequality]
+    \label{lem:fano-ineq}
+    Let $X$ and $Y$ be random variables on some finite set $\Gamma$, and let $\tilde{X} = f(Y)$ for some function $f$. Let $p = \Pr[X \ne \tilde{X}]$. Then it holds that
+    \[ \entpy(X \vert Y) \le p\log(\abs{\Gamma} - 1) + \entpy(p, 1 - p). \]
+\end{lemma}
+\begin{corollary}
+    \label{cor:lower-b}
+    Let $\bm{s} \in \Z_q^n$ be chosen uniformly at random. The number of copies of the state $\rho_{\bm{s}, r}$ needed to recover $\bm{s}$ with constant probability is at least $O(n\log q / \log r)$.
+\end{corollary}
+\begin{proof}
+    Recall the communication scenario above: Alice selects $\bm{s} \in \Z_q^n$ uniformly at random and stores it in the register $\mathsf{Y}$. She then generates $m$ copies of the state $\rho_{\bm{s}, r}$ and sends them to Bob. On receiving $\rho_{\bm{s}, r}^{\otimes m}$, Bob applies a measurement $\mu$ and stores the measurement outcome in the register $\mathsf{Z}$. Bob might perform some post-processing on $\mathsf{Z}$ to obtain another register $\tilde{\mathsf{Z}}$. Assume that $p = \Pr[\mathsf{Y} \ne \tilde{\mathsf{Z}}]$ is a constant. Then
+    \begin{align*}
+        \operatorname{I}_\mu(\eta^{\otimes m})
+        & = \operatorname{I}(\mathsf{X} : \mathsf{Z}) \\
+        & = \entpy(\mathsf{Y}) - \entpy(\mathsf{Y} \vert \mathsf{Z}) \tag{by definition} \\
+        & \ge n\log(q) - (1 - p)\log(q^n - 1) - \entpy(p, 1 - p) \tag{by Lemma \ref{lem:fano-ineq}} \\
+        & \ge pn\log(q) - 1
+    \end{align*}
+    Now, by Theorem \ref{thm:acc-bound}, $m(1 - q^{-n})\log r \ge \chi(\eta^{\otimes m}) \ge \operatorname{I}_\mu(\eta^{\otimes m})$ which completes the proof.
+\end{proof}
+\begin{remark}
+    An interesting case for which the bound in Corollary \ref{cor:lower-b} is tight is $q = r$. In this case, given the state $\rho_{\bm{s}, r}$, applying $\qft_r^* \otimes \qft_{q^n}$ we obtain the state
+    \[ \frac{1}{\sqrt{q^n}} \sum_{\bm{y} \in \Z_q^n} \omega_q^{\lrang{\bm{y}, \bm{x}}} \ket{\lrang{\bm{y}, \bm{s}}}\ket{\bm{y}}. \]
+    Measuring this state we obtain a linear equation $\lrang{\bm{y}, \bm{s}}$, where $\bm{y} \in \Z_q^n$ is uniformly random. We can solve for $\bm{s}$ by gathering $O(n)$ of these linear equations. 
+\end{remark}
 
+
+
+\subsection{Polynomial number of samples}
+\label{sec:hardness-poly}
+
+When the number of samples is $\poly(n)$, it was proved in \cite{brakerski2018learning} that $\edcp$ is quantum polynomial equivalent to $\lwe$. The reduction form $\edcp$ to $\lwe$ is proved as in Section \ref{sec:new-decsn}. The reduction from $\lwe$ to $\edcp$ is based on the ball-intersection technique that originally proposed by \cite{regev2004quantum}. We briefly review the reduction idea here and refer the reader to \cite{regev2004quantum, brakerski2018learning} for details.
+
+Let $(\bm{A}, \bm{b}_0 = \bm{As}_0 + \bm{e}_0)$ be $m$ samples from $\lwe_{n, q, \alpha}$. We start by preparing the state 
+\[ \sum_{\bm{s} \in \Z_q^n} \sum_{j = 0}^{r - 1} \ket{j}\ket{\bm{s}}, \]
+where we have dropped the normalization factors for simplicity. Here, $r$ is a function of $n, q$, and $\alpha$. We then compute $(j, \bm{s}) \mapsto \bm{As} - j\bm{b}_0$ into an auxiliary register. After a change of variables we obtain the state
+\begin{equation}
+    \label{equ:latt-sup}
+    \sum_{\bm{s} \in \Z_q^n} \sum_{j = 0}^{r - 1} \ket{j}\ket{\bm{s} + j\bm{s}_0}\ket{\bm{As} - j\bm{e}_0}.
+\end{equation}
+The goal is to project the above state onto a state $\sum_{\bm{s} \in \Z_q^n} \sum_{j = 0}^{r - 1} \ket{j}\ket{\bm{s} + j\bm{s}_0}$ for some $\bm{s} \in \Z_q^n$ with high probability. To do this, the idea is to draw $m$-dimensional balls around the points $\bm{As} - j\bm{e}_0$ for all $\bm{s} \in \Z_q^n$ and $j \in \Z_r$ and then select a random point in one of these balls. Let $\mathrm{B}_m(0, R)$ be a ball of radius $R$ around $0$. To implement this idea we can represent $\mathrm{B}_m(0, R)$ using points of a fine grid. More precisely, $\mathrm{B}_m(0, R)$ is represented by $\tilde{\mathrm{B}}_m(0, R) = \frac{1}{L} \Z^m \cap \mathrm{B}_m(0, R)$ for a large integer $L$. We can efficiently prepare (an approximation of) the superposition
+\begin{equation}
+    \label{equ:m-ball-sup}
+    \ket{\tilde{\mathrm{B}}_m(0, R)} = \frac{1}{\sqrt{\tilde{\mathrm{B}}_m(0, R)}} \sum_{\bm{x} \in \tilde{\mathrm{B}}_m(0, R)} \ket{\bm{x}}.
+\end{equation}
+Note that for any $\bm{y} \in \Z_q^m$ we have $\bm{y} + \tilde{\mathrm{B}}_m(0, R) = \tilde{\mathrm{B}}_m(\bm{y}, R)$. Tensoring the states in \eqref{equ:latt-sup} and \eqref{equ:m-ball-sup} and adding the third register to the forth register we obtain the state
+\[ \sum_{\bm{s} \in \Z_q^n} \sum_{j = 0}^{r - 1} \ket{j}\ket{\bm{s} + j\bm{s}_0}\ket{\bm{As} - j\bm{e}_0}\ket{\tilde{\mathrm{B}}_m(\bm{As} - j\bm{e}_0, R)}. \]
+For an appropriate choice of the radius $R$, for each $\bm{s} \in \Z_q^n$ the intersection $\cap_{j} \tilde{\mathrm{B}}_m(\bm{As} - j\bm{e}_0, R)$ is large, while $\tilde{\mathrm{B}}_m(\bm{As} - j\bm{e}_0, R) \cap \tilde{\mathrm{B}}_m(\bm{As}' - j'\bm{e}_0, R) = \emptyset$ for any $\bm{s} \ne \bm{s}'$ and any $j, j'$. Therefore, if we measure the last register we obtain the state
+\[ \sum_{j = 0}^{r - 1} \ket{j}\ket{\bm{s} + j\bm{s}_0}\ket{\bm{As} - j\bm{e}_0} \]
+for some random $\bm{s} \in \Z_q^n$, with probability $O(1 - 1 / \ell)$ for some $\ell = \poly(n\log q)$. The last register can be uncomputed using the transform $\ket{j}\ket{\bm{x}}\ket{\bm{y}} \mapsto \ket{j}\ket{\bm{x}}\ket{\bm{y} - \bm{Ax} + j\bm{b}_0}$ to obtain to obtain the state $\sum_{j = 0}^{r - 1} \ket{j}\ket{\bm{s} + j\bm{s}_0}$.
+
+The above procedure produces an $\edcp$ sample from $\lwe$ samples with a probability that is only polynomially close to $1$. This means we can obtain a polynomial number of $\edcp$ sample from a polynomial number of $\lwe$ samples, and that is the most we can do. In other words, producing a super-polynomial number of $\edcp$ samples from a super-polynomial number of $\lwe$ sample using the above procedure, can be done only with negligible probability. There is no known reduction from $\lwe$ to $\edcp$ with, for example, probability subexponentially close to $1$.
+
+
+\subsection{Subexponential number of samples}
+\label{sec:hardness-poly}
 
 
 
