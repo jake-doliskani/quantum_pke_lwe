@@ -77,8 +77,6 @@
 \DeclareMathOperator{\res}{Res}
 \DeclareMathOperator{\aut}{Aut}
 \DeclareMathOperator{\minpoly}{minpoly}
-\DeclareMathOperator{\loglog}{loglog}
-\DeclareMathOperator{\polylog}{polylog}
 \DeclareMathOperator{\poly}{poly}
 \DeclareMathOperator{\rev}{rev}
 \DeclareMathOperator{\entpy}{H}
@@ -235,7 +233,7 @@ Therefore, decision-$\edcp_{n, q, r}$ is the problem of distinguishing between t
     \label{thm:lwe-edcp}
     Let $\chi$ be a discrete Gaussian distribution centered around zero with standard deviation $\alpha q$. There is a polynomial-time quantum reduction from $\lwe_{n, q, \chi}$ to $\edcp_{n, q, r}^m$ with $m = \poly(n\log q)$ and $r = \poly(n\log q) / \alpha$. Conversely, for the same parameter relationship up to $\poly(n\log q)$ factors, there is a polynomial-time quantum reduction from $\edcp$ to $\lwe$. 
 \end{theorem}
-Note that the equivalence in Theorem \ref{thm:lwe-edcp} holds only when the number of samples $m = \poly(n\log q)$. Giving such an equivalence for arbitrary $m$ is an open problem. See Section \ref{sec:hardness-poly} for a detailed discussion.
+Note that the equivalence in Theorem \ref{thm:lwe-edcp} holds only when the number of samples $m = \poly(n\log q)$. Giving such an equivalence for arbitrary $m$ is an open problem. See Section \ref{sec:hardness-poly}.
 
 
 %% ///////////////////////////////////////////////////////
@@ -622,7 +620,7 @@ Assume that Bob has found a measurement $\mu$ on $\eta^{\otimes m}$, i.e., a mea
 \subsection{Polynomial number of samples}
 \label{sec:hardness-poly}
 
-When the number of samples is $\poly(n)$, it was proved in \cite{brakerski2018learning} that $\edcp$ is quantum polynomial equivalent to $\lwe$. The reduction form $\edcp$ to $\lwe$ is proved as in Section \ref{sec:new-decsn}. The reduction from $\lwe$ to $\edcp$ is based on the ball-intersection technique that originally proposed by \cite{regev2004quantum}. We briefly review the reduction idea here and refer the reader to \cite{regev2004quantum, brakerski2018learning} for details.
+When the number of samples is $\poly(n)$, it was proved in \cite{brakerski2018learning} that $\edcp$ is quantum polynomial equivalent to $\lwe$. The reduction form $\edcp$ to $\lwe$ is proved as in Section \ref{sec:new-decsn}. The reduction from $\lwe$ to $\edcp$ is based on the ball-intersection technique that was originally proposed by \cite{regev2004quantum}. We briefly review the reduction idea here and refer the reader to \cite{regev2004quantum, brakerski2018learning} for details.
 
 Let $(\bm{A}, \bm{b}_0 = \bm{As}_0 + \bm{e}_0)$ be $m$ samples from $\lwe_{n, q, \alpha}$. We start by preparing the state 
 \[ \sum_{\bm{s} \in \Z_q^n} \sum_{j = 0}^{r - 1} \ket{j}\ket{\bm{s}}, \]
@@ -636,19 +634,42 @@ The goal is to project the above state onto a state $\sum_{\bm{s} \in \Z_q^n} \s
     \label{equ:m-ball-sup}
     \ket{\tilde{\mathrm{B}}_m(0, R)} = \frac{1}{\sqrt{\tilde{\mathrm{B}}_m(0, R)}} \sum_{\bm{x} \in \tilde{\mathrm{B}}_m(0, R)} \ket{\bm{x}}.
 \end{equation}
-Note that for any $\bm{y} \in \Z_q^m$ we have $\bm{y} + \tilde{\mathrm{B}}_m(0, R) = \tilde{\mathrm{B}}_m(\bm{y}, R)$. Tensoring the states in \eqref{equ:latt-sup} and \eqref{equ:m-ball-sup} and adding the third register to the forth register we obtain the state
+Note that for any $\bm{y} \in \Z_q^m$ we have $\bm{y} + \tilde{\mathrm{B}}_m(0, R) = \tilde{\mathrm{B}}_m(\bm{y}, R)$. Tensoring the states in \eqref{equ:latt-sup} and \eqref{equ:m-ball-sup} and adding the third register to the fourth register we obtain the state
 \[ \sum_{\bm{s} \in \Z_q^n} \sum_{j = 0}^{r - 1} \ket{j}\ket{\bm{s} + j\bm{s}_0}\ket{\bm{As} - j\bm{e}_0}\ket{\tilde{\mathrm{B}}_m(\bm{As} - j\bm{e}_0, R)}. \]
 For an appropriate choice of the radius $R$, for each $\bm{s} \in \Z_q^n$ the intersection $\cap_{j} \tilde{\mathrm{B}}_m(\bm{As} - j\bm{e}_0, R)$ is large, while $\tilde{\mathrm{B}}_m(\bm{As} - j\bm{e}_0, R) \cap \tilde{\mathrm{B}}_m(\bm{As}' - j'\bm{e}_0, R) = \emptyset$ for any $\bm{s} \ne \bm{s}'$ and any $j, j'$. Therefore, if we measure the last register we obtain the state
 \[ \sum_{j = 0}^{r - 1} \ket{j}\ket{\bm{s} + j\bm{s}_0}\ket{\bm{As} - j\bm{e}_0} \]
-for some random $\bm{s} \in \Z_q^n$, with probability $O(1 - 1 / \ell)$ for some $\ell = \poly(n\log q)$. The last register can be uncomputed using the transform $\ket{j}\ket{\bm{x}}\ket{\bm{y}} \mapsto \ket{j}\ket{\bm{x}}\ket{\bm{y} - \bm{Ax} + j\bm{b}_0}$ to obtain to obtain the state $\sum_{j = 0}^{r - 1} \ket{j}\ket{\bm{s} + j\bm{s}_0}$.
+for some random $\bm{s} \in \Z_q^n$, with probability $O(1 - 1 / \ell)$ where $\ell = \poly(n\log q)$. The last register can be uncomputed using the transform $\ket{j}\ket{\bm{x}}\ket{\bm{y}} \mapsto \ket{j}\ket{\bm{x}}\ket{\bm{y} - \bm{Ax} + j\bm{b}_0}$ to obtain to obtain the state $\sum_{j = 0}^{r - 1} \ket{j}\ket{\bm{s} + j\bm{s}_0}$.
 
 The above procedure produces an $\edcp$ sample from $\lwe$ samples with a probability that is only polynomially close to $1$. This means we can obtain a polynomial number of $\edcp$ sample from a polynomial number of $\lwe$ samples, and that is the most we can do. In other words, producing a super-polynomial number of $\edcp$ samples from a super-polynomial number of $\lwe$ sample using the above procedure, can be done only with negligible probability. There is no known reduction from $\lwe$ to $\edcp$ with, for example, probability subexponentially close to $1$.
 
 
 \subsection{Subexponential number of samples}
-\label{sec:hardness-poly}
+\label{sec:hardness-subexp}
 
+When the number of samples is subexponential, $\edcp$ can be solved in time subexponential in $O(n\log q)$. This can be done using Kuperberg's algorithm \cite{kuperberg2005subexponential, kuperberg2011another}, which solves the hidden subgroup problem for the dihedral group $D_N$. The idea of the algorithm is to use a sieve on states of the form
+\begin{equation}
+    \label{equ:dih-coset}
+    \frac{1}{\sqrt{2}}(\ket{0}\ket{x} + \ket{1}\ket{x + s}),
+\end{equation}
+where $x \in \Z_N$ is uniformly random, to recover the hidden shift $s \in \Z_N$. The state \eqref{equ:dih-coset} is called a dihedral coset state and the problem of recovering $s$, given such states, is called the Dihedral Coset Problem (DCP). The complexity of Kuperberg's algorithm is $2^{O(\sqrt{\log N})}$ for both time and space. Regev \cite{regev2004subexponential} improved the algorithm to use only $\poly(\log N)$ space at the cost of slightly increasing the running time to $2^{O(\sqrt{\log N \log\log N})}$. 
 
+Note that DCP is a special case of $\edcp_{n, q, r}$ where $n = 1$, $q = N$ and $r = 2$. Conversely, $\edcp$ can be reduced to vectorial variant of DCP which can be solved using the same technique as in \cite{kuperberg2005subexponential}. We briefly explain the steps of the algorithm here. First, given the distribution $\mu_{\bm{s}, r}$ we can efficiently sample from the distribution $\mu_{\bm{s}, 2}$ using Lemma \ref{lem:self-rd}. A sample from $\mu_{\bm{s}, 2}$ is of the form
+\[ \ket{\phi_{\bm{x}, 2}} = \frac{1}{\sqrt{2}}(\ket{0}\ket{\bm{x}} + \ket{1}\ket{\bm{x} + \bm{s}}), \]
+where $\bm{x} \in \Z_q^n$ is uniformly random. Measuring the second register of $(\mathds{1} \otimes \qft_{q^n}) \ket{\phi_{\bm{x}, 2}}$ we obtain the state
+\begin{equation}
+    \label{equ:dih-coset-v}
+    \ket{\phi_{\bm{y}}} = \frac{1}{\sqrt{2}}(\ket{0} + \omega_q^{\lrang{\bm{y}, \bm{s}}}\ket{1})
+\end{equation}
+where $\bm{y} \in \Z_q^n$ is the outcome of the measurement and is uniformly random. Given two such states $\ket{\phi_{\bm{y}_1}}$ and $\ket{\phi_{\bm{y}_2}}$, we can compute the state
+\[ \ket{\phi_{\bm{y}_1 - \bm{y}_2}} = \frac{1}{\sqrt{2}}(\ket{0} + \omega_q^{\lrang{\bm{y}_1 - \bm{y}_2, \bm{s}}}\ket{1}) \]
+with probability $1 / 2$ by measuring the second register of $\mathrm{CNOT} \ket{\phi_{\bm{y}_1}} \ket{\phi_{\bm{y}_2}}$. If $\bm{y}_1$ and $\bm{y}_2$ had the first $k$ coordinates in common then $\bm{y}_1 - \bm{y}_2$ would have $0$ in the first $k$ coordinates. The idea is to prepare many states of the form \eqref{equ:dih-coset-v}, then pair the states that have $\bm{y}$ with the same first $k$ coordinates, and then perform the above operation to produce new states with $\bm{y}$ that have the first $k$ coordinates zeroed out. Repeating the same process on the new states produces states with $\bm{y}$ that have first $2k$ coordinates equal to $0$, and so on. The final output of this process is a state $\ket{\phi_{\bm{y}}}$ where $\bm{y} = (0, \dots, 0, y)$, i.e., 
+\begin{equation}
+    \label{equ:dih-sve}
+    \ket{\phi_{\bm{y}}} = \frac{1}{\sqrt{2}}(\ket{0} + \omega_q^{ys_n}\ket{1}).
+\end{equation}
+Suppose we have $t \in O(\log q)$ of the states \eqref{equ:dih-sve}. Then
+\[ \ket{\psi} := \bigotimes_{j = 0}^{t - 1} \frac{1}{\sqrt{2}}(\ket{0} + \omega_q^{y_js_n}\ket{1}) = \frac{1}{\sqrt{2^t}} \sum_{x \in \{0, 1\}^t} \omega_q^{\alpha(x)s_n} \ket{x}, \]
+where $\alpha(x) = x_0y_0 + \cdots + x_ty_t$. 
 
 
 %% ///////////////////////////////////////////////////////
@@ -657,6 +678,13 @@ The above procedure produces an $\edcp$ sample from $\lwe$ samples with a probab
 
 \bibliographystyle{plain}
 \bibliography{references}
+
+
+
+
+%% ///////////////////////////////////////////////////////
+
+
 
 
 \appendix
