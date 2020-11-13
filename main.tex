@@ -182,6 +182,7 @@ Two ensembles of distributions $\{ P_{1, n} \}$ and $\{ P_{2, n} \}$ are said to
 \end{lemma}
 Suppose an algorithm $A$ can distinguish between two distributions $P_1$ and $P_2$ with non-negligible advantage. A common technique to amplify the distinguishing advantage of $A$ is to sample enough times from the input distribution and then decide based on majority. A brief description of this technique, which we shall use several times in this paper, is as follows. First, we need the following well-known tail inequality.
 \begin{lemma}[Hoeffding]
+    \label{lem:hoeffding}
     Let $X_1, \dots, X_n$ be independent random variables with $X_i \in [a_i, b_i]$, and let $S = X_1, \cdots + X_n$. Then
     \begin{align*}
         \Pr[S - \E[S] \ge t] & \le e^{-2t^2 / \sum_i^n (b_i - a_i)^2}, \text{ and} \\
@@ -653,7 +654,7 @@ When the number of samples is subexponential, $\edcp$ can be solved in time sube
 \end{equation}
 where $x \in \Z_N$ is uniformly random, to recover the hidden shift $s \in \Z_N$. The state \eqref{equ:dih-coset} is called a dihedral coset state and the problem of recovering $s$, given such states, is called the Dihedral Coset Problem (DCP). The complexity of Kuperberg's algorithm is $2^{O(\sqrt{\log N})}$ for both time and space. Regev \cite{regev2004subexponential} improved the algorithm to use only $\poly(\log N)$ space at the cost of slightly increasing the running time to $2^{O(\sqrt{\log N \log\log N})}$. 
 
-Note that DCP is a special case of $\edcp_{n, q, r}$ where $n = 1$, $q = N$ and $r = 2$. Conversely, $\edcp$ can be reduced to vectorial variant of DCP which can be solved using the same technique as in \cite{kuperberg2005subexponential}. We briefly explain the steps of the algorithm here. First, given the distribution $\mu_{\bm{s}, r}$ we can efficiently sample from the distribution $\mu_{\bm{s}, 2}$ using Lemma \ref{lem:self-rd}. A sample from $\mu_{\bm{s}, 2}$ is of the form
+Note that DCP is a special case of $\edcp_{n, q, r}$ where $n = 1$, $q = N$ and $r = 2$. Conversely, $\edcp$ can be reduced to vectorial variant of DCP which can be solved using the same technique as in \cite{kuperberg2005subexponential}. We briefly explain the steps of the algorithm here. Let $\bm{s} = (s_1, \dots, s_n)$. We will recover $s_n$, the rest of the $s_i$ can be recovered using the same technique. Given the distribution $\mu_{\bm{s}, r}$ we can efficiently sample from the distribution $\mu_{\bm{s}, 2}$ using Lemma \ref{lem:self-rd}. A sample from $\mu_{\bm{s}, 2}$ is of the form
 \[ \ket{\phi_{\bm{x}, 2}} = \frac{1}{\sqrt{2}}(\ket{0}\ket{\bm{x}} + \ket{1}\ket{\bm{x} + \bm{s}}), \]
 where $\bm{x} \in \Z_q^n$ is uniformly random. Measuring the second register of $(\mathds{1} \otimes \qft_{q^n}) \ket{\phi_{\bm{x}, 2}}$ we obtain the state
 \begin{equation}
@@ -662,14 +663,24 @@ where $\bm{x} \in \Z_q^n$ is uniformly random. Measuring the second register of 
 \end{equation}
 where $\bm{y} \in \Z_q^n$ is the outcome of the measurement and is uniformly random. Given two such states $\ket{\phi_{\bm{y}_1}}$ and $\ket{\phi_{\bm{y}_2}}$, we can compute the state
 \[ \ket{\phi_{\bm{y}_1 - \bm{y}_2}} = \frac{1}{\sqrt{2}}(\ket{0} + \omega_q^{\lrang{\bm{y}_1 - \bm{y}_2, \bm{s}}}\ket{1}) \]
-with probability $1 / 2$ by measuring the second register of $\mathrm{CNOT} \ket{\phi_{\bm{y}_1}} \ket{\phi_{\bm{y}_2}}$. If $\bm{y}_1$ and $\bm{y}_2$ had the first $k$ coordinates in common then $\bm{y}_1 - \bm{y}_2$ would have $0$ in the first $k$ coordinates. The idea is to prepare many states of the form \eqref{equ:dih-coset-v}, then pair the states that have $\bm{y}$ with the same first $k$ coordinates, and then perform the above operation to produce new states with $\bm{y}$ that have the first $k$ coordinates zeroed out. Repeating the same process on the new states produces states with $\bm{y}$ that have first $2k$ coordinates equal to $0$, and so on. The final output of this process is a state $\ket{\phi_{\bm{y}}}$ where $\bm{y} = (0, \dots, 0, y)$, i.e., 
+with probability $1 / 2$ by measuring the second register of $\mathrm{CNOT} \ket{\phi_{\bm{y}_1}} \ket{\phi_{\bm{y}_2}}$. If $\bm{y}_1$ and $\bm{y}_2$ had the first $k$ coordinates in common then $\bm{y}_1 - \bm{y}_2$ would have $0$ in the first $k$ coordinates. The idea is to prepare many states of the form \eqref{equ:dih-coset-v}, then pair the states that have $\bm{y}$ with the same first $k$ coordinates, and then perform the above operation to produce new states with $\bm{y}$ that have the first $k$ coordinates zeroed out. Repeating the same process on the new states produces states with $\bm{y}$ that have first $2k$ coordinates equal to $0$, and so on. The final output of this process is a state $\ket{\phi_{\bm{y}}}$ where $\bm{y} = (0, \dots, 0, y)$, i.e., the state
 \begin{equation}
     \label{equ:dih-sve}
-    \ket{\phi_{\bm{y}}} = \frac{1}{\sqrt{2}}(\ket{0} + \omega_q^{ys_n}\ket{1}).
+    \ket{\phi_y} := \ket{\phi_{\bm{y}}} = \frac{1}{\sqrt{2}}(\ket{0} + \omega_q^{ys_n}\ket{1}).
 \end{equation}
-Suppose we have $t \in O(\log q)$ of the states \eqref{equ:dih-sve}. Then
-\[ \ket{\psi} := \bigotimes_{j = 0}^{t - 1} \frac{1}{\sqrt{2}}(\ket{0} + \omega_q^{y_js_n}\ket{1}) = \frac{1}{\sqrt{2^t}} \sum_{x \in \{0, 1\}^t} \omega_q^{\alpha(x)s_n} \ket{x}, \]
-where $\alpha(x) = x_0y_0 + \cdots + x_ty_t$. 
+This is a DCP state over the group $D_q$, so, given a $\poly(\log q)$ number of these states, $s_n$ can be recovered efficiently using Kuperberg's algorithm.
+\begin{remark}
+    Suppose we have prepared the states $\ket{\phi_{y_0}}, \dots, \ket{\phi_{y_t}}$ for some $t \ge \lceil \log q \rceil + 1$. The tensor product of these states is
+    \[ \ket{\psi} := \bigotimes_{j = 0}^{t - 1} \frac{1}{\sqrt{2}}(\ket{0} + \omega_q^{y_js_n}\ket{1}) = \frac{1}{\sqrt{2^t}} \sum_{x \in \{0, 1\}^t} \omega_q^{\alpha(x)s_n} \ket{x}, \]
+    where $\alpha(x) = x_0y_0 + \cdots + x_ty_t \bmod q$. Using the Pretty Good Measurement (PGM) on the state $\ket{\psi}$, we can recover $s_n$ with constant probability \cite{bacon2005optimal}. The implementation of PGM, in this case, boils down to inverting the function $\alpha: \{0, 1\}^t \rightarrow \Z_q$, which can be done efficiently since $q = \poly(n)$.   
+\end{remark}
+To analyze the above algorithm suppose we start with $q^\ell$ states. Since we are zeroing out $k$ coordinates at each stage, there are $n / k$ stages. At any stage, if there are $c \cdot q^k$ states, it can be shown, using a simple application of Lemma \ref{lem:hoeffding}, that at least $c / 8 \cdot q^k$ states service the sieve operation. Therefore, to have $\Theta(q^k)$ states remaining in the last stage, we must have $q^\ell 8^{-n / k} \ge q^k$, so $\ell \ge k + 3n / (k\log q)$. To minimize the right hand side, we take $k \in \Theta(\sqrt{n / \log q})$. Therefore, we can take $\ell \in \Theta(\sqrt{n / \log q})$.
+\begin{theorem}
+    \label{thm:subexp-smpl}
+    $\edcp_{n, q, r}$ can be solved in time $2^{O(\sqrt{n\log q})}$.
+\end{theorem}
+
+
 
 
 %% ///////////////////////////////////////////////////////
