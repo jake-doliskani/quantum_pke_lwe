@@ -405,6 +405,7 @@ Measuring the above state, we obtain a pair $(-\bm{a}, \lrang{-\bm{a}, \bm{s}} +
 
 
 \section{Quantum Public-Key Cryptosystem}
+\label{sec:public-key-enc}
 
 A quantum public-key cryptosystem is, similar to a classical system, a set of three algorithms:
 \begin{itemize}[itemsep = 1pt]
@@ -494,13 +495,34 @@ $\dec(sk = \bm{s}, c = \rho_{\bm{s}, r, b})$:  Apply the transformation $S: \ket
 \section{Information-Theoretic and Hardness Bounds}
 \label{sec:hardness}
 
-In this section, we derive hardness bounds for $\edcp$ based on the number of samples. The $\edcp_{n, q, r}^m$ problem is to recover the secret $\bm{s} \in \Z_q^n$ given $m$ copies of the state $\rho_{\bm{s}, r}$.
+In this section, we derive hardness bounds for $\edcp$ based on the number of samples. The $\edcp_{n, q, r}^m$ problem is to recover the secret $\bm{s} \in \Z_q^n$ given $m$ copies of the state $\rho_{\bm{s}, r}$. We consider bounds $O( n\log q / \log r)$, $\poly(n)$ and $2^{O(\sqrt{n \log q})}$ for $m$. As $m$ increases, $\edcp$ becomes easier. Figure \ref{fig:hardness-bounds} summarizes the hardness of $\edcp$ based on these bounds.  
+
+\begin{figure}
+    \centering
+    \begin{tikzpicture}[tick/.style = {draw = black, fill = red, inner sep = 0.4mm}]
+        \draw [thick, -{latex}] (0, 0) -- (0, 3) node[above] {\scriptsize \# samples};
+        \node [tick] (t1) at (0, 1) {};
+        \node [tick] (t2) at (0, 2) {};
+
+        \node [below left = 1mm of t1] {$\displaystyle O\Big( n \frac{\log q}{\log r} \Big)$};
+        \node [below right = 1mm of t1] {Information-theoretically secure};
+        \node [below left = 1mm of t2] {$\poly(n)$};
+        \node [below right = 1mm of t2] {as hard as $\lwe$};
+        \node [above left = 1mm of t2] {$\displaystyle 2^{O(\sqrt{n \log q})}$};
+        \node [above right = 1mm of t2] {can be solved in $\displaystyle 2^{O(\sqrt{n \log q})}$};
+    \end{tikzpicture}
+    \caption{The hardness of $\edcp$ based on the number of samples. These bounds also hold for the security of the public-key encryption scheme of Section \ref{sec:public-key-enc}. In that case, a sample is a copy of the public key.}
+    \label{fig:hardness-bounds}
+\end{figure}
+
+
 
 
 
 \subsection{Limited number of samples}
+\label{sec:hardness-limited}
 
-We can derive a lower bound on $m$ using the tools from quantum information theory. To better understand the problem we can model it in the following standard way, for $m = 1$. Alice selects a uniformly random $\bm{s} \in \Z_q^n$ and stores it in the classical register $\mathsf{Y}$. She then prepares a register $\mathsf{X}$ in the state $\rho_{\bm{s}, r}$ and sends $\mathsf{X}$ to Bob. Therefore, Bob has access to the register $\mathsf{X}$ that is prepared according to the ensemble
+We derive a lower bound on $m$ using tools from quantum information theory. A special case of the result of this section was also obtained in \cite{bacon2005optimal}. To better understand the problem we can model it in the following standard way, for $m = 1$. Alice selects a uniformly random $\bm{s} \in \Z_q^n$ and stores it in the classical register $\mathsf{Y}$. She then prepares a register $\mathsf{X}$ in the state $\rho_{\bm{s}, r}$ and sends $\mathsf{X}$ to Bob. So, Bob has access to the register $\mathsf{X}$ that is prepared according to the ensemble
 \[
 \begin{array}{rrll}
     \eta: & \Z_q^n & \longrightarrow & \mathrm{Pos}(\X) \\
@@ -526,9 +548,9 @@ The quantum mutual information between $\mathsf{Y}$ and $\mathsf{X}$, with respe
 where $\entpy(\cdot)$ is the von Neumann entropy.
 \begin{theorem}[Holevo's theorem]
     \label{thm:holevo}
-    Let $\Sigma$ be an alphabet and let $\X$ be complex Euclidean space. For any ensemble $\eta: \Sigma \rightarrow \mathrm{Pos}(\X)$ it holds that $\operatorname{I}(\eta) \le \chi(\eta)$.
+    Let $\Sigma$ be an alphabet and let $\X$ be a complex Euclidean space. For any ensemble $\eta: \Sigma \rightarrow \mathrm{Pos}(\X)$ it holds that $\operatorname{I}(\eta) \le \chi(\eta)$.
 \end{theorem}
-Therefore, according to Theorem \ref{thm:holevo}, we can obtain an upper bound on the accessible information of the ensemble $\eta$ by computing $\chi(\eta)$. For an arbitrary number of samples $m$, we need to compute $\chi(\eta^{\otimes m})$ for the ensemble
+Therefore, according to Theorem \ref{thm:holevo}, we can obtain an upper bound on the accessible information of the ensemble $\eta$ by computing $\chi(\eta)$. For an arbitrary number of samples $m$, we need to bound $\chi(\eta^{\otimes m})$ for the ensemble
 \begin{equation}
     \label{equ:ensem-m}
     \begin{array}{rrll}
@@ -536,19 +558,20 @@ Therefore, according to Theorem \ref{thm:holevo}, we can obtain an upper bound o
         & \bm{s} & \longmapsto & \frac{1}{q^n}\rho_{\bm{s}, r}^{\otimes m}.
     \end{array}
 \end{equation}
+This is done is the following theorem.
 \begin{theorem}
     \label{thm:acc-bound}
     For the ensemble $\eta^{\otimes m}$ in \eqref{equ:ensem-m} we have $\chi(\eta^{\otimes m}) \le m(1 - q^{-n})\log r$.
 \end{theorem}
 \begin{proof}
-    First, note that the entropy is additive with respect to tensor products, i.e., for any two states $\sigma_1$ and $\sigma_2$ it holds that $\entpy(\sigma_1 \otimes \sigma_2) = \entpy(\sigma_1) + \entpy(\sigma_2)$, so $\entpy(\rho_{\bm{s}, r}^{\otimes m}) = m\entpy(\rho_{\bm{s}, r})$. Next, for a state $\sigma$ of a compound register $(\mathsf{X}_1, \cdots, \mathsf{X}_m)$, we have, by the subadditivity of von Neumann entropy,
+    First, note that the entropy is additive with respect to tensor products, i.e., for any two states $\sigma_1$ and $\sigma_2$ it holds that $\entpy(\sigma_1 \otimes \sigma_2) = \entpy(\sigma_1) + \entpy(\sigma_2)$. It follows that $\entpy(\rho_{\bm{s}, r}^{\otimes m}) = m\entpy(\rho_{\bm{s}, r})$. Next, for a state $\sigma$ of a compound register $(\mathsf{X}_1, \cdots, \mathsf{X}_m)$, we have, by the subadditivity of von Neumann entropy,
     \[ \entpy(\sigma) \le \entpy(\tr_1(\sigma)) + \cdots + \entpy(\tr_m(\sigma))\]
-    where $\tr_k(\sigma)$ is the reduction of $\sigma$ to the state of the register $\mathsf{X}_k$. Therefore,
+    where $\tr_k(\sigma)$ is the reduction of $\sigma$ to the (state of the) register $\mathsf{X}_k$. Therefore,
     \begin{align*}
-        \entpy\Bigg( \frac{1}{q^n} \sum_{\bm{s} \in \Z_q^n} \rho_{\bm{s}, r}^{\otimes m} \Bigg)
-        & \le \sum_{i = 1}^m \entpy\Bigg(\tr_i\Bigg( \frac{1}{q^n} \sum_{\bm{s} \in \Z_q^n} \rho_{\bm{s}, r}^{\otimes m} \Bigg)\Bigg) \tag{by subadditivity of $\entpy$} \\
-        & = \sum_{i = 1}^m \entpy\Bigg(\frac{1}{q^n} \sum_{\bm{s} \in \Z_q^n} \tr_i(\rho_{\bm{s}, r}^{\otimes m}) \Bigg) \tag{by linearity of $\tr$} \\
-        & = m\entpy\Bigg( \frac{1}{q^n} \sum_{\bm{s} \in \Z_q^n} \rho_{\bm{s}, r} \Bigg).
+        \entpy\bigg( \frac{1}{q^n} \sum_{\bm{s} \in \Z_q^n} \rho_{\bm{s}, r}^{\otimes m} \bigg)
+        & \le \sum_{i = 1}^m \entpy\bigg(\tr_i\bigg( \frac{1}{q^n} \sum_{\bm{s} \in \Z_q^n} \rho_{\bm{s}, r}^{\otimes m} \bigg)\bigg) \tag{by subadditivity of $\entpy$} \\
+        & = \sum_{i = 1}^m \entpy\bigg(\frac{1}{q^n} \sum_{\bm{s} \in \Z_q^n} \tr_i(\rho_{\bm{s}, r}^{\otimes m}) \bigg) \tag{by linearity of $\tr$} \\
+        & = m\entpy\bigg( \frac{1}{q^n} \sum_{\bm{s} \in \Z_q^n} \rho_{\bm{s}, r} \bigg).
     \end{align*}
     It follows from \eqref{equ:holevo-chi}  that $\chi(\eta^{\otimes m}) \le m\chi(\eta)$. Now, we can compute $\chi(\eta)$ by computing the eigenvalues of the operators $\rho_{\bm{s}, r}$ and $\rho = q^{-n}\sum_{\bm{s} \in \Z_q^n} \rho_{\bm{s}, r}$. The eigenvectors of $\rho_{\bm{s}, r}$ are
     \[ \ket{\psi_{\bm{x}, t}} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} \omega_r^{jt} \ket{j}\ket{\bm{x} + j\bm{s}}, \hspace*{2mm} (t, \bm{x}) \in \Z_r \times \Z_q^n, \]
@@ -573,7 +596,7 @@ Therefore, according to Theorem \ref{thm:holevo}, we can obtain an upper bound o
         & = \frac{1}{r} \E_{\bm{y} \in \U(\Z_q^n)} \Big[ \sum_{j, k \in \Z_r} \E_{\bm{s} \in \U(\Z_q^n)} \Big[ \omega_q^{\lrang{(j - k)\bm{y}, \bm{s}}} \Big] \ket{j}\bra{k} \otimes \ket{\bm{y}}\bra{\bm{y}} \Big] \nonumber \\
         & = \frac{1}{rq^n} \sum_{j, k \in \Z_r} \ket{j}\bra{k} \otimes \ket{0}\bra{0} + \frac{1}{rq^n} \mathds{1} \otimes (\mathds{1} - \ket{0}\bra{0}) \label{equ:f-basis}
     \end{align}
-    where, again, the second equality follows from
+    where the second equality follows from
     \[
     \E_{\bm{s} \in \U(\Z_q^n)} \Big[ \omega_q^{\lrang{(j - k)\bm{y}, \bm{s}}} \Big] = 
     \begin{cases}
@@ -586,7 +609,7 @@ Therefore, according to Theorem \ref{thm:holevo}, we can obtain an upper bound o
         & \ket{\psi_{\bm{x}, t}} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} \omega_r^{jt} \ket{j}\ket{\bm{x}}, \hspace*{2mm} (t, \bm{x}) \in \Z_r \times \Z_q^n, \hspace*{1mm} \bm{x} \ne 0, \\
         & \ket{\psi_t} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} \omega_r^{jt} \ket{j}\ket{0}, \hspace*{2mm} t \in \Z_r,
     \end{align*}
-    and the eigenvalues are $0$, $q^{-n}$ and $r^{-1}q^{-n}$ with multiplicities $r - 1$, $1$ and $(q^n - 1)r$, respectively. Finally, using \eqref{equ:holevo-chi} and the eigenvalues for $\rho$ and $\rho_{\bm{s}, r}$ we have
+    and the eigenvalues are $0$, $q^{-n}$ and $r^{-1}q^{-n}$ with multiplicities $r - 1$, $1$ and $(q^n - 1)r$, respectively. Finally, using \eqref{equ:holevo-chi} and the eigenvalues for $\rho$ and $\rho_{\bm{s}, r}$, we have
     \[ m\chi(\eta) \le m\Big( \frac{1}{q^n}\log(q^n) + \frac{r(q^n - 1)}{rq^n}\log(rq^n) - \log(q^n) \Big) = m\Big( 1 - \frac{1}{q^n} \Big)\log r. \qedhere \]
 \end{proof}
 Assume that Bob has found a measurement $\mu$ on $\eta^{\otimes m}$, i.e., a measurement that can operate on the joint state of $m$ copies of Alice's state, such that, after possibly some post-measurement processing, he can guess the value of $\mathsf{Y}$ with a constant probability $p$. Then a lower bound on $m$, that depends on $p$, can be computed using Theorem \ref{thm:acc-bound}. We need the following result known as Fano's inequality.
@@ -611,7 +634,7 @@ Assume that Bob has found a measurement $\mu$ on $\eta^{\otimes m}$, i.e., a mea
     Now, by Theorem \ref{thm:acc-bound}, $m(1 - q^{-n})\log r \ge \chi(\eta^{\otimes m}) \ge \operatorname{I}_\mu(\eta^{\otimes m})$ which completes the proof.
 \end{proof}
 \begin{remark}
-    An interesting case for which the bound in Corollary \ref{cor:lower-b} is tight is $q = r$. In this case, given the state $\rho_{\bm{s}, r}$, applying $\qft_r^* \otimes \qft_{q^n}$ we obtain the state
+    An interesting case for which the bound in Corollary \ref{cor:lower-b} is tight is when $q = r$. In this case, given the state $\rho_{\bm{s}, r}$, applying the transform $\qft_r^* \otimes \qft_{q^n}$ results in the state
     \[ \frac{1}{\sqrt{q^n}} \sum_{\bm{y} \in \Z_q^n} \omega_q^{\lrang{\bm{y}, \bm{x}}} \ket{\lrang{\bm{y}, \bm{s}}}\ket{\bm{y}}. \]
     Measuring this state we obtain a linear equation $\lrang{\bm{y}, \bm{s}}$, where $\bm{y} \in \Z_q^n$ is uniformly random. We can solve for $\bm{s}$ by gathering $O(n)$ of these linear equations. 
 \end{remark}
@@ -621,16 +644,16 @@ Assume that Bob has found a measurement $\mu$ on $\eta^{\otimes m}$, i.e., a mea
 \subsection{Polynomial number of samples}
 \label{sec:hardness-poly}
 
-When the number of samples is $\poly(n)$, it was proved in \cite{brakerski2018learning} that $\edcp$ is quantum polynomial equivalent to $\lwe$. The reduction form $\edcp$ to $\lwe$ is proved as in Section \ref{sec:new-decsn}. The reduction from $\lwe$ to $\edcp$ is based on the ball-intersection technique that was originally proposed by \cite{regev2004quantum}. We briefly review the reduction idea here and refer the reader to \cite{regev2004quantum, brakerski2018learning} for details.
+When the number of samples is $\poly(n)$, $\edcp$ is quantum polynomially equivalent to $\lwe$ \cite{brakerski2018learning}. The reduction form $\edcp$ to $\lwe$ is proved as in Section \ref{sec:new-decsn}. The reduction from $\lwe$ to $\edcp$ is based on the ball-intersection technique that was originally proposed by \cite{regev2004quantum}. We briefly review the reduction idea here and refer the reader to \cite{regev2004quantum, brakerski2018learning} for details.
 
-Let $(\bm{A}, \bm{b}_0 = \bm{As}_0 + \bm{e}_0)$ be $m$ samples from $\lwe_{n, q, \alpha}$. We start by preparing the state 
+Let $(\bm{A}, \bm{b}_0 = \bm{As}_0 + \bm{e}_0)$ be a set of $m$ samples from $\lwe_{n, q, \alpha}$, written in matrix form. We start by preparing the state 
 \[ \sum_{\bm{s} \in \Z_q^n} \sum_{j = 0}^{r - 1} \ket{j}\ket{\bm{s}}, \]
-where we have dropped the normalization factors for simplicity. Here, $r$ is a function of $n, q$, and $\alpha$. We then compute $(j, \bm{s}) \mapsto \bm{As} - j\bm{b}_0$ into an auxiliary register. After a change of variables we obtain the state
+where we have dropped the normalization factors for simplicity. Here, $r$ is a function of $n$ and $q$. We then compute $(j, \bm{s}) \mapsto \bm{As} - j\bm{b}_0$ into an auxiliary register. After a change of variables we obtain the state
 \begin{equation}
     \label{equ:latt-sup}
     \sum_{\bm{s} \in \Z_q^n} \sum_{j = 0}^{r - 1} \ket{j}\ket{\bm{s} + j\bm{s}_0}\ket{\bm{As} - j\bm{e}_0}.
 \end{equation}
-The goal is to project the above state onto a state $\sum_{\bm{s} \in \Z_q^n} \sum_{j = 0}^{r - 1} \ket{j}\ket{\bm{s} + j\bm{s}_0}$ for some $\bm{s} \in \Z_q^n$ with high probability. To do this, the idea is to draw $m$-dimensional balls around the points $\bm{As} - j\bm{e}_0$ for all $\bm{s} \in \Z_q^n$ and $j \in \Z_r$ and then select a random point in one of these balls. Let $\mathrm{B}_m(0, R)$ be a ball of radius $R$ around $0$. To implement this idea we can represent $\mathrm{B}_m(0, R)$ using points of a fine grid. More precisely, $\mathrm{B}_m(0, R)$ is represented by $\tilde{\mathrm{B}}_m(0, R) = \frac{1}{L} \Z^m \cap \mathrm{B}_m(0, R)$ for a large integer $L$. We can efficiently prepare (an approximation of) the superposition
+The goal is to project the above state onto a state $\sum_{\bm{s} \in \Z_q^n} \sum_{j = 0}^{r - 1} \ket{j}\ket{\bm{s} + j\bm{s}_0}$ for some $\bm{s} \in \Z_q^n$ with high probability. To do this, the idea is to draw $m$-dimensional balls around the points $\bm{As} - j\bm{e}_0$ for all $\bm{s} \in \Z_q^n$ and $j \in \Z_r$ and then select a random point in one of these balls. Let $\mathrm{B}_m(0, R)$ be a ball of radius $R$ around $0$. To implement the above idea, we can represent $\mathrm{B}_m(0, R)$ using points of a fine grid. More precisely, $\mathrm{B}_m(0, R)$ is represented by $\tilde{\mathrm{B}}_m(0, R) = \frac{1}{L} \Z^m \cap \mathrm{B}_m(0, R)$ for a large integer $L$. We can efficiently prepare (an approximation of) the superposition
 \begin{equation}
     \label{equ:m-ball-sup}
     \ket{\tilde{\mathrm{B}}_m(0, R)} = \frac{1}{\sqrt{\tilde{\mathrm{B}}_m(0, R)}} \sum_{\bm{x} \in \tilde{\mathrm{B}}_m(0, R)} \ket{\bm{x}}.
@@ -639,9 +662,9 @@ Note that for any $\bm{y} \in \Z_q^m$ we have $\bm{y} + \tilde{\mathrm{B}}_m(0, 
 \[ \sum_{\bm{s} \in \Z_q^n} \sum_{j = 0}^{r - 1} \ket{j}\ket{\bm{s} + j\bm{s}_0}\ket{\bm{As} - j\bm{e}_0}\ket{\tilde{\mathrm{B}}_m(\bm{As} - j\bm{e}_0, R)}. \]
 For an appropriate choice of the radius $R$, for each $\bm{s} \in \Z_q^n$ the intersection $\cap_{j} \tilde{\mathrm{B}}_m(\bm{As} - j\bm{e}_0, R)$ is large, while $\tilde{\mathrm{B}}_m(\bm{As} - j\bm{e}_0, R) \cap \tilde{\mathrm{B}}_m(\bm{As}' - j'\bm{e}_0, R) = \emptyset$ for any $\bm{s} \ne \bm{s}'$ and any $j, j'$. Therefore, if we measure the last register we obtain the state
 \[ \sum_{j = 0}^{r - 1} \ket{j}\ket{\bm{s} + j\bm{s}_0}\ket{\bm{As} - j\bm{e}_0} \]
-for some random $\bm{s} \in \Z_q^n$, with probability $O(1 - 1 / \ell)$ where $\ell = \poly(n\log q)$. The last register can be uncomputed using the transform $\ket{j}\ket{\bm{x}}\ket{\bm{y}} \mapsto \ket{j}\ket{\bm{x}}\ket{\bm{y} - \bm{Ax} + j\bm{b}_0}$ to obtain to obtain the state $\sum_{j = 0}^{r - 1} \ket{j}\ket{\bm{s} + j\bm{s}_0}$.
+for some random $\bm{s} \in \Z_q^n$, with probability $O(1 - 1 / \ell)$ where $\ell = \poly(n\log q)$. The last register can be uncomputed using the transform $\ket{j}\ket{\bm{x}}\ket{\bm{y}} \mapsto \ket{j}\ket{\bm{x}}\ket{\bm{y} - \bm{Ax} + j\bm{b}_0}$ to obtain the state $\sum_{j = 0}^{r - 1} \ket{j}\ket{\bm{s} + j\bm{s}_0}$.
 
-The above procedure produces an $\edcp$ sample from $\lwe$ samples with a probability that is only polynomially close to $1$. This means we can obtain a polynomial number of $\edcp$ sample from a polynomial number of $\lwe$ samples, and that is the most we can do. In other words, producing a super-polynomial number of $\edcp$ samples from a super-polynomial number of $\lwe$ sample using the above procedure, can be done only with negligible probability. There is no known reduction from $\lwe$ to $\edcp$ with, for example, probability subexponentially close to $1$.
+The above procedure produces an $\edcp$ sample from $\lwe$ samples with a probability that is only polynomially close to $1$. This means we can obtain a polynomial number of $\edcp$ sample from a polynomial number of $\lwe$ samples, and that is the most we can do. In other words, producing a super-polynomial number of $\edcp$ samples from a super-polynomial number of $\lwe$ sample using the above procedure, can be done only with negligible probability. There is no known reduction from $\lwe$ to $\edcp$ for which the sample conversion probability is, for example, subexponentially close to $1$.
 
 
 \subsection{Subexponential number of samples}
@@ -652,33 +675,42 @@ When the number of samples is subexponential, $\edcp$ can be solved in time sube
     \label{equ:dih-coset}
     \frac{1}{\sqrt{2}}(\ket{0}\ket{x} + \ket{1}\ket{x + s}),
 \end{equation}
-where $x \in \Z_N$ is uniformly random, to recover the hidden shift $s \in \Z_N$. The state \eqref{equ:dih-coset} is called a dihedral coset state and the problem of recovering $s$, given such states, is called the Dihedral Coset Problem (DCP). The complexity of Kuperberg's algorithm is $2^{O(\sqrt{\log N})}$ for both time and space. Regev \cite{regev2004subexponential} improved the algorithm to use only $\poly(\log N)$ space at the cost of slightly increasing the running time to $2^{O(\sqrt{\log N \log\log N})}$. 
+where $x \in \Z_N$ is uniformly random, to recover the hidden shift $s \in \Z_N$. The state \eqref{equ:dih-coset} is called a dihedral coset state and the problem of recovering $s$, given such states, is called the Dihedral Coset Problem (DCP). The complexity of Kuperberg's algorithm is $2^{O(\sqrt{\log N})}$ for both time and space. Regev \cite{regev2004subexponential} improved the algorithm to use only $\poly(\log N)$ space at the cost of slightly increasing the running time to $2^{O(\sqrt{\log N \log\log N})}$.
 
-Note that DCP is a special case of $\edcp_{n, q, r}$ where $n = 1$, $q = N$ and $r = 2$. Conversely, $\edcp$ can be reduced to vectorial variant of DCP which can be solved using the same technique as in \cite{kuperberg2005subexponential}. We briefly explain the steps of the algorithm here. Let $\bm{s} = (s_1, \dots, s_n)$. We will recover $s_n$, the rest of the $s_i$ can be recovered using the same technique. Given the distribution $\mu_{\bm{s}, r}$ we can efficiently sample from the distribution $\mu_{\bm{s}, 2}$ using Lemma \ref{lem:self-rd}. A sample from $\mu_{\bm{s}, 2}$ is of the form
-\[ \ket{\phi_{\bm{x}, 2}} = \frac{1}{\sqrt{2}}(\ket{0}\ket{\bm{x}} + \ket{1}\ket{\bm{x} + \bm{s}}), \]
-where $\bm{x} \in \Z_q^n$ is uniformly random. Measuring the second register of $(\mathds{1} \otimes \qft_{q^n}) \ket{\phi_{\bm{x}, 2}}$ we obtain the state
-\begin{equation}
-    \label{equ:dih-coset-v}
-    \ket{\phi_{\bm{y}}} = \frac{1}{\sqrt{2}}(\ket{0} + \omega_q^{\lrang{\bm{y}, \bm{s}}}\ket{1})
-\end{equation}
-where $\bm{y} \in \Z_q^n$ is the outcome of the measurement and is uniformly random. Given two such states $\ket{\phi_{\bm{y}_1}}$ and $\ket{\phi_{\bm{y}_2}}$, we can compute the state
-\[ \ket{\phi_{\bm{y}_1 - \bm{y}_2}} = \frac{1}{\sqrt{2}}(\ket{0} + \omega_q^{\lrang{\bm{y}_1 - \bm{y}_2, \bm{s}}}\ket{1}) \]
-with probability $1 / 2$ by measuring the second register of $\mathrm{CNOT} \ket{\phi_{\bm{y}_1}} \ket{\phi_{\bm{y}_2}}$. If $\bm{y}_1$ and $\bm{y}_2$ had the first $k$ coordinates in common then $\bm{y}_1 - \bm{y}_2$ would have $0$ in the first $k$ coordinates. The idea is to prepare many states of the form \eqref{equ:dih-coset-v}, then pair the states that have $\bm{y}$ with the same first $k$ coordinates, and then perform the above operation to produce new states with $\bm{y}$ that have the first $k$ coordinates zeroed out. Repeating the same process on the new states produces states with $\bm{y}$ that have first $2k$ coordinates equal to $0$, and so on. The final output of this process is a state $\ket{\phi_{\bm{y}}}$ where $\bm{y} = (0, \dots, 0, y)$, i.e., the state
-\begin{equation}
-    \label{equ:dih-sve}
-    \ket{\phi_y} := \ket{\phi_{\bm{y}}} = \frac{1}{\sqrt{2}}(\ket{0} + \omega_q^{ys_n}\ket{1}).
-\end{equation}
-This is a DCP state over the group $D_q$, so, given a $\poly(\log q)$ number of these states, $s_n$ can be recovered efficiently using Kuperberg's algorithm.
-\begin{remark}
-    Suppose we have prepared the states $\ket{\phi_{y_0}}, \dots, \ket{\phi_{y_t}}$ for some $t \ge \lceil \log q \rceil + 1$. The tensor product of these states is
-    \[ \ket{\psi} := \bigotimes_{j = 0}^{t - 1} \frac{1}{\sqrt{2}}(\ket{0} + \omega_q^{y_js_n}\ket{1}) = \frac{1}{\sqrt{2^t}} \sum_{x \in \{0, 1\}^t} \omega_q^{\alpha(x)s_n} \ket{x}, \]
-    where $\alpha(x) = x_0y_0 + \cdots + x_ty_t \bmod q$. Using the Pretty Good Measurement (PGM) on the state $\ket{\psi}$, we can recover $s_n$ with constant probability \cite{bacon2005optimal}. The implementation of PGM, in this case, boils down to inverting the function $\alpha: \{0, 1\}^t \rightarrow \Z_q$, which can be done efficiently since $q = \poly(n)$.   
-\end{remark}
-To analyze the above algorithm suppose we start with $q^\ell$ states. Since we are zeroing out $k$ coordinates at each stage, there are $n / k$ stages. At any stage, if there are $c \cdot q^k$ states, it can be shown, using a simple application of Lemma \ref{lem:hoeffding}, that at least $c / 8 \cdot q^k$ states service the sieve operation. Therefore, to have $\Theta(q^k)$ states remaining in the last stage, we must have $q^\ell 8^{-n / k} \ge q^k$, so $\ell \ge k + 3n / (k\log q)$. To minimize the right hand side, we take $k \in \Theta(\sqrt{n / \log q})$. Therefore, we can take $\ell \in \Theta(\sqrt{n / \log q})$.
+Note that DCP is a special case of $\edcp_{n, q, r}$ where $n = 1$, $q = N$ and $r = 2$. Conversely, $\edcp$ can be reduced to vectorial variant of DCP which can be solved using a similar algorithm as in \cite{kuperberg2005subexponential}. We briefly explain the steps of the algorithm here.
 \begin{theorem}
     \label{thm:subexp-smpl}
-    $\edcp_{n, q, r}$ can be solved in time $2^{O(\sqrt{n\log q})}$.
+    Given $2^{O(\sqrt{n\log q})}$ samples, $\edcp_{n, q, r}$ can be solved in time $2^{O(\sqrt{n\log q})}$.
 \end{theorem}
+\begin{proof}
+    Let $\bm{s} = (s_1, \dots, s_n)$. We will recover $s_n$, the rest of the $s_i$ can be recovered similarly. The proof proceeds in a sequence of simple reductions.
+    \begin{enumerate}[leftmargin = *, font = \bfseries]
+    \item From $\edcp_{n, q, r}$ to DCP over $\Z_q^n$: Given the distribution $\mu_{\bm{s}, r}$ we can efficiently sample from the distribution $\mu_{\bm{s}, 2}$ using Lemma \ref{lem:self-rd}. A sample from $\mu_{\bm{s}, 2}$ is of the form
+    \[ \ket{\phi_{\bm{x}, 2}} = \frac{1}{\sqrt{2}}(\ket{0}\ket{\bm{x}} + \ket{1}\ket{\bm{x} + \bm{s}}), \]
+    where $\bm{x} \in \Z_q^n$ is uniformly random. This is a dihedral coset state over the group $\Z_q^n$.
+    \item From DCP over $\Z_q^n$ to DCP over $\Z_q$: measuring the second register of $(\mathds{1} \otimes \qft_{q^n}) \ket{\phi_{\bm{x}, 2}}$ we obtain the state
+    \begin{equation}
+        \label{equ:dih-coset-v}
+        \ket{\phi_{\bm{y}}} = \frac{1}{\sqrt{2}}(\ket{0} + \omega_q^{\lrang{\bm{y}, \bm{s}}}\ket{1})
+    \end{equation}
+    where $\bm{y} \in \Z_q^n$ is the outcome of the measurement and is uniformly random. Given two such states $\ket{\phi_{\bm{y}_1}}$ and $\ket{\phi_{\bm{y}_2}}$, we can compute the state
+    \[ \ket{\phi_{\bm{y}_1 - \bm{y}_2}} = \frac{1}{\sqrt{2}}(\ket{0} + \omega_q^{\lrang{\bm{y}_1 - \bm{y}_2, \bm{s}}}\ket{1}) \]
+    with probability $1 / 2$ by measuring the second register of $\mathrm{CNOT} \ket{\phi_{\bm{y}_1}} \ket{\phi_{\bm{y}_2}}$. If $\bm{y}_1$ and $\bm{y}_2$ had the first $k$ coordinates in common then $\bm{y}_1 - \bm{y}_2$ would have $0$ in the first $k$ coordinates. From this, we can perform a sieve operation: prepare many states of the form \eqref{equ:dih-coset-v}, then pair the states that have $\bm{y}$ with the same first $k$ coordinates, and then perform the above operation to produce new states with $\bm{y}$ that have the first $k$ coordinates zeroed out. Repeating the same process on the new states produces states with $\bm{y}$ that have first $2k$ coordinates equal to $0$, and so on. The final output of this process is a state $\ket{\phi_{\bm{y}}}$ where $\bm{y} = (0, \dots, 0, y)$, i.e., the state
+    \begin{equation}
+        \label{equ:dih-sve}
+        \ket{\phi_y} := \ket{\phi_{\bm{y}}} = \frac{1}{\sqrt{2}}(\ket{0} + \omega_q^{ys_n}\ket{1}).
+    \end{equation}
+    This is a DCP state over the group $\Z_q$.
+    \item Kuperberg for DCP over $\Z_q$: From the states \eqref{equ:dih-sve} $s_n$ can be recovered using Kuperberg's algorithm.
+    \end{enumerate}
+    To analyze the above algorithm, suppose we start with $q^\ell$ states. Since we are zeroing out $k$ coordinates at each stage, there are $n / k$ stages. At any stage, if there are $c \cdot q^k$ states, it can be shown, using a simple application of Lemma \ref{lem:hoeffding}, that at least $c / 8 \cdot q^k$ states service the sieve operation. Therefore, to have $\Theta(q^k)$ states remaining in the last stage, we must have $q^\ell 8^{-n / k} \ge q^k$, hence $\ell \ge k + 3n / (k\log q)$. To minimize the right hand side, we take $k \in \Theta(\sqrt{n / \log q})$, and therefore, we can take $\ell \in \Theta(\sqrt{n / \log q})$.
+\end{proof}
+\begin{remark}
+    When $q = \poly(n)$, Kuperberg's algorithm is not very efficient for solving DCP over $\Z_q$. Instead, we can use a POVM called the Pretty Good Measurement (PGM) \cite{hausladen1994pretty}. Suppose we have prepared the states $\ket{\phi_{y_0}}, \dots, \ket{\phi_{y_t}}$, of the form \eqref{equ:dih-sve}, for some $t \ge \lceil \log q \rceil + 1$. The tensor product of these states is
+    \[ \ket{\psi} := \bigotimes_{j = 0}^{t - 1} \frac{1}{\sqrt{2}}(\ket{0} + \omega_q^{y_js_n}\ket{1}) = \frac{1}{\sqrt{2^t}} \sum_{x \in \{0, 1\}^t} \omega_q^{\alpha(x)s_n} \ket{x}, \]
+    where $\alpha(x) = x_0y_0 + \cdots + x_ty_t \bmod q$. Using PGM on the state $\ket{\psi}$, we can recover $s_n$ with constant probability \cite{bacon2005optimal}. The implementation of PGM, in this case, boils down to inverting the function $\alpha: \{0, 1\}^t \rightarrow \Z_q$, which can be done efficiently since $q = \poly(n)$.   
+\end{remark}
+
 
 
 
@@ -697,7 +729,7 @@ To analyze the above algorithm suppose we start with $q^\ell$ states. Since we a
 
 
 
-
+\newpage
 \appendix
 
 \section{Poisson Summation}
