@@ -342,7 +342,7 @@ It follows from the above corollary that for a prime power $q = p^e$, where $p <
 \section{A Better Decision Problem}
 \label{sec:new-decsn}
 
-In this section, we propose an $\edcp$ decision problem that will be more suitable for applications than the one defined in Section \ref{sec:preli}. We assume, as before, that the modulus $q$ has $\poly(n)$-bounded prime factors. Perhaps the new decision problem is best understood for a prime modulus $q$. So let us assume, for now, that $q$ is a $\poly(n)$-bounded prime. 
+In this section, we propose an $\edcp$ decision problem that we believe is more suitable for applications than the decision problem defined in Section \ref{sec:preli}. We assume, as before, that the modulus $q$ has $\poly(n)$-bounded prime factors. Perhaps the new decision problem is best understood for a prime modulus $q$. So let us assume, for now, that $q$ is a $\poly(n)$-bounded prime. 
 
 Define the distribution $\tilde{\mu}_{\bm{s}, r}$ on the unit sphere $\SX$ by choosing $\bm{x} \in \Z_q^n$ and $t \in \Z_q {\setminus} \{ 0 \}$ uniformly at random and outputting the state
 \begin{equation}
@@ -401,94 +401,6 @@ Measuring the above state, we obtain a pair $(-\bm{a}, \lrang{-\bm{a}, \bm{s}} +
 
 
 %% ///////////////////////////////////////////////////////
-
-
-
-\section{Quantum Public-Key Cryptosystem}
-\label{sec:public-key-enc}
-
-A quantum public-key cryptosystem is, similar to a classical system, a set of three algorithms:
-\begin{itemize}[itemsep = 1pt]
-\item $\gen(1^n)$ generates a public-key $pk$ and a secret-key $sk$, based on the security parameter $n$.
-\item $\enc(pk, m)$, outputs a ciphertext $c$ for a given public-key $pk$ and message $m$.
-\item $\dec(sk, c)$, outputs a message $m$ for a given secret-key $sk$ and ciphertext $c$.
-\end{itemize}
-The output pair $(pk, sk)$ of the $\gen$ algorithm for a quantum system is a consists usually of a quantum state and a classical state, respectively. In particular, the public-key $pk$ is a quantum state that is generated using a classical key $sk$. The algorithm $\enc$ encrypts the message $m$, which is classical information, using the quantum state $pk$. The output $c$ of $\enc$ is a quantum state. The algorithm $\dec$ uses the key $sk$ to decrypt the quantum state into a classical message $m$.
-
-For the security parameter $n$, we set the parameters for public key system as follows. We choose $q = \poly(n)$ such that $q = 2^s$ for some integer $s > 0$. We also set $r = 2^{s'}$ where $s' < s$. The main reason for these choices of parameters is efficiency, as we shall explain at the end of this section. In what follows we describe our cryptosystem for encrypting a one-bit message $b \in \{ 0, 1 \}$.
-
-\vspace*{\topskip}
-
-$\gen(1^n)$: Select $\bm{x}, \bm{s} \in \Z_q^n$ uniformly at random. Apply the transformation $\qft_r \otimes \mathds{1}$ to the register $\ket{0} \ket{\bm{x}}$ to obtain the state $\ket{\psi_1} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} \ket{j} \ket{\bm{x}}$. Apply the transformation $\ket{j}\ket{\bm{x}} \mapsto \ket{j}\ket{\bm{x} + j\bm{s}}$ to $\ket{\psi_1}$ to obtain the state
-\[ \ket{\phi_{\bm{s}, r, 0}(\bm{x})} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} \ket{j} \ket{\bm{x} + j\bm{s}}. \]
-Return the public-key, secret-key pair $(pk, sk) = (\ket{\phi_{\bm{s}, r, 0}(\bm{x})}, \bm{s})$.     
-
-\begin{figure}
-    \centering
-    \begin{quantikz}[thin lines]
-        \lstick{$\ket{0}$} & \gate{\qft_r} & \ctrl{1} & \qw \\
-        \lstick{$\ket{\bm{x}}$} & \qw  & \gate{A} & \qw 
-    \end{quantikz}
-    \caption{The key generation circuit. The gate $\qft_r$ is the quantum fourier transform over $\Z_r$, and the gate $A$ is the multiply-add operation $\ket{j}\ket{\bm{x}} \mapsto \ket{j}\ket{\bm{x} + j\bm{s}}$.}
-\end{figure}
-
-\vspace*{\topskip}
-
-$\enc(pk = \rho_{\bm{s}, r, 0}, b \in \{ 0, 1 \})$:  Apply the transformation $U: \ket{j}\ket{\bm{y}} \mapsto (-1)^{bj}\ket{j}\ket{\bm{y}}$ to $\rho_{\bm{s}, r, 0}$ to obtain the state
-\begin{align*}
-    U \rho_{\bm{s}, r, 0} U^*
-    & = U \E_{\bm{x} \leftarrow \Z_q^n} \Big[ \ket{\phi_{\bm{s}, r, 0}(\bm{x})} \bra{\phi_{\bm{s}, r, 0}(\bm{x})} \Big] U^* \\
-    & = \E_{\bm{x} \leftarrow \Z_q^n} \Big[ U \ket{\phi_{\bm{s}, r, 0}(\bm{x})} \bra{\phi_{\bm{s}, r, 0}(\bm{x})} U^* \Big] \\
-    & = \E_{\bm{x} \leftarrow \Z_q^n} \Big[ \ket{\phi_{\bm{s}, r, b}(\bm{x})} \bra{\phi_{\bm{s}, r, b}(\bm{x})} \Big] \\
-    & = \rho_{\bm{s}, r, b}.
-\end{align*}
-Return $\rho_{\bm{s}, r, b}$.
-
-\begin{figure}
-    \centering
-    \begin{quantikz}[thin lines]
-         \lstick{$\ket{j}$} & \qw & \qw & \ctrl{2} & \qw & \qw \\
-          \lstick{$\ket{\bm{y}}$} & \qw & \qw & \qw & \qw & \qw \\
-        \lstick{$\ket{0}$} & \gate{X} & \gate{H} & \gate{U_b} & \meter{} & \qw
-    \end{quantikz}
-    \caption{The encryption circuit. The gate $U_b$ performs the operation $\ket{j}\ket{c} \mapsto \ket{j}\ket{c \oplus (jb \bmod 2)}$.}
-\end{figure}
-
-\vspace*{\topskip}
-
-$\dec(sk = \bm{s}, c = \rho_{\bm{s}, r, b})$:  Apply the transformation $S: \ket{j}\ket{\bm{y}} \mapsto \ket{j}\ket{\bm{y} - j\bm{s}}$ to $\rho_{\bm{s}, r, b}$. Discard the second register. Apply $\qft_r$ to the resulting state and measure. If the measurement result is 0 then output 0, otherwise output 1.
-
-\begin{figure}
-    \centering
-    \begin{quantikz}[thin lines]
-        \lstick{$\ket{j}$} & \ctrl{1} & \gate{\qft_r} & \meter{} & \qw \\
-        \lstick{$\ket{\bm{y}}$} & \gate{S} & \meter{} & \qw & \qw
-    \end{quantikz}
-    \caption{The decryption circuit. The gate $\qft_r$ is the quantum fourier transform over $\Z_r$, and the gate $S$ is the multiply-subtract operation $\ket{j}\ket{\bm{x}} \mapsto \ket{j}\ket{\bm{x} - j\bm{s}}$.}
-\end{figure}
-
-\begin{lemma}[Correctness]
-    For any bit $b \in \{ 0, 1 \}$ and all outputs $(\bm{s}, \rho_{\bm{s}, r, 0})$ of $\gen$, we have
-    \[ \Pr [ \dec(\bm{s}, \enc(\rho_{\bm{s}, r, 0}, b)) = b ] = 1. \]
-\end{lemma}
-\begin{proof}
-    Given a ciphertext $\rho_{\bm{s}, r, b}$, the decryption steps are as follows
-    \begin{align*}
-        \rho_{\bm{s}, r, b}
-        & \mapsto \E_{\bm{x} \leftarrow \Z_q^n} \Big[ A \ket{\phi_{\bm{s}, r, b}(\bm{x})} \bra{\phi_{\bm{s}, r, b}(\bm{x})} A^* \Big]  \tag{apply $A$} \\
-        & = \E_{\bm{x} \leftarrow \Z_q^n} \bigg[ \frac{1}{r} \sum_{k, j = 0}^{r - 1} (-1)^{b(j - k)}\ket{k}\ket{\bm{x}} \bra{j}\bra{\bm{x}} \bigg] \\
-        & = \frac{1}{r} \sum_{k, j = 0}^{r - 1} (-1)^{b(j - k)}\ket{k}\bra{j} \otimes \E_{\bm{x} \leftarrow \Z_q^n} \Big[ \ket{\bm{x}}\bra{\bm{x}} \Big] \\
-        & \mapsto \frac{1}{r} \sum_{k, j = 0}^{r - 1} (-1)^{b(j - k)}\ket{k}\bra{j} \tag{discard the second register} \\
-        & \mapsto \qft_r \frac{1}{r} \sum_{k, j = 0}^{r - 1} (-1)^{b(j - k)}\ket{k}\bra{j} \qft_r^* \tag{apply quantum Fourier transform}\\
-        & = \ket{br/2} \bra{br/2}
-    \end{align*}
-    If $b = 0$ then the state of the system is $\ket{0} \bra{0}$, otherwise it is $\ket{r / 2} \bra{r / 2}$. 
-\end{proof}
-
-
-
-%% ///////////////////////////////////////////////////////
-
 
 
 
@@ -712,6 +624,127 @@ Note that DCP is a special case of $\edcp_{n, q, r}$ where $n = 1$, $q = N$ and 
 \end{remark}
 
 
+
+%% ///////////////////////////////////////////////////////
+
+
+
+\section{Quantum Public-Key Cryptosystem}
+\label{sec:public-key-enc}
+
+A quantum public-key cryptosystem, similar to a classical system, consists of three algorithms:
+\begin{itemize}[itemsep = 1pt]
+\item $\gen(1^n)$ generates a public-key $pk$ and a secret-key $sk$ based on the security parameter $n$.
+\item $\enc(pk, m)$ outputs a ciphertext $c$ for a given public-key $pk$ and message $m$.
+\item $\dec(sk, c)$ outputs a message $m$ for a given secret-key $sk$ and ciphertext $c$.
+\end{itemize}
+The output pair $(pk, sk)$ of the $\gen$ algorithm for a quantum system consists  of a quantum state and a classical state, respectively. In particular, the public-key $pk$ is a quantum state that is generated using a classical key $sk$. The algorithm $\enc$ encrypts the message $m$, which is classical information, using the quantum state $pk$. The output $c$ of $\enc$ is a quantum state. The algorithm $\dec$ uses the key $sk$ to decrypt the quantum state into a classical message $m$.
+
+For the security parameter $n$, we set the parameters for public key system as follows. We choose a prime $p = \poly(n)$ and set $q = p^s$ for some integer $s > 0$. We also set $r = p^{s'}$ where $s' < s$. The reason for these choices of parameters is that the resulting encryption scheme is simpler and more efficient. More generally, one could select $q$ to be a positive integer with $\poly(n)$-bounded prime factors and $r = p^{s'} \vert q$ to be a proper divisor where $p$ is prime. In what follows, we describe our cryptosystem for encrypting a one-bit message $b \in \{ 0, 1 \}$.
+
+\begin{description}[leftmargin = *]
+\item [$\gen(1^n)$:] Select $\bm{x}, \bm{s} \in \Z_q^n$ uniformly at random. Apply the transform $\qft_r \otimes \mathds{1}$ to the register $\ket{0} \ket{\bm{x}}$ to obtain the state $\ket{\psi_1} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} \ket{j} \ket{\bm{x}}$. Apply the transform $A_{\bm{s}}: \ket{j}\ket{\bm{x}} \mapsto \ket{j}\ket{\bm{x} + j\bm{s}}$ to $\ket{\psi_1}$ to obtain the state
+\[ \ket{\phi_{\bm{s}, r, 0}(\bm{x})} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} \ket{j} \ket{\bm{x} + j\bm{s}}. \]
+Return the public-key, secret-key pair $(pk, sk) = (\ket{\phi_{\bm{s}, r, 0}(\bm{x})}, \bm{s})$. 
+
+\item [$\enc(pk = \rho_{\bm{s}, r, 0}, b \in \{ 0, 1 \})$:]  Select $t \in \Z_r {\setminus} \{0\}$ uniformly at random. Apply the transform $U: \ket{j}\ket{\bm{y}} \mapsto \omega_p^{btj}\ket{j}\ket{\bm{y}}$ to $\rho_{\bm{s}, r, 0}$ to obtain the state
+\begin{align*}
+    U \rho_{\bm{s}, r, 0} U^*
+    & = U \E_{\bm{x} \leftarrow \Z_q^n} \Big[ \ket{\phi_{\bm{s}, r, 0}(\bm{x})} \bra{\phi_{\bm{s}, r, 0}(\bm{x})} \Big] U^* \\
+    & = \E_{\bm{x} \leftarrow \Z_q^n} \Big[ U \ket{\phi_{\bm{s}, r, 0}(\bm{x})} \bra{\phi_{\bm{s}, r, 0}(\bm{x})} U^* \Big] \\
+    & = \E_{\bm{x} \leftarrow \Z_q^n} \Big[ \ket{\phi_{\bm{s}, r, bt}(\bm{x})} \bra{\phi_{\bm{s}, r, bt}(\bm{x})} \Big] \\
+    & = \rho_{\bm{s}, r, bt}.
+\end{align*}
+Return $\rho_{\bm{s}, r, bt}$.
+
+\item [$\dec(sk = \bm{s}, c = \rho_{\bm{s}, r, bt})$:]  Apply the transform $S_{\bm{s}}: \ket{j}\ket{\bm{y}} \mapsto \ket{j}\ket{\bm{y} - j\bm{s}}$ to $\rho_{\bm{s}, r, bt}$. Discard the second register. Apply $\qft_r$ to the resulting state and measure. If the measurement result is 0 then output 0, otherwise output 1. 
+
+\end{description}
+\begin{lemma}[Correctness]
+    For any bit $b \in \{ 0, 1 \}$ and all outputs $(\bm{s}, \rho_{\bm{s}, r, 0})$ of $\gen$, we have
+    \[ \Pr [ \dec(\bm{s}, \enc(\rho_{\bm{s}, r, 0}, b)) = b ] = 1. \]
+\end{lemma}
+\begin{proof}
+    Given the ciphertext $\rho_{\bm{s}, r, tb}$, the decryption steps are as follows
+    \begin{align*}
+        \rho_{\bm{s}, r, b}
+        & \mapsto \E_{\bm{x} \leftarrow \Z_q^n} \Big[ S_{\bm{s}} \ket{\phi_{\bm{s}, r, bt}(\bm{x})} \bra{\phi_{\bm{s}, r, bt}(\bm{x})} S_{\bm{s}}^* \Big]  \tag{apply $S_{\bm{s}}$} \\
+        & = \E_{\bm{x} \leftarrow \Z_q^n} \bigg[ \frac{1}{r} \sum_{k, j = 0}^{r - 1} \omega_p^{bt(j - k)}\ket{k}\ket{\bm{x}} \bra{j}\bra{\bm{x}} \bigg] \\
+        & = \frac{1}{r} \sum_{k, j = 0}^{r - 1} \omega_p^{bt(j - k)}\ket{k}\bra{j} \otimes \E_{\bm{x} \leftarrow \Z_q^n} \Big[ \ket{\bm{x}}\bra{\bm{x}} \Big] \\
+        & \mapsto \frac{1}{r} \sum_{k, j = 0}^{r - 1} \omega_p^{bt(j - k)}\ket{k}\bra{j} \tag{discard the second register} \\
+        & \mapsto \qft_r \frac{1}{r} \sum_{k, j = 0}^{r - 1} \omega_p^{bt(j - k)}\ket{k}\bra{j} \qft_r^* \tag{apply quantum Fourier transform}\\
+        & = \ket{btr/p} \bra{btr/p}
+    \end{align*}
+    If $b = 0$ then the above state is $\ket{0}\bra{0}$, otherwise it is $\ket{tr / p}\bra{tr / p} \ne \ket{0}\bra{0}$. 
+\end{proof}
+
+
+
+\subsection{Circuits}
+
+All there algorithms $\gen, \enc, \dec$ in the above public-key cryptosystem are very easy to implement. In the following, we briefly describe the circuits for these algorithms. Since all the arithmetic unites used in the circuits are already known, we will not give a gate-level design for them.
+
+Figure \ref{fig:gen-circuit} shows the key generation circuit. The gate $\qft_r$ is the quantum Fourier transform over $\Z_r$, and the gate $A_{\bm{s}}$ is the multiply-add transform $\ket{j}\ket{\bm{x}} \mapsto \ket{j}\ket{\bm{x} + j\bm{s}}$.
+
+\begin{figure}[h]
+    \centering
+    \begin{quantikz}[thin lines]
+        \lstick{$\ket{0}$} & \gate{\qft_r} & \ctrl{1} & \qw \\
+        \lstick{$\ket{\bm{x}}$} & \qw  & \gate{A_{\bm{s}}} & \qw 
+    \end{quantikz}
+    \caption{The circuit for $\gen$}
+    \label{fig:gen-circuit}
+\end{figure}
+
+For the encryption algorithm, we need to implement the transform $\ket{j}\ket{\bm{y}} \mapsto \omega_p^{btj}\ket{j}\ket{\bm{y}}$. We start by preparing the state
+\[ (\mathds{1} \otimes \qft_p) \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} \ket{j} \ket{\bm{x} + j\bm{s}} \otimes \ket{1}  = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} \ket{j} \ket{\bm{x} + j\bm{s}} \frac{1}{\sqrt{p}} \sum_{z \in \Z_p} \omega_p^z \ket{z}. \]
+Then we apply the transform $T_{bt}: \ket{j}\ket{\bm{y}}\ket{z} \mapsto \ket{j}\ket{\bm{y}}\ket{z - jbt}$ to obtain the state
+\[ \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} \ket{j} \ket{\bm{x} + j\bm{s}} \frac{1}{\sqrt{p}} \sum_{z \in \Z_p} \omega_p^z \ket{z - jbt} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} \omega_p^{btj} \ket{j} \ket{\bm{x} + j\bm{s}} \frac{1}{\sqrt{p}} \sum_{z \in \Z_p} \omega_p^z \ket{z}. \]
+Finally, we measure the last register to obtain the desired state. Figure \ref{fig:enc-circuit} shows the encryption circuit.
+
+\begin{figure}[h]
+    \centering
+    \begin{quantikz}[thin lines]
+         \lstick{$\ket{j}$} & \qw & \ctrl{2} & \qw & \qw \\
+         \lstick{$\ket{\bm{y}}$} & \qw & \qw & \qw & \qw \\
+         \lstick{$\ket{1}$} & \gate{\qft_p} & \gate{T_{bt}} & \meter{} & \qw
+    \end{quantikz}
+    \caption{The circuit for $\enc$.}
+    \label{fig:enc-circuit}
+\end{figure}
+
+Figure \ref{fig:dec-circuit} shows the decryption circuit. The gate $\qft_r$ is the quantum Fourier transform over $\Z_r$, and the gate $S_{\bm{s}}$ is the multiply-subtract operation $\ket{j}\ket{\bm{x}} \mapsto \ket{j}\ket{\bm{x} - j\bm{s}}$.
+
+\begin{figure}[h]
+    \centering
+    \begin{quantikz}[thin lines]
+        \lstick{$\ket{j}$} & \ctrl{1} & \gate{\qft_r} & \meter{} & \qw \\
+        \lstick{$\ket{\bm{y}}$} & \gate{S_{\bm{s}}} & \meter{} & \qw & \qw
+    \end{quantikz}
+    \caption{The circuit for $\dec$.}
+    \label{fig:dec-circuit}
+\end{figure}
+
+
+
+\subsection{A very efficient instantiation}
+
+Although our cryptosystem is efficient even for a super-polynomial modulus $q = p^s$ and any $\poly(n)$-bounded prime $p$, it can be made more efficient by choosing a $\poly(n)$-bounded $q$ and a small prime $p$. In particular, we can choose $p = 2$ and $q = 2^s$ where $s \in O(\log n)$. In this case, we choose $r = 2^{s'}$ is $s' \ll s$.
+
+For the above parameters, we have $\omega_p = -1$. In the encryption algorithm, the only choice for $t$ is $t = 1$ and, therefore, random number generation is not required. For an input bit $b$ the encrypted state is
+\[ \ket{\phi_{\bm{s}, r, b}(\bm{x})} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} (-1)^b \ket{j}\ket{\bm{x} + j\bm{s}}. \]
+Consequently, the encryption algorithm $\enc$ is much simpler. In particular, the quantum Fourier transform $\qft_p$ is replaced by the Hadamard transform $H: \ket{x} \mapsto (\ket{0} + (-1)^x \ket{1}) / \sqrt{2}$, and the transform $T_{bt}$ is replaced by $T_b: \ket{j}\ket{\bm{y}}\ket{z} \mapsto \ket{j}\ket{\bm{y}}\ket{z \oplus (jb \bmod 2)}$. Figure \ref{fig:enc-circuit-2} shows the new encryption circuit.
+
+\begin{figure}[h]
+    \centering
+    \begin{quantikz}[thin lines]
+         \lstick{$\ket{j}$} & \qw & \ctrl{2} & \qw & \qw \\
+          \lstick{$\ket{\bm{y}}$} & \qw & \qw & \qw & \qw \\
+        \lstick{$\ket{1}$} & \gate{H} & \gate{T_b} & \meter{} & \qw
+    \end{quantikz}
+    \caption{The circuit for $\enc$.}
+    \label{fig:enc-circuit-2}
+\end{figure}
 
 
 
