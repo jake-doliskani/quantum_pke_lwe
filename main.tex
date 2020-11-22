@@ -72,7 +72,7 @@
 \DeclareMathOperator{\lcm}{lcm} % least common multiple
 \DeclareMathOperator{\divisor}{div} % divisor on a curve
 \DeclareMathOperator{\supp}{supp} % support of a divisor
-\DeclareMathOperator{\norm}{N} % norm
+\DeclareMathOperator{\fnorm}{N} % norm
 \DeclareMathOperator{\negl}{negl} % norm
 \DeclareMathOperator{\res}{Res}
 \DeclareMathOperator{\aut}{Aut}
@@ -87,6 +87,7 @@
 
 
 \DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+\DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
 \let\ket\relax
 \DeclarePairedDelimiter{\ket}{\lvert}{\rangle}
 \let\bra\relax
@@ -158,14 +159,14 @@ More, generally, the density operator corresponding to a probability distributio
 For quantum public-key cryptography we will need a formal notion of quantum state discrimination. In particular, we need to formally define the notion of computational (in)distinguishability of quantum states. For our purposes, it is more convenient to define computational distinguishability for probability distributions over quantum states. The following is adapted from \cite[\S 3.3]{watrous2009zero}.
 \begin{definition}
     Let $\X$ be a complex Euclidean space, and let $\gamma, \mu: \SX \rightarrow [0, 1]$ be probability distributions. Then $\gamma$ is said to be $(s, \epsilon)$-distinguishable from $\mu$ if there is a quantum measurement circuit $Q$ of size $s$ such that
-    \[ \Big| \Pr_{\rho \in \gamma}[Q(\rho) = 1] - \Pr_{\rho \in \mu}[Q(\rho) = 1] \Big| \ge \epsilon. \]
+    \[ \abs[\Big]{ \Pr_{\rho \in \gamma}[Q(\rho) = 1] - \Pr_{\rho \in \mu}[Q(\rho) = 1]} \ge \epsilon. \]
 \end{definition} 
 Two distributions $\gamma, \mu$ are $(s, \epsilon)$-indistinguishable if they are not $(s, \epsilon)$-distinguishable.
 \begin{definition}
     For each $n \in \N$, let $\X_n$ be a complex Euclidean space and let $\gamma_n, \mu_n: \mathcal{S}(\X_n) \rightarrow [0, 1]$ be probability distributions. Then the two ensembles $\{ \gamma_n \}_{n \in \N}$ and $\{ \mu_n \}_{n \in \N}$ are said to be polynomially quantum indistinguishable if for all polynomially bounded functions $s, p: \N \rightarrow \N$, the distributions $\gamma_n$ and $\mu_n$ are $(s(n), 1 / p(n))$-indistinguishable for almost all $n \in \N$.
 \end{definition}
 Two ensembles are called quantum computationally indistinguishable if they are polynomially quantum indistinguishable. The advantage of a polynomial-time quantum algorithm $Q$ in distinguishing between the distributions $\gamma_n$ and $\mu_n$ is defined as
-\[ \delta_Q(\gamma_n, \mu_n) = \Big| \Pr_{\rho \in \gamma_n}[Q(\rho) = 1] - \Pr_{\rho \in \mu_n}[Q(\rho) = 1] \Big|. \]
+\[ \delta_Q(\gamma_n, \mu_n) = \abs[\Big]{ \Pr_{\rho \in \gamma_n}[Q(\rho) = 1] - \Pr_{\rho \in \mu_n}[Q(\rho) = 1] }. \]
 Two ensembles $\{ \gamma_n \}$ and $\{ \mu_n \}$ are then quantum computationally indistinguishable if $\delta_Q(\gamma_n, \mu_n) = \negl(n)$ for all such $Q$ and almost all $n$. 
 
 
@@ -174,7 +175,7 @@ Two ensembles $\{ \gamma_n \}$ and $\{ \mu_n \}$ are then quantum computationall
 \label{sec:err-red}
 
 We can abstractly define the advantage of an algorithm $A$, regardless of $A$ being quantum or classical, in distinguishing between two probability distribution $P_1$ and $P_2$ as
-\[ \delta_A(P_1, P_2) = \Big| \Pr_{x \in P_1}[A(x) = 1] - \Pr_{x \in P_2}[A(x) = 1] \Big|. \]
+\[ \delta_A(P_1, P_2) = \abs[\Big]{ \Pr_{x \in P_1}[A(x) = 1] - \Pr_{x \in P_2}[A(x) = 1] }. \]
 Two ensembles of distributions $\{ P_{1, n} \}$ and $\{ P_{2, n} \}$ are said to be polynomial-time indistinguishable if for any polynomial-time algorithm $A$ and any $\poly(n)$-bounded function $p$ we have $\delta_A(P_{1, n}, P_{2, n}) \le 1 / p(n)$ for large enough $n$. The following lemma follows from the triangle inequality.
 \begin{lemma}[Hybrid lemma]
     \label{lem:hybrid}
@@ -791,6 +792,50 @@ holds for every compactly supported continuous function $f: G \rightarrow \C$.
 \end{theorem}
 An example of a locally compact group is $G = \R^n$ with Haar measure taken to be the usual Lebesgue measure. For each $\bm{u} \in \R^n$ the mapping $\chi_{\bm{u}}: \R^n \rightarrow \C$ defined by $\chi_{\bm{u}}(\bm{x}) = e^{2\pi i \lrang{\bm{u}, \bm{v}}}$ is a character of $G$. In fact, all the elements of $\widehat{G}$ are of this form, and we have $\R^n \simeq \widehat{\R^n}$ via the map $\bm{u} \mapsto \chi_{\bm{u}}$. Let $H = L$ where $L$ is a lattice. Then since $L$ and $\widehat{\R^n / L} = L^\perp$ are both discrete groups, the integrals in Theorem \ref{thm:poisson-sum} are just summations, so we obtain
 \[ \sum_{\bm{x} \in L} f(\bm{x} + \bm{y}) = \frac{1}{\mathrm{Vol}(\R^n / L)}\sum_{\bm{x} \in L^\perp} \hat{f}(\bm{x})e^{2\pi i \lrang{\bm{x}, \bm{y}}}  \]
+
+
+
+%% ///////////////////////////////////////////////////////
+
+
+
+\section{Some Tools From Quantum Information}
+
+
+\subsection{Rejection sampling}
+
+Let $\bm{\pi} \in \R^n$ be such that $\norm{\bm{\pi}}_2 = 1$ and let $\bm{\varepsilon} \in \R^n$ be any vector such that $\bm{\varepsilon} \le \bm{\pi}$, i.e., $\varepsilon_k \le \pi_k$ for all $k$. Let
+\begin{equation}
+    \label{equ:qreject-1}
+    \ket{\psi_{\bm{\pi}}} = \sum_{k = 1}^n \pi_k\zeta_k \ket{k}\ket{\alpha_k},
+\end{equation}
+where $\abs{\zeta_k} = 1$ for all $k$, and $\alpha_k$ is a function of $k$. The process of transforming the state \eqref{equ:qreject-1} into the state
+\begin{equation}
+    \label{equ:qreject-2}
+    \ket{\psi_{\bm{\varepsilon}}} = \frac{1}{\norm{\bm{\varepsilon}}_2} \sum_{k = 1}^n \varepsilon_k\zeta_k \ket{k}\ket{\alpha_k},
+\end{equation}
+is called quantum rejection sampling \cite{ozols2013quantum}. Define the set of single-qubit operations
+\[ R_{\bm{\varepsilon}}(k) = \frac{1}{\pi_k}
+\left[
+\begin{array}{ll}
+    \sqrt{\abs{\pi_k}^2 - \varepsilon_k^2} & -\varepsilon_k \\
+    \varepsilon_k &\sqrt{\abs{\pi_k}^2 - \varepsilon_k^2}
+\end{array}
+\right]
+, \quad 1 \le k \le n,
+\]
+and let $R_{\bm{\varepsilon}} = \sum_{k = 1}^n \ket{k}\bra{k} \otimes \mathds{1} \otimes R_{\bm{\varepsilon}}(k)$. Then we have
+\[ R_{\bm{\varepsilon}} \ket{\psi_{\bm{\pi}}}\ket{0} = \sum_{k = 1}^n \zeta_k \ket{k}\ket{\alpha_k} \Big( \sqrt{\abs{\pi_k}^2 - \varepsilon_k^2}\ket{0} + \varepsilon_k\ket{1} \Big). \]
+If we measure the last register, the probability of obtaining the state \eqref{equ:qreject-2} is $\sum_{k = 1}^n \abs{\zeta_k\varepsilon}^2 = \lVert \bm{\varepsilon} \rVert_2^2$. We state this result in the following lemma for the sake of reference.
+\begin{lemma}
+    \label{lem:qrs}
+    The state conversion $\ket{\psi_{\bm{\pi}}} \mapsto \ket{\psi_{\bm{\varepsilon}}}$ can be done with probability $\norm{\displaystyle \bm{\varepsilon}}_2^2$.
+\end{lemma}
+
+
+
+
+
 \end{document}
 
 
