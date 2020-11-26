@@ -72,7 +72,7 @@
 \DeclareMathOperator{\lcm}{lcm} % least common multiple
 \DeclareMathOperator{\divisor}{div} % divisor on a curve
 \DeclareMathOperator{\supp}{supp} % support of a divisor
-\DeclareMathOperator{\fnorm}{N} % norm
+\DeclareMathOperator{\norm}{N} % norm
 \DeclareMathOperator{\negl}{negl} % norm
 \DeclareMathOperator{\res}{Res}
 \DeclareMathOperator{\aut}{Aut}
@@ -87,7 +87,6 @@
 
 
 \DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
-\DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
 \let\ket\relax
 \DeclarePairedDelimiter{\ket}{\lvert}{\rangle}
 \let\bra\relax
@@ -148,7 +147,7 @@
 
 \subsection{Quantum Computation}
 
-Our notations for quantum information mostly follow those of \cite{watrous2018theory}. The classical state of a register $\mathsf{X}$ is represented by a finite alphabet, say $\Sigma$. If the registers $\mathsf{X}_1, \dots, \mathsf{X}_n$ are represented by alphabets $\Sigma_1, \dots, \Sigma_n$ then the classical state of the tuple $(\mathsf{X}_1, \dots, \mathsf{X}_n)$ is represented by $\Sigma_1 \times \cdots \times \Sigma_n$. The complex Euclidean space associated with the register $\mathsf{X}$ is denoted by $\C^\Sigma$. For a complex Euclidean space $\X$, denote the unit sphere in $\X$ by $\SX$. A linear operator $\rho$ acting on $\X$ is called a density operator if $\rho$ is positive semidefinite with trace equal to $1$. The quantum state of the register $\mathsf{X}$ is represented by the set of density operators $\text{D}(\X)$.
+Our notations for quantum information mostly follow those of \cite{watrous2018theory}. The classical state of a register $\mathsf{X}$ is represented by a finite alphabet, say $\Sigma$. If the registers $\mathsf{X}_1, \dots, \mathsf{X}_n$ are represented by alphabets $\Sigma_1, \dots, \Sigma_n$ then the classical state of the tuple $(\mathsf{X}_1, \dots, \mathsf{X}_n)$ is represented by $\Sigma_1 \times \cdots \times \Sigma_n$. The complex Euclidean space associated with the register $\mathsf{X}$ is denoted by $\C^\Sigma$. For a complex Euclidean space $\X$, denote the unit sphere in $\X$ by $\SX$. A linear operator $\rho$ acting on $\X$ is called a density operator if $\rho$ is positive semidefinite with trace equal to $1$. The quantum state of the register $\mathsf{X}$ is represented by the set of density operators $\mathrm{D}(\X)$.
 
 We will use the Dirac notation for the elements of $\SX$. In particular, we denote the column vector $x \in \SX$ by $\ket{x}$ and the row vector $x^*$ by $\bra{x}$. A state $\rho$ is called pure if it can be written as $\rho = \ket{x}\bra{x}$, in which case we will simply write the state as $\ket{x}$. By the spectral theorem, every state $\rho$ is a linear combination of pure states. Therefore, a quantum state can also be represented as a linear combination
 \[ \sum_{x} \alpha_x \ket{x}, \hspace*{1mm} \sum_{x} \abs{\alpha_x}^2 = 1. \]
@@ -368,7 +367,7 @@ where $\bm{a} \in \Z_q^n$ is uniformly random and known. We have
     & \approx_\epsilon \sum_{y \in \Z_q} \sum_{j \in \Z} \omega_q^{j(\lrang{\bm{a}, \bm{s}} + y + t)} g_\sigma(j) \ket{y} \tag{by Lemma ??} \\
     & = \sum_{y \in \Z_q} \sum_{j \in \Z} g_{1/\sigma} \Big( j + \frac{\lrang{\bm{a}, \bm{s}} + y + t}{q} \Big) \ket{y} \tag{by Lemma ??} \\
     & = \sum_{e \in \Z} g_{1/\sigma} \Big( \frac{e}{q} \Big) \ket{\lrang{-\bm{a}, \bm{s}} + e - t \bmod q} \tag{$e = jq + \lrang{\bm{a}, \bm{s}} + t + y$} \\
-    & \approx_\epsilon \sum_{e \in \Z_q} g_{1/\sigma} \Big( \frac{e}{q} \Big) \ket{\lrang{-\bm{a}, \bm{s}} + e - t} \tag{by Lemma ??}.
+    & \approx_\epsilon \sum_{e \in \Z_q} g_{1/\sigma} \Big( \frac{e}{q} \Big) \ket{\lrang{-\bm{a}, \bm{s}} + e - t \bmod q} \tag{by Lemma ??}.
 \end{align*}
 Measuring the above state, we obtain a pair $(-\bm{a}, \lrang{-\bm{a}, \bm{s}} + e - t)$ where $e$ is sampled from $\mathcal{D}_{\Z, q / \sigma}$. For a general modulus $q$, an immediate generalization of the decision problem would be to just replace the prime modulus with a general one, and the above transformation to an LWE sample goes through without any change. However, for such a generalization, it is not clear how to reduce the search problem to the decision problem when $q$ is super-polynomially large in $n$.
 \begin{definition}[EDCP, Decision]
@@ -608,7 +607,7 @@ Note that DCP is a special case of $\edcp_{n, q, r}$ where $n = 1$, $q = N$ and 
     \end{equation}
     where $\bm{y} \in \Z_q^n$ is the outcome of the measurement and is uniformly random. Given two such states $\ket{\phi_{\bm{y}_1}}$ and $\ket{\phi_{\bm{y}_2}}$, we can compute the state
     \[ \ket{\phi_{\bm{y}_1 - \bm{y}_2}} = \frac{1}{\sqrt{2}}(\ket{0} + \omega_q^{\lrang{\bm{y}_1 - \bm{y}_2, \bm{s}}}\ket{1}) \]
-    with probability $1 / 2$ by measuring the second register of $\mathrm{CNOT} \ket{\phi_{\bm{y}_1}} \ket{\phi_{\bm{y}_2}}$. If $\bm{y}_1$ and $\bm{y}_2$ had the first $k$ coordinates in common then $\bm{y}_1 - \bm{y}_2$ would have $0$ in the first $k$ coordinates. From this, we can perform a sieve operation: prepare many states of the form \eqref{equ:dih-coset-v}, then pair the states that have $\bm{y}$ with the same first $k$ coordinates, and then perform the above operation to produce new states with $\bm{y}$ that have the first $k$ coordinates zeroed out. Repeating the same process on the new states produces states with $\bm{y}$ that have first $2k$ coordinates equal to $0$, and so on. The final output of this process is a state $\ket{\phi_{\bm{y}}}$ where $\bm{y} = (0, \dots, 0, y)$, i.e., the state
+    with probability $1 / 2$ by measuring the second register of $\textsc{cnot} \ket{\phi_{\bm{y}_1}} \ket{\phi_{\bm{y}_2}}$. If $\bm{y}_1$ and $\bm{y}_2$ had the first $k$ coordinates in common then $\bm{y}_1 - \bm{y}_2$ would have $0$ in the first $k$ coordinates. From this, we can perform a sieve operation: prepare many states of the form \eqref{equ:dih-coset-v}, then pair the states that have $\bm{y}$ with the same first $k$ coordinates, and then perform the above operation to produce new states with $\bm{y}$ that have the first $k$ coordinates zeroed out. Repeating the same process on the new states produces states with $\bm{y}$ that have first $2k$ coordinates equal to $0$, and so on. The final output of this process is a state $\ket{\phi_{\bm{y}}}$ where $\bm{y} = (0, \dots, 0, y)$, i.e., the state
     \begin{equation}
         \label{equ:dih-sve}
         \ket{\phi_y} := \ket{\phi_{\bm{y}}} = \frac{1}{\sqrt{2}}(\ket{0} + \omega_q^{ys_n}\ket{1}).
@@ -740,8 +739,8 @@ Consequently, the encryption algorithm $\enc$ is much simpler. In particular, th
     \centering
     \begin{quantikz}[thin lines]
          \lstick{$\ket{j}$} & \qw & \ctrl{2} & \qw & \qw \\
-          \lstick{$\ket{\bm{y}}$} & \qw & \qw & \qw & \qw \\
-        \lstick{$\ket{1}$} & \gate{H} & \gate{T_b} & \meter{} & \qw
+         \lstick{$\ket{\bm{y}}$} & \qw & \qw & \qw & \qw \\
+         \lstick{$\ket{1}$} & \gate{H} & \gate{T_b} & \meter{} & \qw
     \end{quantikz}
     \caption{The circuit for $\enc$.}
     \label{fig:enc-circuit-2}
@@ -804,7 +803,7 @@ An example of a locally compact group is $G = \R^n$ with Haar measure taken to b
 
 \subsection{Rejection sampling}
 
-Let $\bm{\pi} \in \R^n$ be such that $\norm{\bm{\pi}}_2 = 1$ and let $\bm{\varepsilon} \in \R^n$ be any vector such that $\bm{\varepsilon} \le \bm{\pi}$, i.e., $\varepsilon_k \le \pi_k$ for all $k$. Let
+Let $\bm{\pi} \in \R^n$ be such that $\opnorm{\bm{\pi}}_2 = 1$ and let $\bm{\varepsilon} \in \R^n$ be any vector such that $\bm{\varepsilon} \le \bm{\pi}$, i.e., $\varepsilon_k \le \pi_k$ for all $k$. Let
 \begin{equation}
     \label{equ:qreject-1}
     \ket{\psi_{\bm{\pi}}} = \sum_{k = 1}^n \pi_k\zeta_k \ket{k}\ket{\alpha_k},
@@ -812,7 +811,7 @@ Let $\bm{\pi} \in \R^n$ be such that $\norm{\bm{\pi}}_2 = 1$ and let $\bm{\varep
 where $\abs{\zeta_k} = 1$ for all $k$, and $\alpha_k$ is a function of $k$. The process of transforming the state \eqref{equ:qreject-1} into the state
 \begin{equation}
     \label{equ:qreject-2}
-    \ket{\psi_{\bm{\varepsilon}}} = \frac{1}{\norm{\bm{\varepsilon}}_2} \sum_{k = 1}^n \varepsilon_k\zeta_k \ket{k}\ket{\alpha_k},
+    \ket{\psi_{\bm{\varepsilon}}} = \frac{1}{\opnorm{\bm{\varepsilon}}_2} \sum_{k = 1}^n \varepsilon_k\zeta_k \ket{k}\ket{\alpha_k},
 \end{equation}
 is called quantum rejection sampling \cite{ozols2013quantum}. Define the set of single-qubit operations
 \[ R_{\bm{\varepsilon}}(k) = \frac{1}{\pi_k}
@@ -829,11 +828,50 @@ and let $R_{\bm{\varepsilon}} = \sum_{k = 1}^n \ket{k}\bra{k} \otimes \mathds{1}
 If we measure the last register, the probability of obtaining the state \eqref{equ:qreject-2} is $\sum_{k = 1}^n \abs{\zeta_k\varepsilon}^2 = \lVert \bm{\varepsilon} \rVert_2^2$. We state this result in the following lemma for the sake of reference.
 \begin{lemma}
     \label{lem:qrs}
-    The state conversion $\ket{\psi_{\bm{\pi}}} \mapsto \ket{\psi_{\bm{\varepsilon}}}$ can be done with probability $\norm{\displaystyle \bm{\varepsilon}}_2^2$.
+    The state conversion $\ket{\psi_{\bm{\pi}}} \mapsto \ket{\psi_{\bm{\varepsilon}}}$ can be done with probability $\opnorm{\displaystyle \bm{\varepsilon}}_2^2$.
 \end{lemma}
 
 
 
+\subsection{Norms and Gaussians}
+
+Let $\X = \C^n$. For a quantum state $\sigma \in \mathrm{D}(\X)$, the trace norm is defined as
+\[ \opnorm{\sigma}_1 = \tr\big(\sqrt{\sigma^*\sigma}\big). \]
+This is the Schatten $p$-norm for $p = 1$. Let $\bm{u}, \bm{v} \in \SX$ be unit vectors, and let
+\[ \ket{\psi_{\bm{u}}} = \sum_{k = 1}^n u_k \ket{\alpha_k}, \quad \ket{\psi_{\bm{v}}} = \sum_{k = 1}^n v_k \ket{\alpha_k} \]
+be quantum states, where $\{\ket{\alpha_k}\}$ is an orthonormal set, and $v_k$ and $u_k$ are the coordinates of $\bm{u}$ and $\bm{v}$, respectively. Then the following inequality holds between the trace norm and the $\ell_1$ norm.
+\begin{equation}
+    \label{equ:l1-trace}
+    \opnorm{\ket{\psi_{\bm{u}}}\bra{\psi_{\bm{u}}} - \ket{\psi_{\bm{v}}}\bra{\psi_{\bm{v}}}}_1 \le \opnorm{\bm{u} - \bm{v}}_1.
+\end{equation}
+The inequality \eqref{equ:l1-trace} can be used to approximate quantum states that involve Gaussians. In particular, let $g_r(x) = \exp(-\pi x^2 / r^2)$ be a one-dimensional Gaussian. For any set of complex numbers $\{\zeta_k\}_{k \in \Z}$ on the unit circle and any subset $A \subseteq \Z$ define
+\[ g_r(A) = \sum_{k \in A}g_r(k), \quad  \tilde{g}_r(A) = \sum_{k \in A} \zeta_k g_r(k). \]
+\begin{lemma}
+    \label{lem:trfr-bound-c}
+    For any $\kappa, r > 0$, we have $\abs{\tilde{g}_r(\Z {\setminus} [-\sqrt{\kappa}r, \sqrt{\kappa}r])} \le 2^{-\Omega(\kappa)} g_r(\Z)$. 
+\end{lemma}
+\begin{proof}
+    \begin{align*}
+        \abs{\tilde{g}_r(\Z {\setminus} [-\sqrt{\kappa}r, \sqrt{\kappa}r])}
+        & \le \sum_{k \in \Z {\setminus} [-\sqrt{\kappa}r, \sqrt{\kappa}r]} \abs{\zeta_k g_r(k)} \\
+        & = g_r(\Z {\setminus} [-\sqrt{\kappa}r, \sqrt{\kappa}r]) \\
+        & \le 2^{-\Omega(\kappa)} g_r(\Z),
+    \end{align*}
+    where the last inequality follows from Lemma \ref{lem:trfr-bound}.
+\end{proof}
+\begin{lemma}[{\cite[Lemma 1]{brakerski2018learning}}]
+    \label{lem:trfr-bound}
+    For any $\kappa, r > 0$, we have $g_r(\Z {\setminus} [-\sqrt{\kappa}r, \sqrt{\kappa}r]) \le 2^{-\Omega(\kappa)} g_r(\Z)$. 
+\end{lemma}
+\begin{corollary}
+    \label{cor:gaus-apprx}
+    Let $\kappa, r > 0$ and let $A = [-\sqrt{\kappa}r, \sqrt{\kappa}r]$. Let $\{ \zeta_{k, j} \}_{(k, j) \in \Z_n \times \Z}$ be complex numbers on the unit circle. For the quantum states  
+    \[ \ket{\psi_A} = \frac{1}{S} \sum_{k = 1}^n \sum_{j \in A} \zeta_{k, j} g_r(j) \ket{k}, \quad \ket{\psi_\Z} = \frac{1}{T}\sum_{k = 1}^n \sum_{j \in \Z} \zeta_{k, j} g_r(j) \ket{k} \]
+    we have $\opnorm{\ket{\psi_A}\bra{\psi_A} - \ket{\psi_\Z}\bra{\psi_\Z}}_1 \le 2^{-\Omega(\kappa)} T^{-1} g_r(\Z)$.
+\end{corollary}
+\begin{proof}
+    This follows from \eqref{equ:l1-trace}, Lemma \ref{lem:trfr-bound-c} and a straightforward calculation.
+\end{proof}
 
 
 \end{document}
