@@ -125,7 +125,7 @@
 \date{}
 \setlength{\parindent}{0pt}
 \sloppy
-
+\allowdisplaybreaks
 
 
 
@@ -156,17 +156,22 @@ We shall alternate between these equivalent representations of quantum states th
 More, generally, the density operator corresponding to a probability distribution $\gamma: \SX \rightarrow [0, 1]$ is defined as
 \[ \rho_\gamma = \int_{\ket{\phi} \in \SX} \ket{\phi}\bra{\phi} d\gamma(\ket{\phi}) = \E_{\ket{\phi} \in \gamma} \Big[ \ket{\phi}\bra{\phi} \Big]. \]
 For quantum public-key cryptography we will need a formal notion of quantum state discrimination. In particular, we need to formally define the notion of computational (in)distinguishability of quantum states. For our purposes, it is more convenient to define computational distinguishability for probability distributions over quantum states. The following is adapted from \cite[\S 3.3]{watrous2009zero}.
+
 \begin{definition}
     Let $\X$ be a complex Euclidean space, and let $\gamma, \mu: \SX \rightarrow [0, 1]$ be probability distributions. Then $\gamma$ is said to be $(s, \epsilon)$-distinguishable from $\mu$ if there is a quantum measurement circuit $Q$ of size $s$ such that
     \[ \abs[\Big]{ \Pr_{\rho \in \gamma}[Q(\rho) = 1] - \Pr_{\rho \in \mu}[Q(\rho) = 1]} \ge \epsilon. \]
 \end{definition} 
+
 Two distributions $\gamma, \mu$ are $(s, \epsilon)$-indistinguishable if they are not $(s, \epsilon)$-distinguishable.
+
 \begin{definition}
     For each $n \in \N$, let $\X_n$ be a complex Euclidean space and let $\gamma_n, \mu_n: \mathcal{S}(\X_n) \rightarrow [0, 1]$ be probability distributions. Then the two ensembles $\{ \gamma_n \}_{n \in \N}$ and $\{ \mu_n \}_{n \in \N}$ are said to be polynomially quantum indistinguishable if for all polynomially bounded functions $s, p: \N \rightarrow \N$, the distributions $\gamma_n$ and $\mu_n$ are $(s(n), 1 / p(n))$-indistinguishable for almost all $n \in \N$.
 \end{definition}
+
 Two ensembles are called quantum computationally indistinguishable if they are polynomially quantum indistinguishable. The advantage of a polynomial-time quantum algorithm $Q$ in distinguishing between the distributions $\gamma_n$ and $\mu_n$ is defined as
 \[ \delta_Q(\gamma_n, \mu_n) = \abs[\Big]{ \Pr_{\rho \in \gamma_n}[Q(\rho) = 1] - \Pr_{\rho \in \mu_n}[Q(\rho) = 1] }. \]
 Two ensembles $\{ \gamma_n \}$ and $\{ \mu_n \}$ are then quantum computationally indistinguishable if $\delta_Q(\gamma_n, \mu_n) = \negl(n)$ for all such $Q$ and almost all $n$. 
+
 
 
 
@@ -176,11 +181,14 @@ Two ensembles $\{ \gamma_n \}$ and $\{ \mu_n \}$ are then quantum computationall
 We can abstractly define the advantage of an algorithm $A$, regardless of $A$ being quantum or classical, in distinguishing between two probability distribution $P_1$ and $P_2$ as
 \[ \delta_A(P_1, P_2) = \abs[\Big]{ \Pr_{x \in P_1}[A(x) = 1] - \Pr_{x \in P_2}[A(x) = 1] }. \]
 Two ensembles of distributions $\{ P_{1, n} \}$ and $\{ P_{2, n} \}$ are said to be polynomial-time indistinguishable if for any polynomial-time algorithm $A$ and any $\poly(n)$-bounded function $p$ we have $\delta_A(P_{1, n}, P_{2, n}) \le 1 / p(n)$ for large enough $n$. The following lemma follows from the triangle inequality.
+
 \begin{lemma}[Hybrid lemma]
     \label{lem:hybrid}
     Let $P_1, \dots, P_k$ be a sequence of probability distributions. Assume that $\delta_A(P_1, P_k) \ge \epsilon$ for some polynomial-time algorithm $A$. Then $\delta_A(P_i, P_{i + 1}) \ge \epsilon / k$ for some $1 \le i < k$.
 \end{lemma}
+
 Suppose an algorithm $A$ can distinguish between two distributions $P_1$ and $P_2$ with non-negligible advantage. A common technique to amplify the distinguishing advantage of $A$ is to sample enough times from the input distribution and then decide based on majority. A brief description of this technique, which we shall use several times in this paper, is as follows. First, we need the following well-known tail inequality.
+
 \begin{lemma}[Hoeffding]
     \label{lem:hoeffding}
     Let $X_1, \dots, X_n$ be independent random variables with $X_i \in [a_i, b_i]$, and let $S = X_1, \cdots + X_n$. Then
@@ -189,6 +197,7 @@ Suppose an algorithm $A$ can distinguish between two distributions $P_1$ and $P_
         \Pr[S - \E[S] \le -t] & \le e^{-2t^2 / \sum_i^n (b_i - a_i)^2}.
     \end{align*}
 \end{lemma}
+
 Now, assume $\delta_A(P_1, P_2) \ge 1 / p(n)$ for some polynomial $p(n)$, and let $P$ be the input distribution. Draw $m = 2np(n)^2$ samples from $P$, and let $X_i$ be a random variable representing the output of $A$ on input the $i$-th sample. Here, $X_i = 0$ (resp., $X_i = 1$) means $A$ has recognized the $i$-th sample to be from $P_1$ (resp., $P_2$). Let $S = X_1 + \cdots + X_m$. If $P = P_2$ then from the bound on $\delta_A$ we have $\E[S] \ge m / 2 + np(n)$. By Hoeffdings's inequality,
 \begin{align*}
     \Pr\Big[ S \le \frac{1}{2} (m + np(n)) \Big]
@@ -209,31 +218,39 @@ Therefore, by running $A$ on $m$ samples and counting the number of $1$'s we can
 \subsection{Learning With Errors}
 
 In what follows, we briefly review the Learning With Error and the Extrapolated Dihedral Coset problems. Let $n \ge 1$, and $q = q(n) \ge 2$ be integers, and let $\chi$ be a probability distribution over $\Z$. For a random fixed $\bm{s} \in \Z_q^n$, denote by $A_{\bm{s}, \chi}$ the probability distribution over $\Z_q^n \times \Z_q$ defined as follows: choose $\bm{a} \in \Z_q^n$ uniformly at random, choose $e$ from according to $\chi$ and output  $(\bm{a}, \lrang{\bm{a}, \bm{s}} + e)$.
+
 \begin{definition}[LWE, Search]
 The search-$\lwe_{n, q, \chi}$ is the problem of recovering $\bm{s}$ given samples from the distribution $A_{\bm{s}, \chi}$. An algorithm $Q$ is said to solve $\lwe_{n, q, \chi}$ if $Q$  outputs $\bm{s}$ with probability at least $1 / \poly(n\log q)$ and has running time at most $\poly(n \log q)$.
 \end{definition}
+
 \begin{definition}[LWE, Decision]
     The decision-$\lwe_{n, q, \chi}$ problem is to distinguish between the distribution $A_{\bm{s}, \chi}$ and the uniform distribution over $\Z_q^n \times \Z_q$. An algorithm $Q$ is said to solve the desicion-$\lwe_{n, q, \chi}$ if it succeeds with advantage at least $1 / \poly(n\log q)$ and has running time at most $\poly(n\log q)$. 
 \end{definition}
+
 The distribution $\chi$ is called the error distribution and is usually chosen to be $\mathcal{D}_{\Z, \alpha q}$, the discrete Gaussian distribution centered around zero with standard deviation $\alpha q$. The parameter $\alpha \in (0, 1)$ is called the error rate. Let $n \ge 1$ and $q \ge 2$ be as above and let $r = r(n) < q$ be a positive integer. Let $\Sigma = \Z_r \times \Z_q^n$ and define the complex Euclidean space $\X = \C^\Sigma$. For a fixed $\bm{s} \in \Z_q^n$ define the probability distribution $\mu_{\bm{s}, r}: \SX \rightarrow [0, 1]$ as follows: choose $\bm{x} \in \Z_q^n$ uniformly at random and output the state
 \[ \ket{\phi_{\bm{s}, r}(\bm{x})} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1}\ket{j}\ket{\bm{x} + j\bm{s}}. \]
 If we only have access to the output of $\mu_{\bm{s}, r}$, i.e., $\bm{x}$ is unknown, then the quantum system corresponding to the state $\ket{\phi_{\bm{s}, r}(\bm{x})}$ is described by the density operator
 \[ \rho_{\bm{s}, r} = \frac{1}{q^n} \sum_{\bm{x} \in \Z_q^n} \ket{\phi_{\bm{s}, r}(\bm{x})} \bra{\phi_{\bm{s}, r}(\bm{x})} = \E_{\bm{x} \in \U(\Z_q^n)} \Big[ \ket{\phi_{\bm{s}, r}(\bm{x})} \bra{\phi_{\bm{s}, r}(\bm{x})} \Big], \]
 Therefore, the output of the distribution $\mu_{\bm{s}, r}$ is always described by the density operator $\rho_{\bm{s}, r}$. In other words, the distribution $\mu_{\bm{s}, r}$ provides \textit{copies} of the state $\rho_{\bm{s}, r}$.
+
 \begin{definition}[EDCP, Search]
     Let $n$, $q$ and $r$ be defined as above. The search-$\edcp_{n, q, r}$ is the problem of recovering $\bm{s}$ given samples from the distribution $\mu_{\bm{s}, r}$. A quantum algorithm $Q$ is said to solve $\edcp_{n, q, r}$ if it outputs $\bm{s}$ with probability at least $1 / \poly(n\log q)$ and has running time at most $\poly(n\log q)$.
 \end{definition}
+
 \begin{definition}[EDCP, Decision]
     \label{def:d-edcp}
     Let $n$, $q$ and $r$ be defined as above. Define the probability distribution $\gamma_r: \SX \rightarrow [0, 1]$ by choosing $(j, \bm{x}) \in \Z_r \times \Z_q^n$ uniformly at random and outputting the state $\ket{j}\ket{\bm{x}}$. The decision-$\edcp_{n, q, r}$ is the problem of distinguishing between the distributions $\mu_{\bm{s}, r}$ and $\gamma_r$.
 \end{definition}
+
 A quantum algorithm $Q$ is said to solve the decision-$\edcp_{n, q, r}$ if it succeeds with advantage at least $1 / \poly(n\log q)$ and has running time at most $\poly(n\log q)$. The density operator corresponding to the output of the distribution $\gamma_r$ in Definition \ref{def:d-edcp} is
 \[ \rho = \frac{1}{rq^n} \sum_{j = 0}^{r - 1} \sum_{\bm{x} \in \Z_q^n}  \ket{j}\ket{\bm{x}} \bra{j}\bra{\bm{x}} = \E_{(j, \bm{x}) \in \U(\Z_r \times \Z_q^n)} \Big[ \ket{j}\ket{\bm{x}} \bra{j}\bra{\bm{x}} \Big] = \mathds{1}_{\X}, \]
 Therefore, decision-$\edcp_{n, q, r}$ is the problem of distinguishing between the same number of copies of the states $\rho_{\bm{s}, r}$ and $\mathds{1}_{\X}$. For an integer $m > 0$, we denote by $\edcp_{n, q, r}^m$ the $\edcp$ problem in which the number of samples from $\mu_{\bm{s}, r}$ is bounded by $m$. The following theorem establishes a polynomial-time equivalence between $\lwe$ and $\edcp$.
+
 \begin{theorem}
     \label{thm:lwe-edcp}
     Let $\chi$ be a discrete Gaussian distribution centered around zero with standard deviation $\alpha q$. There is a polynomial-time quantum reduction from $\lwe_{n, q, \chi}$ to $\edcp_{n, q, r}^m$ with $m = \poly(n\log q)$ and $r = \poly(n\log q) / \alpha$. Conversely, for the same parameter relationship up to $\poly(n\log q)$ factors, there is a polynomial-time quantum reduction from $\edcp$ to $\lwe$. 
 \end{theorem}
+
 Note that the equivalence in Theorem \ref{thm:lwe-edcp} holds only when the number of samples $m = \poly(n\log q)$. Giving such an equivalence for arbitrary $m$ is an open problem. See Section \ref{sec:hardness-poly}.
 
 
@@ -243,7 +260,8 @@ Note that the equivalence in Theorem \ref{thm:lwe-edcp} holds only when the numb
 
 \section{A Search to Decision Reduction}
 
-In this section, we give a search-to-decision reduction for $\edcp$. The reduction works for a large class of moduli $q$. The technique we use is inspired by the one in \cite{micciancio2012trapdoors} for a search-to-decision reduction for LWE. We need the following lemma, which shows the self-reducibility of $\edcp$.
+In this section, we give a search-to-decision reduction for $\edcp$. The reduction works for a large class of moduli $q$. The technique we use is inspired by the one in \cite{micciancio2012trapdoors} for a search-to-decision reduction for $\lwe$. We need the following lemma, which shows the self-reducibility of $\edcp$.
+
 \begin{lemma}
     \label{lem:self-rd}
     For any $r' \le r$, given access to the distribution $\mu_{\bm{s}, r}$, we can efficiently sample from the distribution $\mu_{\bm{s}, r'}$. In particular, there is an efficient reduction from $\edcp_{n, q, r}$ to $\edcp_{n, q, r'}$.
@@ -278,7 +296,9 @@ In this section, we give a search-to-decision reduction for $\edcp$. The reducti
     \[ \lfloor r / r' \rfloor \frac{\ell}{r} = \lfloor r / r' \rfloor \frac{r'}{r} \ge \left( \frac{r}{r'} - 1 \right)\frac{r}{r'} = 1 - \frac{r'}{r} \ge \frac{1}{2}. \]
     If the measurement outcome is $a = \lfloor r / r' \rfloor$ then we repeat the above process.
 \end{proof}
+
 It follows from the proof of Lemma \ref{lem:self-rd} that obtaining a sample from $\mu_{\bm{s}, r'}$ requires (an expected) $2$ samples from $\mu_{\bm{s}, r'}$. This means $\edcp_{n, q, r}^m$ is reduced to $\edcp_{n, q, r'}^{\Theta(m)}$ regardless of the ratio between $r$ and $r'$.
+
 \begin{theorem}
     Let $q = p_1^{e_1} \cdots p_\ell^{e_\ell}$ be the prime factorization of $q$ and assume that the primes $p_i$ are of size $\poly(n)$. Let $0 < r < q$ and let $k$ be the number of primes $p_i < r$. Then there is a polynomial-time quantum reduction from solving worst-case search-$\edcp_{n, q, r}$, with overwhelming probability, to solving average-case decision-$\edcp_{n, q, r'}$, with non-negligible probability, for any $r' \le r$ such that $(r')^k \le r$, and $r' \le p_i^{e_i}$ for all $i$. 
 \end{theorem}
@@ -328,9 +348,11 @@ It follows from the proof of Lemma \ref{lem:self-rd} that obtaining a sample fro
     where $\bm{u} \in \Z_q^n$ is uniformly random. Applying $\qft_{q'}^*$ to the above state, we obtain $\lrang{\bm{u}, \bm{s} / v} \bmod q'$. The value $\bm{s} / v$ can be computed, with high probability, by gathering $O(n)$ of these linear equations. \qedhere
     \end{enumerate}
 \end{proof}
+
 \begin{corollary}
     Let $q = p_1^{e_1} \cdots p_\ell^{e_\ell}$ be the prime factorization of $q$ and assume that the primes $p_i$ are of size $\poly(n)$. If $r \le p_i$ for all $1 \le i \le \ell$ then there is a polynomial-time quantum reduction from solving search-$\edcp_{n, q, r}$ to solving decision-$\edcp_{n, q, r}$. 
 \end{corollary}
+
 It follows from the above corollary that for a prime power $q = p^e$, where $p < \poly(n)$ and $r \le p$ then search-$\edcp_{n, q, r}$ and decision-$\edcp_{n, q, r}$ are quantum polynomial-time equivalent. Two interesting special cases of this equivalence are $q = 2^e, r = 2$ and $q = p, r < p$.
 
 
@@ -342,60 +364,66 @@ It follows from the above corollary that for a prime power $q = p^e$, where $p <
 \section{A Better Decision Problem}
 \label{sec:new-decsn}
 
-In this section, we propose an $\edcp$ decision problem that we believe is more suitable for applications than the decision problem defined in Section \ref{sec:preli}. We assume, as before, that the modulus $q$ has $\poly(n)$-bounded prime factors. Perhaps the new decision problem is best understood for a prime modulus $q$. So let us assume, for now, that $q$ is a $\poly(n)$-bounded prime. 
+In this section, we propose an $\edcp$ decision problem that we believe is more suitable for applications than the decision problem defined in Section \ref{sec:preli}. In particular, our public-key cryptosystem (Section \ref{sec:public-key-enc}) is based on the new decision problem. We show that the new decision problem is quantum polynomial-time equivalent to search-$\edcp$. This establishes the fact that the new decision decision problem is at least is as hard as the old one.
 
-Define the distribution $\tilde{\mu}_{\bm{s}, r}$ on the unit sphere $\SX$ by choosing $\bm{x} \in \Z_q^n$ and $t \in \Z_q {\setminus} \{ 0 \}$ uniformly at random and outputting the state
+We assume, as before, that the modulus $q$ has $\poly(n)$-bounded prime factors. Perhaps the new decision problem is best understood for a prime modulus $q$. So let us assume, for now, that $q$ is a $\poly(n)$-bounded prime. Define the distribution $\tilde{\mu}_{\bm{s}, r}$ on the unit sphere $\SX$ by choosing $\bm{x} \in \Z_q^n$ and $t \in \Z_q {\setminus} \{ 0 \}$ uniformly at random and outputting the state
 \begin{equation}
     \label{equ:new-dec}
-    \ket{\tilde{\phi}_{\bm{s}, r}(\bm{x})} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} \omega_q^{jt} \ket{j}\ket{\bm{x} + j\bm{s}}.
+    \ket{\phi_{\bm{s}, r}(\bm{x}, t)} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} \omega_q^{jt} \ket{j}\ket{\bm{x} + j\bm{s}}.
 \end{equation}
-The new decision problem is to distinguish between the distributions $\mu_{\bm{s}, r}$ and $\tilde{\mu}_{\bm{s}, r}$. The motivation behind this new definition is that the state \eqref{equ:new-dec} can be efficiently transformed into a \textit{shifted} LWE sample $(\bm{a}, \lrang{\bm{a}, \bm{s}} + e + t)$ where $e$ is sampled from $\mathcal{D}_{\Z, q / r}$. For a large enough $q$, this pair is closer to a uniformly random element of $\Z_q^n \times \Z_q$ than an LWE sample. An instance of the above decision problem then translates to an instance of the LWE decision problem. The transformation of \eqref{equ:new-dec} into a shifted LWE sample can be done using the technique in \cite{brakerski2018learning}: given the state $\ket{\tilde{\phi}_{\bm{s}, r}(\bm{x})}$, we first apply the transformation $\ket{j} \mapsto \ket{j - \lfloor (r - 1) / 2 \rfloor}$ to the first register to obtain the state
+The new decision problem is to distinguish between the distributions $\mu_{\bm{s}, r}$ and $\tilde{\mu}_{\bm{s}, r}$. The motivation behind this new definition is that from states of the form \eqref{equ:new-dec} we can efficiently obtain ``\textit{shifted}'' $\lwe$ samples $(\bm{a}, \lrang{\bm{a}, \bm{s}} + e + t)$ where $\bm{a} \in \Z_q^n$ is uniformly random and $e$ is sampled from $\mathcal{D}_{\Z, q / \lambda}$ for an appropriate value of $\lambda$. For a large enough $q$, this pair is closer to a uniformly random element of $\Z_q^n \times \Z_q$ than an $\lwe$ sample. An instance of the above decision problem then translates to an instance of the $\lwe$ decision problem.
+
+A shifted $\lwe$ sample can be obtained from the state \eqref{equ:new-dec} using the technique in \cite{brakerski2018learning}, which we briefly explain in the following. We ignore the normalization factors in front superpositions for clarity. Applying the transform $\ket{j} \mapsto \ket{j - \lfloor (r - 1) / 2 \rfloor}$ to the first register of the state \eqref{equ:new-dec} we obtain the state
 \begin{equation}
     \label{equ:symm-edcp}
-    \frac{1}{\sqrt{r}} \sum_{j = -\lfloor (r - 1) / 2 \rfloor}^{\lceil (r - 1) / 2 \rceil} \omega_q^{jt} \ket{j}\ket{\bm{x} + j\bm{s}},
+    \sum_{j = -\lfloor (r - 1) / 2 \rfloor}^{\lceil (r - 1) / 2 \rceil} \omega_q^{jt} \ket{j}\ket{\bm{x} + j\bm{s}},
 \end{equation}
-where we have again denoted the uniformly random element $\bm{x} + \lfloor (r - 1) / 2 \rfloor \bm{s} \in \Z_q^n$ by $\bm{x}$. Next, using the quantum rejection sampling we can, with probability $\Omega(\sigma / r) = \Omega(1 / \sqrt{\kappa})$, transform \eqref{equ:symm-edcp} into 
+where we have again denoted the uniformly random element $\bm{x} + \lfloor (r - 1) / 2 \rfloor \bm{s} \in \Z_q^n$ by $\bm{x}$. Next, using Lemma \ref{lem:qrs} we can transform \eqref{equ:symm-edcp} into 
 \begin{equation}
     \label{equ:symm-eg}
-    \sum_{j = -\lfloor (r - 1) / 2 \rfloor}^{\lceil (r - 1) / 2 \rceil} \omega_q^{jt} g_\sigma(j) \ket{j}\ket{\bm{x} + j\bm{s}},
+    \sum_{j = -\lfloor (r - 1) / 2 \rfloor}^{\lceil (r - 1) / 2 \rceil} \omega_q^{jt} g_\lambda(j) \ket{j}\ket{\bm{x} + j\bm{s}},
 \end{equation}
-where $g_\sigma(x) = \exp(-\pi x^2 / \sigma^2)$ is the Gaussian distribution. Now if we apply the transform $\qft_q \otimes \qft_{q^n}$ to \eqref{equ:symm-eg} and measure the last register we obtain the state
-\[ \ket{\psi} =  \frac{1}{\sqrt{q}} \sum_{y \in \Z_q} \sum_{j = -\lfloor (r - 1) / 2 \rfloor}^{\lceil (r - 1) / 2 \rceil} \omega_q^{j(\lrang{\bm{a}, \bm{s}} + y + t)} g_\sigma(j) \ket{y},\]
-where $\bm{a} \in \Z_q^n$ is uniformly random and known. We have
+with probability $\Omega(\lambda / r)$. Here, $g_\lambda(x) = \exp(-\pi x^2 / \lambda^2)$ is a one-dimensional Gaussian function. We assume that $r$ is large enough so that the above probability is not too small. For example, $r = \lfloor \lambda\sqrt{n} \rfloor$ and so $\Omega(\lambda / r) = \Omega(1 / \sqrt{n})$. Now if we apply the transform $\qft_q \otimes \qft_{q^n}$ to \eqref{equ:symm-eg} and measure the last register we obtain the state
+\[ \ket{\psi} = \sum_{y \in \Z_q} \sum_{j = -\lfloor (r - 1) / 2 \rfloor}^{\lceil (r - 1) / 2 \rceil} \omega_q^{j(\lrang{\bm{a}, \bm{s}} + y + t)} g_\lambda(j) \ket{y}, \]
+where $\bm{a} \in \Z_q^n$ is uniformly random and known. In the following, we use the notation $\ket{\psi_1} \approx \ket{\psi_2}$ when the two quantum states $\ket{\psi_1}$ and $\ket{\psi_2}$ have an exponentially small trace distance. We have
 \begin{align*}
     \ket{\psi}
-    & \approx_\epsilon \sum_{y \in \Z_q} \sum_{j \in \Z} \omega_q^{j(\lrang{\bm{a}, \bm{s}} + y + t)} g_\sigma(j) \ket{y} \tag{by Lemma ??} \\
-    & = \sum_{y \in \Z_q} \sum_{j \in \Z} g_{1/\sigma} \Big( j + \frac{\lrang{\bm{a}, \bm{s}} + y + t}{q} \Big) \ket{y} \tag{by Lemma ??} \\
-    & = \sum_{e \in \Z} g_{1/\sigma} \Big( \frac{e}{q} \Big) \ket{\lrang{-\bm{a}, \bm{s}} + e - t \bmod q} \tag{$e = jq + \lrang{\bm{a}, \bm{s}} + t + y$} \\
-    & \approx_\epsilon \sum_{e \in \Z_q} g_{1/\sigma} \Big( \frac{e}{q} \Big) \ket{\lrang{-\bm{a}, \bm{s}} + e - t \bmod q} \tag{by Lemma ??}.
+    & \approx \sum_{y \in \Z_q} \sum_{j \in \Z} \omega_q^{j(\lrang{\bm{a}, \bm{s}} + y + t)} g_\lambda(j) \ket{y} \tag{by Corollary \ref{cor:gaus-apprx}} \\
+    & = \sum_{y \in \Z_q} \sum_{j \in \Z} g_{1/\lambda} \Big( j + \frac{\lrang{\bm{a}, \bm{s}} + y + t}{q} \Big) \ket{y} \tag{by Theorem \ref{thm:poisson-sum}} \\
+    & = \sum_{e \in \Z} g_{1/\sigma} \Big( \frac{e}{q} \Big) \ket{\lrang{-\bm{a}, \bm{s}} + e - t \bmod q} \tag{$e \leftarrow jq + \lrang{\bm{a}, \bm{s}} + t + y$} \\
+    & \approx \sum_{e \in \Z_q} g_{1/\sigma} \Big( \frac{e}{q} \Big) \ket{\lrang{-\bm{a}, \bm{s}} + e - t \bmod q} \tag{by Corollary \ref{cor:gaus-apprx}}.
 \end{align*}
-Measuring the above state, we obtain a pair $(-\bm{a}, \lrang{-\bm{a}, \bm{s}} + e - t)$ where $e$ is sampled from $\mathcal{D}_{\Z, q / \sigma}$. For a general modulus $q$, an immediate generalization of the decision problem would be to just replace the prime modulus with a general one, and the above transformation to an LWE sample goes through without any change. However, for such a generalization, it is not clear how to reduce the search problem to the decision problem when $q$ is super-polynomially large in $n$.
+Measuring the above state, we obtain a pair $(-\bm{a}, \lrang{-\bm{a}, \bm{s}} + e - t)$ where $e$ is sampled from $\mathcal{D}_{\Z, q / \lambda}$.
+
+For a general modulus $q$, an immediate generalization of the above decision problem would be to just replace the prime modulus with a general one, and the above process of obtaining an $\lwe$ sample goes through without any change. However, for such a generalization, it is not clear how to reduce the search problem to the decision problem when $q$ is super-polynomially large in $n$. An alternative approach is to associate a distribution to each of the primes $p \mid q$, then the decision problem is to distinguish between these distribution and $\mu_{\bm{s}, r}$. We make this precise in the following.
+
 \begin{definition}[EDCP, Decision]
-    Let $p \mid q$ be a prime. Define the distribution $B_{\bm{s}, r, p}$ on the unit sphere $\SX$ by choosing $\bm{x} \in \Z_q^n$ and $t \in \Z_p {\setminus} \{ 0 \}$ uniformly at random and outputting the state
+    Let $p \mid q$ be a prime. Define the distribution $\mu_{\bm{s}, r, p}$ on the unit sphere $\SX$ by choosing $\bm{x} \in \Z_q^n$ and $t \in \Z_p {\setminus} \{ 0 \}$ uniformly at random and outputting the state
     \begin{equation}
-        \ket{
-            \phi_{\bm{s}, r, p}(\bm{x})} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} \omega_p^{jt} \ket{j}\ket{\bm{x} + j\bm{s}}.
+        \label{equ:new-dec1}
+        \ket{\phi_{\bm{s}, r}(\bm{x}, p, t)} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} \omega_p^{jt} \ket{j}\ket{\bm{x} + j\bm{s}}.
     \end{equation}
-    The decision-$\edcp_{n, q, r}$ is the problem of distinguishing between the distribution $B_{\bm{s}, r}$ and any distribution in the set $\{ B_{\bm{s}, r, p} \}_{p \mid q}$.
+    The decision-$\edcp_{n, q, r}$ is the problem of distinguishing between the distribution $\mu_{\bm{s}, r}$ and any distribution in the set $\{ \mu_{\bm{s}, r, p} \}_{p \mid q}$.
 \end{definition}
+
 \begin{theorem}
-    Assume that all the prime factors of $q$ are $\poly(n)$-bounded. Then there is a polynomial-time quantum reduction from solving search-$\edcp_{n, q, r}$ to solving decision-$\edcp_{n, q, r}$.
+    Assume that all the prime factors of $q$ are $\poly(n)$-bounded. Then there is a quantum polynomial-time reduction from solving search-$\edcp_{n, q, r}$ to solving decision-$\edcp_{n, q, r}$.
 \end{theorem}
 \begin{proof}
-    Let $q = p_1^{e_1} \cdots p_\ell^{e_\ell}$ be the prime factorization of $q$. Let $D$ be an oracle for solving decision-$\edcp_{n, q, r}$. The idea is to use $D$ to find $\bm{s} \bmod p_i^{e_i}$ for all $i$ and then reconstruct $\bm{s} \bmod q$ using the Chinese remainder theorem. Let $\bm{s} = (s_1, \dots, s_n)$. We show how to recover $s_1 \bmod p_1^{e_1}$, the other values $s_i \bmod p_j^{e_j}$ can be computed similarly. Set $p = p_1$ and $e = e_1$.
-    For any $y \in \Z_p$ and nonzero $c \in \Z_p$ define the following unitary on $\X$
+    Let $q = p_1^{e_1} \cdots p_\ell^{e_\ell}$ be the prime factorization of $q$. Let $D$ be an oracle for solving decision-$\edcp_{n, q, r}$. The idea is to use $D$ to find $\bm{s} \bmod p_i^{e_i}$ for all $i$ and then reconstruct $\bm{s} \bmod q$ using the Chinese remainder theorem. Let $\bm{s} = (s_1, \dots, s_n)$. We show how to recover $s_1 \bmod p_1^{e_1}$, the other values $s_i \bmod p_j^{e_j}$ can be recovered similarly. Set $p = p_1$ and $e = e_1$.
+    For any $y \in \Z_p$ and nonzero $c \in \Z_p$ define the unitary  
     \[ U_{c, y} \ket{j}\ket{\bm{a}} = \omega_p^{(a_1 - jy)c}\ket{j}\ket{\bm{a}}, \]
-    where $a_1$ is the first coordinate of $\bm{a}$. Given a sample $\rho_{\bm{s}, r}$ from $B_{\bm{s}, r}$, fix $y \in \Z_p$ and select a fresh nonzero $c \in \Z_p$ uniformly at random. Then we have
-    \[ U_{c, y}\ket{\phi_{\bm{s}, r}(\bm{x})} = \frac{1}{\sqrt{r}} \omega_p^{x_1}\sum_{j = 0}^{r - 1} \omega_p^{j(s_1 - y)c} \ket{j}\ket{\bm{x} + j\bm{s}}. \]
-    Therefore, ignoring the global phase, if $s_1 \ne y \bmod p$ then $U_{c, y} \rho_{\bm{s}, r} U_{c, y}^*$ is a sample from $B_{\bm{s}, r, p}$, otherwise $U_{c, y} \rho_{\bm{s}, r} U_{c, y}^* = \rho_{\bm{s}, r}$. So, the oracle $D$ could tell us which is the case. Trying all $y \in \Z_p$ we can find $s_1 \bmod p$. Now assume we have recovered $\tilde{s}_1 = s_1 \bmod p^k$ for $k < e$. To compute $s_1 \bmod p^{k + 1}$, we can modify the unitary $U_{c, y}$ as 
+    where $a_1$ is the first coordinate of $\bm{a}$. Given a sample $\rho_{\bm{s}, r}$ from $\mu_{\bm{s}, r}$, fix $y \in \Z_p$ and select a fresh nonzero $c \in \Z_p$ uniformly at random. Then we have
+    \[ U_{c, y}\ket{\phi_{\bm{s}, r}(\bm{x})} = \frac{1}{\sqrt{r}} \omega_p^{x_1c}\sum_{j = 0}^{r - 1} \omega_p^{j(s_1 - y)c} \ket{j}\ket{\bm{x} + j\bm{s}}. \]
+    Therefore, ignoring the global phase, if $s_1 \ne y \bmod p$ then $U_{c, y} \rho_{\bm{s}, r} U_{c, y}^*$ is a sample from $\mu_{\bm{s}, r, p}$, otherwise $U_{c, y} \rho_{\bm{s}, r} U_{c, y}^* = \rho_{\bm{s}, r}$. So, the oracle $D$ could tell us which is the case. Trying all $y \in \Z_p$ we can find $s_1 \bmod p$. Now assume we have recovered $\tilde{s}_1 = s_1 \bmod p^k$ for $k < e$. To compute $s_1 \bmod p^{k + 1}$, we can modify the unitary $U_{c, y}$ as 
     \[ U_{c, y, k} \ket{j}\ket{\bm{a}} = \omega_{p^{k + 1}}^{(a_1 - j\tilde{s}_1 - jp^ky)c}\ket{j}\ket{\bm{a}}. \]
-    To see how $U_{c, y, k}$ acts on a sample $\rho_{\bm{s}, r}$ from $B_{\bm{s}, r}$, let $s_{1, k + 1}$ be the $(k + 1)$-th digit of $s_1$ in base $p$. Then
+    To see how $U_{c, y, k}$ acts on a sample $\rho_{\bm{s}, r}$ from $\mu_{\bm{s}, r}$, let $s_{1, k}$ be the $(k + 1)$-th digit of $s_1$ in base $p$. Then
     \begin{align*}
         U_{c, y, k} \ket{j}\ket{\bm{x} + j\bm{s}}
         & = \omega_{p^{k + 1}}^{(x_1 + js_1 - j\tilde{s}_1 - jp^ky)c}\ket{j}\ket{\bm{x} + j\bm{s}} \\
-        & = \omega_{p^{k + 1}}^{x_1} \omega_p^{j(s_{1, k + 1} - y)c}\ket{j}\ket{\bm{x} + j\bm{s}}.
+        & = \omega_{p^{k + 1}}^{x_1c} \omega_p^{j(s_{1, k} - y)c}\ket{j}\ket{\bm{x} + j\bm{s}}.
     \end{align*}
-    Therefore, repeating the above procedure, we can recover $s_{1, k + 1}$. This completes the proof.
+    Therefore, repeating the above procedure, we can recover $s_{1, k}$. This completes the proof.
 \end{proof}
 
 
@@ -560,7 +588,7 @@ When the number of samples is $\poly(n)$, $\edcp$ is quantum polynomially equiva
 
 Let $(\bm{A}, \bm{b}_0 = \bm{As}_0 + \bm{e}_0)$ be a set of $m$ samples from $\lwe_{n, q, \alpha}$, written in matrix form. We start by preparing the state 
 \[ \sum_{\bm{s} \in \Z_q^n} \sum_{j = 0}^{r - 1} \ket{j}\ket{\bm{s}}, \]
-where we have dropped the normalization factors for simplicity. Here, $r$ is a function of $n$ and $q$. We then compute $(j, \bm{s}) \mapsto \bm{As} - j\bm{b}_0$ into an auxiliary register. After a change of variables we obtain the state
+where we have omitted the normalization factors for clarity. Here, $r$ is a function of $n$ and $q$. We then compute $(j, \bm{s}) \mapsto \bm{As} - j\bm{b}_0$ into an auxiliary register. After a change of variables we obtain the state
 \begin{equation}
     \label{equ:latt-sup}
     \sum_{\bm{s} \in \Z_q^n} \sum_{j = 0}^{r - 1} \ket{j}\ket{\bm{s} + j\bm{s}_0}\ket{\bm{As} - j\bm{e}_0}.
@@ -640,19 +668,19 @@ A quantum public-key cryptosystem, similar to a classical system, consists of th
 \end{itemize}
 The output pair $(pk, sk)$ of the $\gen$ algorithm for a quantum system consists  of a quantum state and a classical state, respectively. In particular, the public-key $pk$ is a quantum state that is generated using a classical key $sk$. The algorithm $\enc$ encrypts the message $m$, which is classical information, using the quantum state $pk$. The output $c$ of $\enc$ is a quantum state. The algorithm $\dec$ uses the key $sk$ to decrypt the quantum state into a classical message $m$.
 
-For the security parameter $n$, we set the parameters for public key system as follows. We choose a prime $p = \poly(n)$ and set $q = p^s$ for some integer $s > 0$. We also set $r = p^{s'}$ where $s' < s$. The reason for these choices of parameters is that the resulting encryption scheme is simpler and more efficient. More generally, one could select $q$ to be a positive integer with $\poly(n)$-bounded prime factors and $r = p^{s'} \vert q$ to be a proper divisor where $p$ is prime. In what follows, we describe our cryptosystem for encrypting a one-bit message $b \in \{ 0, 1 \}$.
+For the security parameter $n$, we set the parameters for public key system as follows. We choose a prime $p = \poly(n)$ and set $q = p^s$ for some integer $s > 0$. We also set $r = p^{s'}$ where $s' < s$. The reason for these choices of parameters is that the resulting encryption scheme is simpler and more efficient. More generally, one could select $q$ to be a positive integer with $\poly(n)$-bounded prime factors and $r = p^{s'} \vert q$ to be a proper divisor where $p$ is prime. In what follows, we describe our cryptosystem for encrypting a one-bit message $b \in \{ 0, 1 \}$. Since there is only one prime $p$, we drop the parameter $p$ in \eqref{equ:new-dec1} for clarity.
 
 \begin{description}[leftmargin = *]
 \item [$\gen(1^n)$:] Select $\bm{x}, \bm{s} \in \Z_q^n$ uniformly at random. Apply the transform $\qft_r \otimes \mathds{1}$ to the register $\ket{0} \ket{\bm{x}}$ to obtain the state $\ket{\psi_1} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} \ket{j} \ket{\bm{x}}$. Apply the transform $A_{\bm{s}}: \ket{j}\ket{\bm{x}} \mapsto \ket{j}\ket{\bm{x} + j\bm{s}}$ to $\ket{\psi_1}$ to obtain the state
-\[ \ket{\phi_{\bm{s}, r, 0}(\bm{x})} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} \ket{j} \ket{\bm{x} + j\bm{s}}. \]
-Return the public-key, secret-key pair $(pk, sk) = (\ket{\phi_{\bm{s}, r, 0}(\bm{x})}, \bm{s})$. 
+\[ \ket{\phi_{\bm{s}, r}(\bm{x}, 0)} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} \ket{j} \ket{\bm{x} + j\bm{s}}. \]
+Return the public-key, secret-key pair $(pk, sk) = (\ket{\phi_{\bm{s}, r}(\bm{x}, 0)}, \bm{s})$. 
 
 \item [$\enc(pk = \rho_{\bm{s}, r, 0}, b \in \{ 0, 1 \})$:]  Select $t \in \Z_r {\setminus} \{0\}$ uniformly at random. Apply the transform $U: \ket{j}\ket{\bm{y}} \mapsto \omega_p^{btj}\ket{j}\ket{\bm{y}}$ to $\rho_{\bm{s}, r, 0}$ to obtain the state
 \begin{align*}
     U \rho_{\bm{s}, r, 0} U^*
-    & = U \E_{\bm{x} \leftarrow \Z_q^n} \Big[ \ket{\phi_{\bm{s}, r, 0}(\bm{x})} \bra{\phi_{\bm{s}, r, 0}(\bm{x})} \Big] U^* \\
-    & = \E_{\bm{x} \leftarrow \Z_q^n} \Big[ U \ket{\phi_{\bm{s}, r, 0}(\bm{x})} \bra{\phi_{\bm{s}, r, 0}(\bm{x})} U^* \Big] \\
-    & = \E_{\bm{x} \leftarrow \Z_q^n} \Big[ \ket{\phi_{\bm{s}, r, bt}(\bm{x})} \bra{\phi_{\bm{s}, r, bt}(\bm{x})} \Big] \\
+    & = U \E_{\bm{x} \leftarrow \Z_q^n} \Big[ \ket{\phi_{\bm{s}, r}(\bm{x}, 0)} \bra{\phi_{\bm{s}, r}(\bm{x}, 0)} \Big] U^* \\
+    & = \E_{\bm{x} \leftarrow \Z_q^n} \Big[ U \ket{\phi_{\bm{s}, r}(\bm{x}, 0)} \bra{\phi_{\bm{s}, r}(\bm{x}, 0)} U^* \Big] \\
+    & = \E_{\bm{x} \leftarrow \Z_q^n} \Big[ \ket{\phi_{\bm{s}, r}(\bm{x}, bt)} \bra{\phi_{\bm{s}, r}(\bm{x}, bt)} \Big] \\
     & = \rho_{\bm{s}, r, bt}.
 \end{align*}
 Return $\rho_{\bm{s}, r, bt}$.
@@ -668,7 +696,7 @@ Return $\rho_{\bm{s}, r, bt}$.
     Given the ciphertext $\rho_{\bm{s}, r, tb}$, the decryption steps are as follows
     \begin{align*}
         \rho_{\bm{s}, r, b}
-        & \mapsto \E_{\bm{x} \leftarrow \Z_q^n} \Big[ S_{\bm{s}} \ket{\phi_{\bm{s}, r, bt}(\bm{x})} \bra{\phi_{\bm{s}, r, bt}(\bm{x})} S_{\bm{s}}^* \Big]  \tag{apply $S_{\bm{s}}$} \\
+        & \mapsto \E_{\bm{x} \leftarrow \Z_q^n} \Big[ S_{\bm{s}} \ket{\phi_{\bm{s}, r}(\bm{x}, bt)} \bra{\phi_{\bm{s}, r}(\bm{x}, bt)} S_{\bm{s}}^* \Big]  \tag{apply $S_{\bm{s}}$} \\
         & = \E_{\bm{x} \leftarrow \Z_q^n} \bigg[ \frac{1}{r} \sum_{k, j = 0}^{r - 1} \omega_p^{bt(j - k)}\ket{k}\ket{\bm{x}} \bra{j}\bra{\bm{x}} \bigg] \\
         & = \frac{1}{r} \sum_{k, j = 0}^{r - 1} \omega_p^{bt(j - k)}\ket{k}\bra{j} \otimes \E_{\bm{x} \leftarrow \Z_q^n} \Big[ \ket{\bm{x}}\bra{\bm{x}} \Big] \\
         & \mapsto \frac{1}{r} \sum_{k, j = 0}^{r - 1} \omega_p^{bt(j - k)}\ket{k}\bra{j} \tag{discard the second register} \\
@@ -732,7 +760,7 @@ Figure \ref{fig:dec-circuit} shows the decryption circuit. The gate $\qft_r$ is 
 Although our cryptosystem is efficient even for a super-polynomial modulus $q = p^s$ and any $\poly(n)$-bounded prime $p$, it can be made more efficient by choosing a $\poly(n)$-bounded $q$ and a small prime $p$. In particular, we can choose $p = 2$ and $q = 2^s$ where $s \in O(\log n)$. In this case, we choose $r = 2^{s'}$ is $s' \ll s$.
 
 For the above parameters, we have $\omega_p = -1$. In the encryption algorithm, the only choice for $t$ is $t = 1$ and, therefore, random number generation is not required. For an input bit $b$ the encrypted state is
-\[ \ket{\phi_{\bm{s}, r, b}(\bm{x})} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} (-1)^b \ket{j}\ket{\bm{x} + j\bm{s}}. \]
+\[ \ket{\phi_{\bm{s}, r}(\bm{x}, b)} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} (-1)^b \ket{j}\ket{\bm{x} + j\bm{s}}. \]
 Consequently, the encryption algorithm $\enc$ is much simpler. In particular, the quantum Fourier transform $\qft_p$ is replaced by the Hadamard transform $H: \ket{x} \mapsto (\ket{0} + (-1)^x \ket{1}) / \sqrt{2}$, and the transform $T_{bt}$ is replaced by $T_b: \ket{j}\ket{\bm{y}}\ket{z} \mapsto \ket{j}\ket{\bm{y}}\ket{z \oplus (jb \bmod 2)}$. Figure \ref{fig:enc-circuit-2} shows the new encryption circuit.
 
 \begin{figure}[h]
