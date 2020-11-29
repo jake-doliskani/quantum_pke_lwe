@@ -113,7 +113,7 @@
 \def\X{\mathcal{X}}
 \def\SX{\mathcal{S(X)}}
 \def\U{\mathcal{U}}
-
+\def\PosSemi{\mathrm{Pos}}
 
 \title{Efficient Quantum Public-Key Encryption \\ From Learning With Errors}
 
@@ -273,21 +273,21 @@ In this section, we give a search-to-decision reduction for $\edcp$. The reducti
         1 & \text{if } x < r', \\
         0 & \text{otherwise}.
     \end{cases} \]
-    Then applying the transformation $\ket{j}\ket{\bm{y}}\ket{0} \mapsto \ket{j}\ket{\bm{y}}\ket{f(j)}$, where $\bm{y} \in \Z_q^n$, to $\rho_{\bm{s}, r} \in \mu_{\bm{s}, r}$ and measuring the last register results in the state $\rho_{\bm{s}, r'}$ with probability at least $1 / 2$. If the measurement outcome is not $1$ then we repeat the above process.
+    Then applying the transform $\ket{j}\ket{\bm{y}}\ket{0} \mapsto \ket{j}\ket{\bm{y}}\ket{f(j)}$, where $\bm{y} \in \Z_q^n$, to $\rho_{\bm{s}, r} \in \mu_{\bm{s}, r}$ and measuring the last register results in the state $\rho_{\bm{s}, r'}$ with probability at least $1 / 2$. If the measurement outcome is not $1$ then we repeat the above process.
 
-    If $r' \le r / 2$ then we proceed as follows. Consider the measurement $M$ on the space $\X$ defined by the operators
-    \[ M_a = \sum_{b = 0}^{\ell - 1} \ket{b}\bra{ar' + b} \otimes \mathds{1}, \]
-    where $\ell = r'$ for $0 \le a < \lfloor r / r'  \rfloor$ and $\ell = r - r'$ for $a = \lfloor r / r'  \rfloor$. This measurement can be implemented efficiently \cite[\S A.8]{kaye2007introduction}. If we perform $M$ on a sample $\rho_{\bm{s}, r}$ from $\mu_{\bm{s}, r}$ the probability of observing the outcome $a$ is
+    If $r' \le r / 2$ then we proceed as follows. Let $\X = \C^{\Z_r \times \Z_q^n}$ and define the measurement $\mu: [0, \lfloor r / r'  \rfloor] \rightarrow \PosSemi(\X)$ using the operators
+    \[ \mu_a = \sum_{b = 0}^{\ell - 1} \ket{b}\bra{ar' + b} \otimes \mathds{1}, \]
+    where $\ell = r'$ for $0 \le a < \lfloor r / r'  \rfloor$ and $\ell = r - r'$ for $a = \lfloor r / r'  \rfloor$. This measurement can be implemented efficiently \cite[A.8]{kaye2007introduction}. If we perform $\mu$ on a sample $\rho_{\bm{s}, r}$ from $\mu_{\bm{s}, r}$ the probability of observing the outcome $a$ is
     \begin{align*}
-        \tr(M_a^*M_a \rho_{\bm{s}, r})
-        & = \E_{\bm{x} \in \U(\Z_q^n)} \Big[ \tr(M_a \ket{\phi_{\bm{s}, r}(\bm{x})} \bra{\phi_{\bm{s}, r}(\bm{x})} M_a^*) \Big] \\
+        \tr(\mu_a^*\mu_a \rho_{\bm{s}, r})
+        & = \E_{\bm{x} \in \U(\Z_q^n)} \Big[ \tr(\mu_a \ket{\phi_{\bm{s}, r}(\bm{x})} \bra{\phi_{\bm{s}, r}(\bm{x})} \mu_a^*) \Big] \\
         & = \frac{1}{r} \sum_{b, c = 0}^{\ell - 1} \E_{\bm{x} \in \U(\Z_q^n)}\Big[ \tr(\ket{b}\ket{\bm{x} + (ar' + b)\bm{s}} \bra{c}\bra{\bm{x} + (ar' + c)\bm{s}}) \Big] \\
         & = \frac{1}{r} \sum_{b, c = 0}^{\ell - 1} \E_{\bm{x} \in \U(\Z_q^n)}\Big[ \tr(\ket{b}\bra{c} \otimes \ket{\bm{x} + (ar' + b)\bm{s}} \bra{\bm{x} + (ar' + c)\bm{s}}) \Big] \\
         & = \frac{\ell}{r},
     \end{align*}
     and the post-measurement state corresponding to this outcome is
     \begin{align*}
-        \frac{M_a \rho_{\bm{s}, r} M_a^*}{(\ell / r)}
+        \frac{\mu_a \rho_{\bm{s}, r} \mu_a^*}{(\ell / r)}
         & = \frac{1}{r} \sum_{b, c = 0}^{\ell - 1} \E_{\bm{x} \in \U(\Z_q^n)}\Big[ \ket{b}\ket{\bm{x} + (ar' + b)\bm{s}} \bra{c}\bra{\bm{x} + (ar' + c)\bm{s}} \Big] \\
         & = \frac{1}{r} \sum_{b, c = 0}^{\ell - 1} \E_{\bm{x} \in \U(\Z_q^n)}\Big[ \ket{b}\ket{\bm{x} + b\bm{s}} \bra{c}\bra{\bm{x} + c\bm{s}} \Big] \\
         & = \rho_{\bm{s}, \ell},
@@ -297,7 +297,7 @@ In this section, we give a search-to-decision reduction for $\edcp$. The reducti
     If the measurement outcome is $a = \lfloor r / r' \rfloor$ then we repeat the above process.
 \end{proof}
 
-It follows from the proof of Lemma \ref{lem:self-rd} that obtaining a sample from $\mu_{\bm{s}, r'}$ requires (an expected) $2$ samples from $\mu_{\bm{s}, r'}$. This means $\edcp_{n, q, r}^m$ is reduced to $\edcp_{n, q, r'}^{\Theta(m)}$ regardless of the ratio between $r$ and $r'$.
+It follows from the proof of Lemma \ref{lem:self-rd} that obtaining a sample from $\mu_{\bm{s}, r'}$ requires (an expected) $2$ samples from $\mu_{\bm{s}, r}$. This means $\edcp_{n, q, r}^m$ is reduced to $\edcp_{n, q, r'}^{\Theta(m)}$ regardless of the ratio between $r$ and $r'$.
 
 \begin{theorem}
     Let $q = p_1^{e_1} \cdots p_\ell^{e_\ell}$ be the prime factorization of $q$ and assume that the primes $p_i$ are of size $\poly(n)$. Let $0 < r < q$ and let $k$ be the number of primes $p_i < r$. Then there is a polynomial-time quantum reduction from solving worst-case search-$\edcp_{n, q, r}$, with overwhelming probability, to solving average-case decision-$\edcp_{n, q, r'}$, with non-negligible probability, for any $r' \le r$ such that $(r')^k \le r$, and $r' \le p_i^{e_i}$ for all $i$. 
@@ -306,26 +306,29 @@ It follows from the proof of Lemma \ref{lem:self-rd} that obtaining a sample fro
     Let $D$ be an oracle for solving decision-$\edcp_{n, q, r'}$. The idea of the proof is to use $D$ and samples from the distribution $\mu_{\bm{s}, r}$ to recover $\bm{s} \bmod p_i^{h_i}$, with large-enough $h_i$, for each $i$, and then assemble the results using the Chinese remainder theorem to recover $\bm{s} \bmod \prod_i p_i^{h_i}$. From there, since $q / \prod_i p_i^{h_i}$ is small-enough, we can use quantum Fourier transform to recover $\bm{s} \bmod q$. We shall compute $\bm{s} \bmod p_1^{e_1}$, the algorithm is the same for the other $p_i$. Let $p = p_1$ and $e = e_1$. The proof proceeds in several steps.
 
     \begin{enumerate}[leftmargin = *, font = \bfseries]
-    \item Sampling from $\mu_{\bm{s}, r'}$: given samples from $\mu_{\bm{s}, r}$, according to Lemma \ref{lem:self-rd}, we can efficiently sample from $\mu_{\bm{s}, r'}$. So from now on we assume that we have access to samples from $\mu_{\bm{s}, r'}$.
-    \item Building hybrid distributions: from the distribution $\mu_{\bm{s}, r'}$ we construct the distribution $\mu_{\bm{s}, r'}^k$ for all $k = 0, \dots, e$. Given a sample $\rho_{\bm{s}, r'} \in \mu_{\bm{s}, r'}$, a sample from $\mu_{\bm{s}, r'}^k$ is constructed by computing $j \bmod p^k$ into an auxiliary register and then discarding the register. More precisely, denote by $\ket{\phi_{\bm{s}, r'}^k(\bm{x})}$ the result of 
+    \item Sampling from $\mu_{\bm{s}, r'}$: given samples from $\mu_{\bm{s}, r}$, according to Lemma \ref{lem:self-rd}, we can efficiently sample from $\mu_{\bm{s}, r'}$. So, from now on we assume that we have access to samples from $\mu_{\bm{s}, r'}$.
+
+    \item Building hybrid distributions: from the distribution $\mu_{\bm{s}, r'}$ we construct the distribution $\mu_{\bm{s}, r'}^k$ for all $k = 0, \dots, e$. Given a sample $\rho_{\bm{s}, r'} \in \mu_{\bm{s}, r'}$, a sample from $\mu_{\bm{s}, r'}^k$ is obtained by computing $j \bmod p^k$ into an auxiliary register and then measuring the register. More precisely, denote by $\ket{\phi_{\bm{s}, r'}^k(\bm{x})}$ the result of 
     \begin{align}
         \ket{\phi_{\bm{s}, r'}(\bm{x})}\ket{0}
         & \mapsto \frac{1}{\sqrt{r'}} \sum_{j = 0}^{r' - 1} \ket{j}\ket{\bm{x} + j\bm{s}}\ket{j \bmod p^k} \label{equ:r-1}  \\
-        & \mapsto \frac{1}{\sqrt{r_k}} \sum_{j = 0}^{r_k - 1} \ket{jp^k + c}\ket{\bm{x} + (jp^k + c)\bm{s}}, \nonumber \tag{discard the last register}
+        & \mapsto \frac{1}{\sqrt{r_k}} \sum_{j = 0}^{r_k - 1} \ket{jp^k + c}\ket{\bm{x} + (jp^k + c)\bm{s}}, \nonumber \tag{measure the last register}
     \end{align}
     where $0 < r_k \le \lfloor r' / p^k \rfloor$ and the random constant $0 \le c \le p^k - 1$ depend on the outcome of measuring the last register. Then
     \[ \rho_{\bm{s}, r'}^k = \E_{\bm{x} \in \U(\Z_q^n)} \Big[ \ket{\phi_{\bm{s}, r'}^k(\bm{x})} \bra{\phi_{\bm{s}, r'}^k(\bm{x})} \Big] \]
     is a sample from $\mu_{\bm{s}, r'}^k$.
-    \item\label{step:s-mod-p} Computing $\bm{s} \bmod p$: for $k = 0$ we have $j = 0 \bmod p^0$ for all $j$, so $\rho_{\bm{s}, r'}^0 = \rho_{\bm{s}, r'}$ hence $\mu_{\bm{s}, r'}^0 = \mu_{\bm{s}, r'}$. Let $h$ be the smallest integer such that $r' \le p^h$, such an $h$ exists since $r' \le p^e$ by assumption. Then for $k = h$, discarding the last register in \eqref{equ:r-1} collapses the state $\rho_{\bm{s}, r'}$ to $\mathds{1}$. Therefore, by a hybrid argument, Lemma \ref{lem:hybrid}, there is a minimal $0 < t \le h$ such that $D$ can distinguish between $\mu_{\bm{s}, r'}^{t - 1}$ and $\mu_{\bm{s}, r'}^t$ with non-negligible advantage. Using the amplification technique of Section \ref{sec:err-red} we can assume that the distinguishing advantage of $D$ is exponentially close to $1$. Let $\bm{s} = (s_1, \dots, s_n)$. We recover $s_1 \bmod p$, the other $s_i \bmod p$ can be recovered similarly. Consider the state $\ket{\phi_{\bm{s}, r'}^{t - 1}(\bm{x})}$ where $\bm{x} = (x_1, \dots, x_n)$, and let $a \in \Z_p$ and $\bm{y} = (y_1, \dots, y_n) \in \Z_q^n$ be arbitrary. If we perform the transformation
+    
+    \item\label{step:s-mod-p} Computing $\bm{s} \bmod p$: for $k = 0$ we have $j = 0 \bmod p^0$ for all $j$, so $\rho_{\bm{s}, r'}^0 = \rho_{\bm{s}, r'}$ hence $\mu_{\bm{s}, r'}^0 = \mu_{\bm{s}, r'}$. Let $h$ be the smallest integer such that $r' \le p^h$, such an $h$ exists since $r' \le p^e$ by assumption. Then for $k = h$, measuring the last register in \eqref{equ:r-1} collapses the state $\rho_{\bm{s}, r'}$ to $\mathds{1}_{\X'} / (r'q^n)$ where $\X' = \C^{\Z_{r'} \times \Z_q^n}$. Therefore, by a hybrid argument (Lemma \ref{lem:hybrid}) there is a minimal $0 < t \le h$ such that $D$ can distinguish between $\mu_{\bm{s}, r'}^{t - 1}$ and $\mu_{\bm{s}, r'}^t$ with non-negligible advantage. Using the amplification technique of Section \ref{sec:err-red} we can assume that the distinguishing advantage of $D$ is exponentially close to $1$. Note that $t$ can be efficiently computed by analyzing the output of $D$. Let $\bm{s} = (s_1, \dots, s_n)$. We recover $s_1 \bmod p$, the other $s_i \bmod p$ can be recovered similarly. Consider the state $\ket{\phi_{\bm{s}, r'}^{t - 1}(\bm{x})}$ where $\bm{x} = (x_1, \dots, x_n)$, and let $a \in \Z_p$ and $\bm{y} = (y_1, \dots, y_n) \in \Z_q^n$ be arbitrary. If we perform the transform
     \begin{equation}
         \label{equ:s1-trans}
         U_1: \ket{j}\ket{\bm{y}}\ket{0} \mapsto \ket{j}\ket{\bm{y}}\ket{y_1 - ja \bmod p^t}
     \end{equation}
-    on $\ket{\phi_{\bm{s}, r'}^{t - 1}(\bm{x})}$ we have
-    \[ U_1\ket{\phi_{\bm{s}, r'}^{t - 1}(\bm{x})}\ket{0} = \frac{1}{\sqrt{r_{t - 1}}} \sum_{j = 0}^{r_{t - 1} - 1} \ket{jp^{t - 1} + c}\ket{\bm{x} + (jp^{t - 1} + c)\bm{s}}\ket{x_1 + (jp^{t - 1} + c)(s_1 - a) \bmod p^t}. \]
-    If we measure the last register, the resulting state will be a sample from $\mu_{\bm{s}, r'}^{t - 1}$ or $\mu_{\bm{s}, r'}^t$ depending on whether $s_1 = a$ or $s_1 \ne a \bmod p$:
+    on $\ket{\phi_{\bm{s}, r'}^{t - 1}(\bm{x})}\ket{0}$ we obtain the state
+    \[ \frac{1}{\sqrt{r_{t - 1}}} \sum_{j = 0}^{r_{t - 1} - 1} \ket{jp^{t - 1} + c}\ket{\bm{x} + (jp^{t - 1} + c)\bm{s}}\ket{x_1 + (jp^{t - 1} + c)(s_1 - a) \bmod p^t}. \]
+    Measuring the last register results in a state that will be a sample from $\mu_{\bm{s}, r'}^{t - 1}$ or $\mu_{\bm{s}, r'}^t$ depending on whether $s_1 = a$ or $s_1 \ne a \bmod p$, respectively:
     \begin{itemize}
     \item $s_1 = a \bmod p$. In this case, the value of the last register is $x_1 + (s_1 - a)c \bmod p^t$. So the last register is not entangled with the first two registers, and we obtain the original sample from $\mu_{\bm{s}, r'}^{t - 1}$.
+        
     \item $s_1 \ne a \bmod p$. Let $0 \le c_1 \le p^k - 1$ be the outcome of the measurement. Then the post-measurement state contains the terms with $j$ satisfying $jp^{t -1} = (c_1 - x_1) / (s_1 - a) - c \bmod p^t$. If we write the right hand side as $c_2p^{t - 1}$ for some constant $0 \le c_2 \le p - 1$ then $j = c_2 \bmod p$ and the post-measurement state is 
     \begin{align*}
         \ket{\psi_{\bm{x}}}
@@ -335,16 +338,17 @@ It follows from the proof of Lemma \ref{lem:self-rd} that obtaining a sample fro
     where $0 < r_t \le \lfloor r_{t - 1} / p \rfloor$. We clearly have
     \[ \E_{\bm{x} \in \U(\Z_q^n)} \Big[ \ket{\psi_{\bm{x}}}\bra{\psi_{\bm{x}}}  \Big] \in \mu_{\bm{s}, r'}^t. \]
     \end{itemize}
-    Therefore, using $D$ we can find out whether $s_1 = a \bmod p$. Since $p < \poly(n)$, we can recover $s_1 \bmod p$ by trying every $a \in \Z_p$.
-    \item\label{step:s-mod-pk} Computing $\bm{s} \bmod p^k$: assume we have recovered, for some $k > 1$, the first $k - 1$ digits of $s_1$ in base $p$, that is we have computed $0 \le \tilde{s}_1 < p^{k - 1}$ such that $\tilde{s}_1 = s_1 \bmod p^{k - 1}$. Let $s_{1, k}$ be the $k$-th digit of $s_1$ in base $p$. To compute $s_{1, k}$, we can modify the transformation in Step \ref{step:s-mod-p} as
+    Therefore, using $D$ we can find out whether $s_1 = a \bmod p$. Since $p \le \poly(n)$, we can recover $s_1 \bmod p$ by trying every $a \in \Z_p$.
+    \item\label{step:s-mod-pk} Computing $\bm{s} \bmod p^k$: assume we have recovered, for some $k > 1$, the first $k - 1$ digits of $s_1$ in base $p$, that is we have computed $0 \le \tilde{s}_1 < p^{k - 1}$ such that $\tilde{s}_1 = s_1 \bmod p^{k - 1}$. Let $s_{1, k - 1}$ be the $k$-th digit of $s_1$ in base $p$. To compute $s_{1, k - 1}$, we can modify the transform in Step \ref{step:s-mod-p} as
     \begin{equation*}
         U_k: \ket{j}\ket{\bm{y}}\ket{0} \mapsto \ket{j}\ket{\bm{y}}\ket{y_1 - j\tilde{s}_1 - jp^{k - 1}a \bmod p^{t + k - 1}}.
     \end{equation*}
-    Applying $U_k$ to a sample from $\mu_{\bm{s}, r'}^{t - 1}$ and measuring the last register produces a sample from $\mu_{\bm{s}, r'}^{t - 1}$ or $\mu_{\bm{s}, r'}^t$ depending on whether $s_{1, k} = a$ or $s_{1, k} \ne a \bmod p$. This method works as long as $t + k - 1 \le e$.
+    Applying $U_k$ to a sample from $\mu_{\bm{s}, r'}^{t - 1}$ and measuring the last register produces a sample from $\mu_{\bm{s}, r'}^{t - 1}$ or $\mu_{\bm{s}, r'}^t$ depending on whether $s_{1, k - 1} = a$ or $s_{1, k - 1} \ne a \bmod p$, respectively. This method works as long as $t + k - 1 \le e$.
+    
     \item Quantum Fourier transform: using the procedure in Step \ref{step:s-mod-pk}, we can compute $\bm{s} \bmod p^{e - t + 1}$ where $t$ is  the minimal integer determined in Step \ref{step:s-mod-p}. Similarly, we recover $\bm{s} \bmod p^{e_i - t_i + 1}$ with $t_i$ the corresponding minimal integer for $p_i$, for all $i$. Note that if $r' \le p_i$ then $t_i = 1$. Also, we always have $r' \ge p_i^{t_i - 1}$. Using the Chinese remainder theorem we can compute $\tilde{\bm{s}} = \bm{s} \bmod v$ where
     \[ v = \prod_{i = 1}^\ell p_i^{e_i - t_i + 1} = q / \prod_{i = 1}^\ell p_i^{t_i - 1} \ge \frac{q}{(r')^k} \ge \frac{q}{r}. \]
-    Now, by applying the transformation $\ket{j}\ket{\bm{y}} \mapsto \ket{j}\ket{\bm{y} - j\tilde{\bm{s}}}$ to the states $\ket{\phi_{\bm{s}, r}(\bm{x})}$, we assume that all the coordinates of $\bm{s}$ are multiples of $v$. Next, using Lemma \ref{lem:self-rd}, we project $\ket{\phi_{\bm{s}, r}(\bm{x})}$ onto $\ket{\phi_{\bm{s}, q'}(\bm{x})}$, where $q' = q / v \le r$. Finally, apply $\qft_{q^n}$ to the second register of $\ket{\phi_{\bm{s}, q'}(\bm{x})}$ and measure to obtain the state
-    \[ \frac{1}{\sqrt{r}} \sum_{j = 0}^{q' - 1} \omega_q^{j\lrang{\bm{u}, \bm{s}}} \ket{j} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{q' - 1} \omega_{q'}^{j\lrang{\bm{u}, \bm{s} / v}} \ket{j} = \qft_{q'}\ket{\lrang{\bm{u}, \bm{s} / v} \bmod q'}, \]
+    Now, by applying the transform $\ket{j}\ket{\bm{y}} \mapsto \ket{j}\ket{\bm{y} - j\tilde{\bm{s}}}$ to the states $\ket{\phi_{\bm{s}, r}(\bm{x})}$, we assume all the coordinates of $\bm{s}$ are multiples of $v$. Next, using Lemma \ref{lem:self-rd}, we project $\ket{\phi_{\bm{s}, r}(\bm{x})}$ onto $\ket{\phi_{\bm{s}, q'}(\bm{x})}$, where $q' = q / v \le r$. Finally, we apply $\qft_{q^n}$ to the second register of $\ket{\phi_{\bm{s}, q'}(\bm{x})}$ and measure to obtain the state
+    \[ \frac{1}{\sqrt{q'}} \sum_{j = 0}^{q' - 1} \omega_q^{j\lrang{\bm{u}, \bm{s}}} \ket{j} = \frac{1}{\sqrt{q'}} \sum_{j = 0}^{q' - 1} \omega_{q'}^{j\lrang{\bm{u}, \bm{s} / v}} \ket{j} = \qft_{q'}\ket{\lrang{\bm{u}, \bm{s} / v} \bmod q'}, \]
     where $\bm{u} \in \Z_q^n$ is uniformly random. Applying $\qft_{q'}^*$ to the above state, we obtain $\lrang{\bm{u}, \bm{s} / v} \bmod q'$. The value $\bm{s} / v$ can be computed, with high probability, by gathering $O(n)$ of these linear equations. \qedhere
     \end{enumerate}
 \end{proof}
@@ -353,7 +357,7 @@ It follows from the proof of Lemma \ref{lem:self-rd} that obtaining a sample fro
     Let $q = p_1^{e_1} \cdots p_\ell^{e_\ell}$ be the prime factorization of $q$ and assume that the primes $p_i$ are of size $\poly(n)$. If $r \le p_i$ for all $1 \le i \le \ell$ then there is a polynomial-time quantum reduction from solving search-$\edcp_{n, q, r}$ to solving decision-$\edcp_{n, q, r}$. 
 \end{corollary}
 
-It follows from the above corollary that for a prime power $q = p^e$, where $p < \poly(n)$ and $r \le p$ then search-$\edcp_{n, q, r}$ and decision-$\edcp_{n, q, r}$ are quantum polynomial-time equivalent. Two interesting special cases of this equivalence are $q = 2^e, r = 2$ and $q = p, r < p$.
+It follows from the above corollary that for a prime power $q = p^e$, where $p < \poly(n)$ and $r \le p$, search-$\edcp_{n, q, r}$ and decision-$\edcp_{n, q, r}$ are quantum polynomial-time equivalent. Two interesting special cases of this equivalence are $\{q = 2^e, r = 2\}$ and $\{q = p, r < p\}$.
 
 
 
@@ -469,7 +473,7 @@ We derive a lower bound on $m$ using tools from quantum information theory. A sp
     & \bm{s} & \longmapsto & \frac{1}{q^n}\rho_{\bm{s}, r},
 \end{array}
 \]
-where $\mathrm{Pos(\X)}$ is the space of positive semidefinite operators on $\X$. Bob picks a measurement $\mu: \Z_q^n \rightarrow \mathrm{Pos}(\X)$ and measures $\mathsf{X}$ according to $\mu$. He stores the outcome of the measurement in a classical register $\mathsf{Z}$. The pair $(\mathsf{Y}, \mathsf{Z})$ of classical registers will be distributed according to the distribution
+where $\PosSemi(\X)$ is the space of positive semidefinite operators on $\X$. Bob picks a measurement $\mu: \Z_q^n \rightarrow \mathrm{Pos}(\X)$ and measures $\mathsf{X}$ according to $\mu$. He stores the outcome of the measurement in a classical register $\mathsf{Z}$. The pair $(\mathsf{Y}, \mathsf{Z})$ of classical registers will be distributed according to the distribution
 \[
 \begin{array}{rrll}
     q: & \Z_q^n \times \Z_q^n & \longrightarrow & [0, 1] \\
