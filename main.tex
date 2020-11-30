@@ -149,13 +149,13 @@
 
 Our notations for quantum information mostly follow those of \cite{watrous2018theory}. The classical state of a register $\mathsf{X}$ is represented by a finite alphabet, say $\Sigma$. If the registers $\mathsf{X}_1, \dots, \mathsf{X}_n$ are represented by alphabets $\Sigma_1, \dots, \Sigma_n$ then the classical state of the tuple $(\mathsf{X}_1, \dots, \mathsf{X}_n)$ is represented by $\Sigma_1 \times \cdots \times \Sigma_n$. The complex Euclidean space associated with the register $\mathsf{X}$ is denoted by $\C^\Sigma$. For a complex Euclidean space $\X$, denote the unit sphere in $\X$ by $\SX$. A linear operator $\rho$ acting on $\X$ is called a density operator if $\rho$ is positive semidefinite with trace equal to $1$. The quantum state of the register $\mathsf{X}$ is represented by the set of density operators $\mathrm{D}(\X)$.
 
-We will use the Dirac notation for the elements of $\SX$. In particular, we denote the column vector $x \in \SX$ by $\ket{x}$ and the row vector $x^*$ by $\bra{x}$. A state $\rho$ is called pure if it can be written as $\rho = \ket{x}\bra{x}$, in which case we will simply write the state as $\ket{x}$. By the spectral theorem, every state $\rho$ is a linear combination of pure states. Therefore, a quantum state can also be represented as a linear combination
+We will use the Dirac notation for the elements of $\SX$. In particular, we denote the column vector $x \in \SX$ by $\ket{x}$ and the row vector $x^*$ by $\bra{x}$. A state $\rho$ is called pure if it can be written as $\rho = \ket{x}\bra{x}$, in which case we will simply write the state as $\ket{x}$. By the spectral theorem, every state $\rho$ is a linear combination of pure states. Therefore, a quantum state can also be represented by a linear combination
 \[ \sum_{x} \alpha_x \ket{x}, \hspace*{1mm} \sum_{x} \abs{\alpha_x}^2 = 1. \]
 We shall alternate between these equivalent representations of quantum states throughout this paper. The density operator representation is particularly useful when the underlying quantum state is not completely known. For example if, we only know that the system is in the state $\ket{\psi_x}$ with probability $p_x$ then the state of the system is described by the density operator
 \[ \rho = \sum_{x} p_x \ket{\psi_x}\bra{\psi_x} = \E_x \Big[ \ket{\psi_x} \bra{\psi_x} \Big]. \]
 More, generally, the density operator corresponding to a probability distribution $\gamma: \SX \rightarrow [0, 1]$ is defined as
 \[ \rho_\gamma = \int_{\ket{\phi} \in \SX} \ket{\phi}\bra{\phi} d\gamma(\ket{\phi}) = \E_{\ket{\phi} \in \gamma} \Big[ \ket{\phi}\bra{\phi} \Big]. \]
-For quantum public-key cryptography we will need a formal notion of quantum state discrimination. In particular, we need to formally define the notion of computational (in)distinguishability of quantum states. For our purposes, it is more convenient to define computational distinguishability for probability distributions over quantum states. The following is adapted from \cite[\S 3.3]{watrous2009zero}.
+For quantum public-key cryptography we will need a formal notion of quantum state discrimination. In particular, we need to formally define the notion of computational (in)distinguishability of quantum states. For our purposes, it is more convenient to define computational distinguishability for probability distributions over quantum states. The following is adapted from \cite[3.3]{watrous2009zero}.
 
 \begin{definition}
     Let $\X$ be a complex Euclidean space, and let $\gamma, \mu: \SX \rightarrow [0, 1]$ be probability distributions. Then $\gamma$ is said to be $(s, \epsilon)$-distinguishable from $\mu$ if there is a quantum measurement circuit $Q$ of size $s$ such that
@@ -189,7 +189,7 @@ Two ensembles of distributions $\{ P_{1, n} \}$ and $\{ P_{2, n} \}$ are said to
 
 Suppose an algorithm $A$ can distinguish between two distributions $P_1$ and $P_2$ with non-negligible advantage. A common technique to amplify the distinguishing advantage of $A$ is to sample enough times from the input distribution and then decide based on majority. A brief description of this technique, which we shall use several times in this paper, is as follows. First, we need the following well-known tail inequality.
 
-\begin{lemma}[Hoeffding]
+\begin{lemma}[Hoeffding \cite{hoeffding1963probability}]
     \label{lem:hoeffding}
     Let $X_1, \dots, X_n$ be independent random variables with $X_i \in [a_i, b_i]$, and let $S = X_1, \cdots + X_n$. Then
     \begin{align*}
@@ -217,7 +217,9 @@ Therefore, by running $A$ on $m$ samples and counting the number of $1$'s we can
 
 \subsection{Learning With Errors}
 
-In what follows, we briefly review the Learning With Error and the Extrapolated Dihedral Coset problems. Let $n \ge 1$, and $q = q(n) \ge 2$ be integers, and let $\chi$ be a probability distribution over $\Z$. For a random fixed $\bm{s} \in \Z_q^n$, denote by $A_{\bm{s}, \chi}$ the probability distribution over $\Z_q^n \times \Z_q$ defined as follows: choose $\bm{a} \in \Z_q^n$ uniformly at random, choose $e$ from according to $\chi$ and output  $(\bm{a}, \lrang{\bm{a}, \bm{s}} + e)$.
+In the following, we briefly review the Learning With Errors ($\lwe$) problem and the Extrapolated Dihedral Coset Problem ($\edcp$). In \cite{brakerski2018learning}, $\edcp$ refers to a general class of problems from which two specific instances are studied in detail: the $U$-$\edcp$ and $G$-$\edcp$ which are the \textit{Uniform} and \textit{Gaussian} $\edcp$, respectively. In this work, we will only study uniform-$\edcp$, and simply refer to it as $\edcp$.
+
+Let $n \ge 1$ and $q = q(n) \ge 2$ be integers, and let $\chi$ be a probability distribution over $\Z$. For a random fixed $\bm{s} \in \Z_q^n$, denote by $A_{\bm{s}, \chi}$ the probability distribution over $\Z_q^n \times \Z_q$ defined as follows: choose $\bm{a} \in \Z_q^n$ uniformly at random, choose $e$ according to $\chi$ and output $(\bm{a}, \lrang{\bm{a}, \bm{s}} + e)$.
 
 \begin{definition}[LWE, Search]
 The search-$\lwe_{n, q, \chi}$ is the problem of recovering $\bm{s}$ given samples from the distribution $A_{\bm{s}, \chi}$. An algorithm $Q$ is said to solve $\lwe_{n, q, \chi}$ if $Q$  outputs $\bm{s}$ with probability at least $1 / \poly(n\log q)$ and has running time at most $\poly(n \log q)$.
@@ -227,11 +229,11 @@ The search-$\lwe_{n, q, \chi}$ is the problem of recovering $\bm{s}$ given sampl
     The decision-$\lwe_{n, q, \chi}$ problem is to distinguish between the distribution $A_{\bm{s}, \chi}$ and the uniform distribution over $\Z_q^n \times \Z_q$. An algorithm $Q$ is said to solve the desicion-$\lwe_{n, q, \chi}$ if it succeeds with advantage at least $1 / \poly(n\log q)$ and has running time at most $\poly(n\log q)$. 
 \end{definition}
 
-The distribution $\chi$ is called the error distribution and is usually chosen to be $\mathcal{D}_{\Z, \alpha q}$, the discrete Gaussian distribution centered around zero with standard deviation $\alpha q$. The parameter $\alpha \in (0, 1)$ is called the error rate. Let $n \ge 1$ and $q \ge 2$ be as above and let $r = r(n) < q$ be a positive integer. Let $\Sigma = \Z_r \times \Z_q^n$ and define the complex Euclidean space $\X = \C^\Sigma$. For a fixed $\bm{s} \in \Z_q^n$ define the probability distribution $\mu_{\bm{s}, r}: \SX \rightarrow [0, 1]$ as follows: choose $\bm{x} \in \Z_q^n$ uniformly at random and output the state
+The distribution $\chi$ is called the error distribution and is usually chosen to be $\mathcal{D}_{\Z, \alpha q}$, the discrete Gaussian distribution centered around zero with standard deviation $\alpha q$. The parameter $\alpha \in (0, 1)$ is called the error rate. We sometimes write $\lwe_{n, q, \alpha}$ instead of $\lwe_{n, q, \chi}$ for simplicity. Let $n \ge 1$ and $q \ge 2$ be as above and let $r = r(n) < q$ be a positive integer. Let $\Sigma = \Z_r \times \Z_q^n$ and define the complex Euclidean space $\X = \C^\Sigma$. For a fixed uniformly random $\bm{s} \in \Z_q^n$ define the probability distribution $\mu_{\bm{s}, r}: \SX \rightarrow [0, 1]$ as follows: choose $\bm{x} \in \Z_q^n$ uniformly at random and output the state
 \[ \ket{\phi_{\bm{s}, r}(\bm{x})} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1}\ket{j}\ket{\bm{x} + j\bm{s}}. \]
-If we only have access to the output of $\mu_{\bm{s}, r}$, i.e., $\bm{x}$ is unknown, then the quantum system corresponding to the state $\ket{\phi_{\bm{s}, r}(\bm{x})}$ is described by the density operator
-\[ \rho_{\bm{s}, r} = \frac{1}{q^n} \sum_{\bm{x} \in \Z_q^n} \ket{\phi_{\bm{s}, r}(\bm{x})} \bra{\phi_{\bm{s}, r}(\bm{x})} = \E_{\bm{x} \in \U(\Z_q^n)} \Big[ \ket{\phi_{\bm{s}, r}(\bm{x})} \bra{\phi_{\bm{s}, r}(\bm{x})} \Big], \]
-Therefore, the output of the distribution $\mu_{\bm{s}, r}$ is always described by the density operator $\rho_{\bm{s}, r}$. In other words, the distribution $\mu_{\bm{s}, r}$ provides \textit{copies} of the state $\rho_{\bm{s}, r}$.
+If we only have access to the output of $\mu_{\bm{s}, r}$, e.g., if $\bm{x}$ is unknown, then the quantum system corresponding to the state $\ket{\phi_{\bm{s}, r}(\bm{x})}$ is described by the density operator
+\[ \rho_{\bm{s}, r} = \frac{1}{q^n} \sum_{\bm{x} \in \Z_q^n} \ket{\phi_{\bm{s}, r}(\bm{x})} \bra{\phi_{\bm{s}, r}(\bm{x})} = \E_{\bm{x} \in \U(\Z_q^n)} \Big[ \ket{\phi_{\bm{s}, r}(\bm{x})} \bra{\phi_{\bm{s}, r}(\bm{x})} \Big]. \]
+Therefore, the output of the distribution $\mu_{\bm{s}, r}$ is always described by the same state $\rho_{\bm{s}, r}$. In other words, a sample from the distribution $\mu_{\bm{s}, r}$ is a \textit{copy} of the state $\rho_{\bm{s}, r}$.
 
 \begin{definition}[EDCP, Search]
     Let $n$, $q$ and $r$ be defined as above. The search-$\edcp_{n, q, r}$ is the problem of recovering $\bm{s}$ given samples from the distribution $\mu_{\bm{s}, r}$. A quantum algorithm $Q$ is said to solve $\edcp_{n, q, r}$ if it outputs $\bm{s}$ with probability at least $1 / \poly(n\log q)$ and has running time at most $\poly(n\log q)$.
@@ -239,19 +241,19 @@ Therefore, the output of the distribution $\mu_{\bm{s}, r}$ is always described 
 
 \begin{definition}[EDCP, Decision]
     \label{def:d-edcp}
-    Let $n$, $q$ and $r$ be defined as above. Define the probability distribution $\gamma_r: \SX \rightarrow [0, 1]$ by choosing $(j, \bm{x}) \in \Z_r \times \Z_q^n$ uniformly at random and outputting the state $\ket{j}\ket{\bm{x}}$. The decision-$\edcp_{n, q, r}$ is the problem of distinguishing between the distributions $\mu_{\bm{s}, r}$ and $\gamma_r$.
+    Let $n$, $q$ and $r$ be defined as above. Define the probability distribution $\gamma_r: \SX \rightarrow [0, 1]$ by choosing $(j, \bm{x}) \in \Z_r \times \Z_q^n$ uniformly at random and outputting the state $\ket{j}\ket{\bm{x}}$. The decision-$\edcp_{n, q, r}$ is the problem of distinguishing between the distributions $\mu_{\bm{s}, r}$ and $\gamma_r$. A quantum algorithm $Q$ is said to solve the decision-$\edcp_{n, q, r}$ if it succeeds with advantage at least $1 / \poly(n\log q)$ and has running time at most $\poly(n\log q)$.
 \end{definition}
 
-A quantum algorithm $Q$ is said to solve the decision-$\edcp_{n, q, r}$ if it succeeds with advantage at least $1 / \poly(n\log q)$ and has running time at most $\poly(n\log q)$. The density operator corresponding to the output of the distribution $\gamma_r$ in Definition \ref{def:d-edcp} is
-\[ \rho = \frac{1}{rq^n} \sum_{j = 0}^{r - 1} \sum_{\bm{x} \in \Z_q^n}  \ket{j}\ket{\bm{x}} \bra{j}\bra{\bm{x}} = \E_{(j, \bm{x}) \in \U(\Z_r \times \Z_q^n)} \Big[ \ket{j}\ket{\bm{x}} \bra{j}\bra{\bm{x}} \Big] = \mathds{1}_{\X}, \]
-Therefore, decision-$\edcp_{n, q, r}$ is the problem of distinguishing between the same number of copies of the states $\rho_{\bm{s}, r}$ and $\mathds{1}_{\X}$. For an integer $m > 0$, we denote by $\edcp_{n, q, r}^m$ the $\edcp$ problem in which the number of samples from $\mu_{\bm{s}, r}$ is bounded by $m$. The following theorem establishes a polynomial-time equivalence between $\lwe$ and $\edcp$.
+The density operator corresponding to the output of the distribution $\gamma_r$ in Definition \ref{def:d-edcp} is
+\[ \rho = \frac{1}{rq^n} \sum_{j = 0}^{r - 1} \sum_{\bm{x} \in \Z_q^n}  \ket{j}\ket{\bm{x}} \bra{j}\bra{\bm{x}} = \E_{(j, \bm{x}) \in \U(\Z_r \times \Z_q^n)} \Big[ \ket{j}\ket{\bm{x}} \bra{j}\bra{\bm{x}} \Big] = \frac{1}{rq^n} \mathds{1}_{\X}, \]
+which is the maximally mixed state over the space $\X$. Therefore, decision-$\edcp_{n, q, r}$ is the problem of distinguishing between the same number of copies of the states $\rho_{\bm{s}, r}$ and $\mathds{1}_{\X} / (rq^n)$. For an integer $m > 0$, we denote by $\edcp_{n, q, r}^m$ the $\edcp$ problem in which the number of samples from $\mu_{\bm{s}, r}$ is bounded by $m$. The following theorem establishes a polynomial-time equivalence between $\lwe$ and $\edcp$.
 
-\begin{theorem}
+\begin{theorem}[\cite{brakerski2018learning}]
     \label{thm:lwe-edcp}
     Let $\chi$ be a discrete Gaussian distribution centered around zero with standard deviation $\alpha q$. There is a polynomial-time quantum reduction from $\lwe_{n, q, \chi}$ to $\edcp_{n, q, r}^m$ with $m = \poly(n\log q)$ and $r = \poly(n\log q) / \alpha$. Conversely, for the same parameter relationship up to $\poly(n\log q)$ factors, there is a polynomial-time quantum reduction from $\edcp$ to $\lwe$. 
 \end{theorem}
 
-Note that the equivalence in Theorem \ref{thm:lwe-edcp} holds only when the number of samples $m = \poly(n\log q)$. Giving such an equivalence for arbitrary $m$ is an open problem. See Section \ref{sec:hardness-poly}.
+It is important to note that the equivalence in Theorem \ref{thm:lwe-edcp} holds only when the number of samples is polynomially bounded, i.e., $m = \poly(n\log q)$. Giving such an equivalence for arbitrary $m$ is an open problem, see the discussion in Section \ref{sec:hardness-poly}.
 
 
 %% ///////////////////////////////////////////////////////
