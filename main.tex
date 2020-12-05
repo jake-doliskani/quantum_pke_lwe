@@ -118,8 +118,8 @@
 \title{Efficient Quantum Public-Key Encryption \\ From Learning With Errors}
 
 \author{
-	%% Javad Oilskin\thanks{Department of Computer Science, Ryerson University,
-	%% (\tt{javad.doliskani@ryerson.ca}).}
+	Javad Doliskani\thanks{Department of Computer Science, Ryerson University,
+	(\tt{javad.doliskani@ryerson.ca}).}
 }
 
 \date{}
@@ -131,8 +131,16 @@
 
 \begin{document}
 \maketitle
+\newpage
 
 
+\section{Introduction}
+\label{sec:intro}
+
+The application of quantum information in cryptography goes back to the work of Wiesner \cite{wiesner1983conjugate} who proposed the first quantum cryptographic tool called \textit{Conjugate Coding}. Remarkably, the idea of conjugate coding is still used in different forms in many modern protocols in quantum cryptography. Quantum cryptography, however, gained much attraction after the introduction of Quantum Key Distribution (QKD) by Bennett and Brassard \cite{bennett1983quantum, bennett1984quantum}. It was later proved by Lo and Chau \cite{lo1999unconditional} and Mayers \cite{mayers2001unconditional} that QKD is information-theoretically secure. A more accessible proof of security, based on error correcting codes, was  given by Shor and Preskill \cite{shor2000simple}. 
+
+
+Although in theory QKD provides perfect security, its real-world implementations are not (and perhaps will not be) ideal. That means the QKD implementations, like other cryptographic implementations, are vulnerable to side-channel attacks, e.g., see \cite{lydersen2010hacking}. Even if we assume that QKD provides perfect security in practice there are many other important cryptographic tasks, such as bit commitment, multiparty computation and oblivious transfer, that are not addressed by key distribution. In fact, it was proved by Mayers \cite{mayers1997unconditionally} and Lo and Chau \cite{lo1997quantum} that unconditionally secure quantum bit commitment is impossible. The impossibility of information-theoretically secure two-party computation using quantum communication was also latter proved by Colbeck \cite{colbeck2007impossibility}. 
 
 
 
