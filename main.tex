@@ -188,7 +188,9 @@ where $p$ is a prime divisor of $q$ and $t \in \Z_p {\setminus} \{0\}$ is unifor
 \end{itemize}
  
 \paragraph{Quantum public-key cryptosystem.}
-
+In Section \ref{sec:public-key-enc}, we build a quantum public-key encryption scheme from $\edcp$. The idea behind the encryption is very simple. The public key is a single $\edcp$ state as in \eqref{equ:edcp-state-intro}. To encrypt a classical bit $b \in \{0,1\}$, a unitary transform is applied to the public key to encode the value $bt$ into the phase, where $t \in \Z_p$ is uniformly random and nonzero. The ciphertext is the state
+\[ \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} \omega_p^{jbt} \ket{j}\ket{\bm{x} + j\bm{s}}. \]
+The decryption algorithm is essentially a scalar multiplication over $\Z_q^n$ and an application of the quantum Fourier transform $\qft_r$ over $\Z_r$. 
 
 %% \paragraph{Security beyond Holevo's bound.} 
 
@@ -311,7 +313,7 @@ which is the maximally mixed state over the space $\X$. Therefore, decision-$\ed
     Let $\chi$ be a discrete Gaussian distribution centered around zero with standard deviation $\alpha q$. There is a polynomial-time quantum reduction from $\lwe_{n, q, \chi}$ to $\edcp_{n, q, r}^m$ with $m = \poly(n\log q)$ and $r = \poly(n\log q) / \alpha$. Conversely, for the same parameter relationship up to $\poly(n\log q)$ factors, there is a polynomial-time quantum reduction from $\edcp$ to $\lwe$. 
 \end{theorem}
 
-It is important to note that the equivalence in Theorem \ref{thm:lwe-edcp} holds only when the number of samples is polynomially bounded, i.e., $m = \poly(n\log q)$. Giving such an equivalence for arbitrary $m$ is an open problem, see the discussion in Section \ref{sec:hardness-poly}.
+It is important to note that the equivalence in Theorem \ref{thm:lwe-edcp} holds only when the number of $\edcp$ samples is polynomially bounded, i.e., $m = \poly(n\log q)$. Giving such an equivalence for arbitrary $m$ is an open problem, see the discussion in Section \ref{sec:hardness-poly}.
 
 
 %% ///////////////////////////////////////////////////////
@@ -737,7 +739,7 @@ The output pair $(pk, sk)$ of the $\gen$ algorithm for a quantum system consists
 For the security parameter $n$, we set the parameters for public key system as follows. We choose a prime $p = \poly(n)$ and set $q = p^s$ for some integer $s > 0$. We also set $r = p^{s'}$ where $s' < s$. The reason for these choices of parameters is that the resulting encryption scheme is simpler and more efficient. More generally, one could select $q$ to be a positive integer with $\poly(n)$-bounded prime factors and $r = p^{s'} \vert q$ to be a proper divisor where $p$ is prime. In what follows, we describe our cryptosystem for encrypting a one-bit message $b \in \{ 0, 1 \}$. Since there is only one prime $p$, we drop the parameter $p$ in \eqref{equ:new-dec1} for clarity.
 
 \begin{description}[leftmargin = *]
-\item [$\gen(1^n)$:] Select $\bm{x}, \bm{s} \in \Z_q^n$ uniformly at random. Apply the transform $\qft_r \otimes \mathds{1}$ to the register $\ket{0} \ket{\bm{x}}$ to obtain the state $\ket{\psi_1} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} \ket{j} \ket{\bm{x}}$. Apply the transform $A_{\bm{s}}: \ket{j}\ket{\bm{x}} \mapsto \ket{j}\ket{\bm{x} + j\bm{s}}$ to $\ket{\psi_1}$ to obtain the state
+\item [$\gen(1^n)$:] Select $\bm{x}, \bm{s} \in \Z_q^n$ uniformly at random. Apply the transform $\qft_r \otimes \mathds{1}$ to the register $\ket{0} \ket{\bm{x}}$ to obtain the state $\ket{\psi} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} \ket{j} \ket{\bm{x}}$. Apply the transform $A_{\bm{s}}: \ket{j}\ket{\bm{x}} \mapsto \ket{j}\ket{\bm{x} + j\bm{s}}$ to $\ket{\psi}$ to obtain the state
 \[ \ket{\phi_{\bm{s}, r}(\bm{x}, 0)} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} \ket{j} \ket{\bm{x} + j\bm{s}}. \]
 Return the public-key, secret-key pair $(pk, sk) = (\ket{\phi_{\bm{s}, r}(\bm{x}, 0)}, \bm{s})$. 
 
@@ -771,6 +773,14 @@ Return $\rho_{\bm{s}, r, bt}$.
     \end{align*}
     If $b = 0$ then the above state is $\ket{0}\bra{0}$, otherwise it is $\ket{tr / p}\bra{tr / p} \ne \ket{0}\bra{0}$. 
 \end{proof}
+
+\paragraph{Discussion.}
+The above encryption scheme can be naturally based on the original decision-$\edcp$ (Definition \ref{def:d-edcp}) as well. The resulting scheme, however, is not as efficient. To see this, suppose public keys are generated using the $\gen$ algorithm above. Bob encrypts a bit $b \in \{0, 1\}$ as follows: if $b = 0$ then he outputs the public key as the ciphertext. If $b = 1$ then he measures the first register of the public key to obtain a state $\ket{j}\ket{\bm{x}}$, for uniformly random $(j, \bm{x}) \in \Z_r \times \Z_q^n$, and outputs this state as the ciphertext. Distinguishing between the encryption of $0$ and $1$ is then equivalent to solving the decision-$\edcp$. Now, if Alice runs the above $\dec$ algorithm on the ciphertext she gets two possible outputs depending on the value of $b$:
+\begin{itemize}
+\item When $b = 0$, the output is always $0$, since the last state obtained in the algorithm is always $\ket{0}\bra{0}$ and so the measurement outcome is $0$.
+\item When $b = 1$, the output is $1$ with probability $1 - 1 / r$. This is because the last state obtained in the algorithm, just before the last measurement, is $\qft_r \ket{j}\bra{j} \qft_r^*$. 
+\end{itemize}
+To decrease the above (rather large) decryption error down to, say, $2^{-\Omega(n)}$, the $\dec$ algorithm has to be repeated $\Omega(n / \log r)$ times. In the quantum setting, that means Alice has to have access to $\Omega(n / \log r)$ copies of the ciphertext, which in turn means Bob needs the same number of copies of the public key to generate the ciphertexts. This is equivalent to saying that for an encryption-decryption round with negligible error probability, the size of the public key increases by a factor of $\Omega(n / \log r)$. This scheme then has no advantage over a classical $\lwe$-based encryption scheme.
 
 
 
