@@ -174,12 +174,12 @@ The decision-$\edcp$, as was defined in \cite{brakerski2018learning}, is the pro
     \label{equ:redu-seq}
     \text{search-}\edcp \le \text{search-}\lwe \le \text{decision-}\lwe \le \text{decision-}\edcp.
 \end{equation}
-In this paper, we give a direct reduction from search-$\edcp$ to decision-$\edcp$ (Theorem \ref{thm:old-search-decision}).
+In Section \ref{sec:old-search-dec}, we give a direct reduction from search-$\edcp$ to decision-$\edcp$ (Theorem \ref{thm:old-search-decision}) which works a large class of moduli $q$.
 
 \paragraph{A new decision-$\edcp$.}
 The original decision-$\edcp$, explained above, is obtained from decision-$\lwe$ by following the same procedure used to establish the equivalence between search-$\lwe$ and search-$\edcp$. For such a decision problem for $\edcp$, however, there is no known general reduction from the search-$\edcp$; The search-to-decision reductions are either obtained using the sequence \eqref{equ:redu-seq} or using Theorem \ref{thm:old-search-decision}. In the former case, one has to rely on the search-to-decision reductions for $\lwe$, e.g., \cite{regev2009lattices, brakerski2013classical, micciancio2012trapdoors}, which are not general enough in the sense that they either cause non-negligible loss in $\lwe$ parameters, or work only for special forms of the modulus $q$. In the latter case, the parameter $r$ has to satisfy some constraints with respect to $q$.
 
-One could argue that the equivalence between the search and decision problems for $\edcp$ is of less importance due to the recent result of Peikert \textit{et al.} \cite{peikert2017pseudorandomness} who proved that there is a polynomial-time quantum reduction from standard lattice problems directly to decision-$\lwe$. In any case, another issue is that it is not clear to us how to base \textit{efficient} cryptographic primitives on the original decision-$\edcp$, see the discussion in Section \ref{sec:public-key-enc}. To resolve these issues, we propose a new decision problem for $\edcp$. Informally, the new decision problem asks to distinguish between states of he form \eqref{equ:edcp-state-intro} and states of the form 
+One could argue that the equivalence between the search and decision problems for $\edcp$ is of less importance due to the recent result of Peikert \textit{et al.} \cite{peikert2017pseudorandomness} who proved that there is a polynomial-time quantum reduction from standard lattice problems directly to decision-$\lwe$. Their proof works for any modulus $q$. In any case, another issue is that it is not clear to us how to base \textit{efficient} cryptographic primitives on the original decision-$\edcp$, see the discussion in Section \ref{sec:public-key-enc}. To resolve these issues, we propose a new decision problem for $\edcp$. Informally, the new decision problem asks to distinguish between states of he form \eqref{equ:edcp-state-intro} and states of the form 
 \[ \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} \omega_p^{jt} \ket{j}\ket{\bm{x} + j\bm{s}}, \]
 where $p$ is a prime divisor of $q$ and $t \in \Z_p {\setminus} \{0\}$ is uniformly random. This new decision problem allows us to accomplish the following:
 \begin{itemize}
@@ -190,7 +190,7 @@ where $p$ is a prime divisor of $q$ and $t \in \Z_p {\setminus} \{0\}$ is unifor
 \paragraph{Quantum public-key cryptosystem.}
 In Section \ref{sec:public-key-enc}, we build a quantum public-key encryption scheme from $\edcp$. The idea behind the encryption is very simple. The public key is a single $\edcp$ state as in \eqref{equ:edcp-state-intro}. To encrypt a classical bit $b \in \{0,1\}$, a unitary transform is applied to the public key to encode the value $bt$ into the phase, where $t \in \Z_p$ is uniformly random and nonzero. The ciphertext is the state
 \[ \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} \omega_p^{jbt} \ket{j}\ket{\bm{x} + j\bm{s}}. \]
-The decryption algorithm is essentially a scalar multiplication over $\Z_q^n$ and an application of the quantum Fourier transform $\qft_r$ over $\Z_r$. 
+Here, $r$ and $p$ are divisors of $q$, and $r = p^{s'}$ for some integer $s' \ge 1$. The decryption algorithm is essentially a scalar multiplication over $\Z_q^n$ and an application of the quantum Fourier transform $\qft_r$ over $\Z_r$. This scheme is very efficient in terms of both computation and public key size. An even more efficient instantiation of this scheme is obtained by setting $p = 2$, $r = 2^{s'}$, and $q = 2^s$ such that $q = \poly(n)$ and $s' \ll s$. In this case, the size of the public key is $O(n\log q)$ qubits. The encryption algorithm takes a constant number of operations, and the key generation and decryption algorithms take $\tildO(n)$ qubit operations.
 
 %% \paragraph{Security beyond Holevo's bound.} 
 
@@ -321,6 +321,7 @@ It is important to note that the equivalence in Theorem \ref{thm:lwe-edcp} holds
 
 
 \section{A Search to Decision Reduction}
+\label{sec:old-search-dec}
 
 In this section, we give a search-to-decision reduction for $\edcp$. The reduction works for a large class of moduli $q$. The technique we use is inspired by the one in \cite{micciancio2012trapdoors} for a search-to-decision reduction for $\lwe$. We need the following lemma, which shows the self-reducibility of $\edcp$.
 
@@ -833,11 +834,11 @@ Figure \ref{fig:dec-circuit} shows the decryption circuit. The gate $\qft_r$ is 
 
 \subsection{A very efficient instantiation}
 
-Although our cryptosystem is efficient even for a super-polynomial modulus $q = p^s$ and any $\poly(n)$-bounded prime $p$, it can be made more efficient by choosing a $\poly(n)$-bounded $q$ and a small prime $p$. In particular, we can choose $p = 2$ and $q = 2^s$ where $s \in O(\log n)$. In this case, we choose $r = 2^{s'}$ is $s' \ll s$.
+Although our cryptosystem is efficient even for a super-polynomial modulus $q = p^s$ and any $\poly(n)$-bounded prime $p$, it can be made more efficient by choosing a $\poly(n)$-bounded $q$ and a small prime $p$. In particular, we can choose $p = 2$ and $q = 2^s$ such that $q = \poly(n)$. In this case, we choose $r = 2^{s'}$ where $s' \ll s$.
 
-For the above parameters, we have $\omega_p = -1$. In the encryption algorithm, the only choice for $t$ is $t = 1$ and, therefore, random number generation is not required. For an input bit $b$ the encrypted state is
-\[ \ket{\phi_{\bm{s}, r}(\bm{x}, b)} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} (-1)^b \ket{j}\ket{\bm{x} + j\bm{s}}. \]
-Consequently, the encryption algorithm $\enc$ is much simpler. In particular, the quantum Fourier transform $\qft_p$ is replaced by the Hadamard transform $H: \ket{x} \mapsto (\ket{0} + (-1)^x \ket{1}) / \sqrt{2}$, and the transform $T_{bt}$ is replaced by $T_b: \ket{j}\ket{\bm{y}}\ket{z} \mapsto \ket{j}\ket{\bm{y}}\ket{z \oplus (jb \bmod 2)}$. Figure \ref{fig:enc-circuit-2} shows the new encryption circuit.
+For the above parameters, we have $\omega_p = -1$. In the encryption algorithm, since $t \ne 0$, the only choice for $t$ is $t = 1$ and, therefore, random number generation is not required. For an input bit $b$ the ciphertext state is
+\[ \ket{\phi_{\bm{s}, r}(\bm{x}, b)} = \frac{1}{\sqrt{r}} \sum_{j = 0}^{r - 1} (-1)^{bj} \ket{j}\ket{\bm{x} + j\bm{s}}. \]
+The phase $(-1)^{bj}$ is much simpler to compute than the more general phase $\omega_p^{btj}$. In particular, the quantum Fourier transform $\qft_p$ is now the Hadamard transform $H: \ket{x} \mapsto (\ket{0} + (-1)^x \ket{1}) / \sqrt{2}$, and the transform $T_{bt}$ is now $T_b: \ket{j}\ket{\bm{y}}\ket{z} \mapsto \ket{j}\ket{\bm{y}}\ket{z \oplus (jb \bmod 2)}$. Figure \ref{fig:enc-circuit-2} shows the new encryption circuit.
 
 \begin{figure}[h]
     \centering
@@ -850,7 +851,7 @@ Consequently, the encryption algorithm $\enc$ is much simpler. In particular, th
     \label{fig:enc-circuit-2}
 \end{figure}
 
-
+Let us briefly analyze the complexity of this scheme. The $\gen$ algorithm requires random generation, scalar multiplication and addition in $\Z_q^n$. These can be done at the cost of $O(n\log q \log\log q)$ qubit operations. The quantum Fourier transform over $\Z_r$ can be done in $O(\log r\log\log r)$ bit operations \cite{hales2000improved}. The $\enc$ algorithm takes constant time since the $T_b$ operation takes constant time. The $\dec$ algorithm has the same complexity as the $\gen$ algorithm.
 
 %% ///////////////////////////////////////////////////////
 
