@@ -343,23 +343,22 @@ In this section, we give a search-to-decision reduction for $\edcp$. The reducti
     Then applying the transform $\ket{j}\ket{\bm{y}}\ket{0} \mapsto \ket{j}\ket{\bm{y}}\ket{f(j)}$, where $\bm{y} \in \Z_q^n$, to $\rho_{\bm{s}, r} \in \mu_{\bm{s}, r}$ and measuring the last register results in the state $\rho_{\bm{s}, r'}$ with probability at least $1 / 2$. If the measurement outcome is not $1$ then we repeat the above process.
 
     If $r' \le r / 2$ then we proceed as follows. Let $\X = \C^{\Z_r \times \Z_q^n}$ and define the measurement $\mu: [0, \lfloor r / r'  \rfloor] \rightarrow \PosSemi(\X)$ using the operators
-    \[ \mu_a = \sum_{b = 0}^{\ell - 1} \ket{b}\bra{ar' + b} \otimes \mathds{1}, \]
+    \[ \mu_a = \sum_{b = 0}^{\ell - 1} \ket{ar' + b}\bra{ar' + b} \otimes \mathds{1}, \]
     where $\ell = r'$ for $0 \le a < \lfloor r / r'  \rfloor$ and $\ell = r - r'$ for $a = \lfloor r / r'  \rfloor$. This measurement can be implemented efficiently \cite[A.8]{kaye2007introduction}. If we perform $\mu$ on a sample $\rho_{\bm{s}, r}$ from $\mu_{\bm{s}, r}$ the probability of observing the outcome $a$ is
     \begin{align*}
         \tr(\mu_a^*\mu_a \rho_{\bm{s}, r})
         & = \E_{\bm{x} \in \U(\Z_q^n)} \Big[ \tr(\mu_a \ket{\phi_{\bm{s}, r}(\bm{x})} \bra{\phi_{\bm{s}, r}(\bm{x})} \mu_a^*) \Big] \\
-        & = \frac{1}{r} \sum_{b, c = 0}^{\ell - 1} \E_{\bm{x} \in \U(\Z_q^n)}\Big[ \tr(\ket{b}\ket{\bm{x} + (ar' + b)\bm{s}} \bra{c}\bra{\bm{x} + (ar' + c)\bm{s}}) \Big] \\
-        & = \frac{1}{r} \sum_{b, c = 0}^{\ell - 1} \E_{\bm{x} \in \U(\Z_q^n)}\Big[ \tr(\ket{b}\bra{c} \otimes \ket{\bm{x} + (ar' + b)\bm{s}} \bra{\bm{x} + (ar' + c)\bm{s}}) \Big] \\
+        & = \frac{1}{r} \sum_{b, c = 0}^{\ell - 1} \E_{\bm{x} \in \U(\Z_q^n)}\Big[ \tr(\ket{ar' + b}\ket{\bm{x} + (ar' + b)\bm{s}} \bra{ar' + c}\bra{\bm{x} + (ar' + c)\bm{s}}) \Big] \\
+        & = \frac{1}{r} \sum_{b, c = 0}^{\ell - 1} \E_{\bm{x} \in \U(\Z_q^n)}\Big[ \tr(\ket{ar' + b}\bra{ar' + c} \otimes \ket{\bm{x} + (ar' + b)\bm{s}} \bra{\bm{x} + (ar' + c)\bm{s}}) \Big] \\
         & = \frac{\ell}{r},
     \end{align*}
     and the post-measurement state corresponding to this outcome is
     \begin{align*}
         \frac{\mu_a \rho_{\bm{s}, r} \mu_a^*}{(\ell / r)}
-        & = \frac{1}{r} \sum_{b, c = 0}^{\ell - 1} \E_{\bm{x} \in \U(\Z_q^n)}\Big[ \ket{b}\ket{\bm{x} + (ar' + b)\bm{s}} \bra{c}\bra{\bm{x} + (ar' + c)\bm{s}} \Big] \\
-        & = \frac{1}{r} \sum_{b, c = 0}^{\ell - 1} \E_{\bm{x} \in \U(\Z_q^n)}\Big[ \ket{b}\ket{\bm{x} + b\bm{s}} \bra{c}\bra{\bm{x} + c\bm{s}} \Big] \\
-        & = \rho_{\bm{s}, \ell},
+        & = \frac{1}{r} \sum_{b, c = 0}^{\ell - 1} \E_{\bm{x} \in \U(\Z_q^n)}\Big[ \ket{ar' + b}\ket{\bm{x} + (ar' + b)\bm{s}} \bra{ar' + c}\bra{\bm{x} + (ar' + c)\bm{s}} \Big] \\
+        & = \frac{1}{r} \sum_{b, c = 0}^{\ell - 1} \E_{\bm{x} \in \U(\Z_q^n)}\Big[ \ket{ar' + b}\ket{\bm{x} + b\bm{s}} \bra{ar' + c}\bra{\bm{x} + c\bm{s}} \Big].
     \end{align*}
-    So if the outcome is $a \in [0, \lfloor r / r'  \rfloor)$ we obtain the state $\rho_{\bm{s}, r'}$, which is what we are looking for. Therefore, the probability of obtaining the desired state after one measurement is
+    Subtracting $ar'$ from the first register, we obtain the state $\rho_{\bm{s}, \ell}$. So if the outcome is $a \in [0, \lfloor r / r'  \rfloor)$ we obtain the state $\rho_{\bm{s}, r'}$, which is what we are looking for. Therefore, the probability of obtaining the desired state after one measurement is
     \[ \lfloor r / r' \rfloor \frac{\ell}{r} = \lfloor r / r' \rfloor \frac{r'}{r} \ge \left( \frac{r}{r'} - 1 \right)\frac{r}{r'} = 1 - \frac{r'}{r} \ge \frac{1}{2}. \]
     If the measurement outcome is $a = \lfloor r / r' \rfloor$ then we repeat the above process.
 \end{proof}
